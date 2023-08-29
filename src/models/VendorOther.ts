@@ -2,7 +2,7 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize
 import { Vendor } from './Vendor';
 
 @Table
-class VendorBank extends Model<VendorBank> {
+class VendorOther extends Model {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -13,39 +13,18 @@ class VendorBank extends Model<VendorBank> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  beneficiaryName!: string;
+  otherKey!: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  accountNumber!: string;
+  otherValue!: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
-  ifsc!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  bankName!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  branch!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  proofAttUrl!: string;
+  otherAtt!: string;
 
   @ForeignKey(() => Vendor)
   @Column({
@@ -57,4 +36,4 @@ class VendorBank extends Model<VendorBank> {
   vendor?: Vendor;
 }
 
-export default VendorBank;
+export default VendorOther;
