@@ -94,13 +94,6 @@ export class Vendor extends Model {
         type: DataType.STRING,
         allowNull: false,
     })
-    agreement!: string;
-
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
     agreementAtt!: string;
 
     @HasOne(() => VendorBank)

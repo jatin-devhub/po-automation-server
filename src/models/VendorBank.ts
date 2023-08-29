@@ -2,7 +2,7 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize
 import { Vendor } from './Vendor';
 
 @Table
-class VendorBank extends Model<VendorBank> {
+class VendorBank extends Model {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -45,7 +45,7 @@ class VendorBank extends Model<VendorBank> {
     type: DataType.STRING,
     allowNull: false,
   })
-  proofAttUrl!: string;
+  proofAtt!: string;
 
   @ForeignKey(() => Vendor)
   @Column({

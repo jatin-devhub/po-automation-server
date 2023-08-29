@@ -1,29 +1,41 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
 
-// export const validateNew: RequestHandler =async (req, res, next) => {
-//     try {
-//         const validateNewSchema = Joi.object({
-//             companyName: Joi.string().required(),
-//             gst: Joi.string().required(),
-//             address: Joi.string().required(),
-//             beneficiary: Joi.string().required(),
-//             accountNumber: Joi.string().required(),
-//             ifsc: Joi.string().required(),
-//             bankName: Joi.string().required(),
-//             branch: Joi.string().required(),
-//             coi: Joi.string().required(),
-//             msme: Joi.string().required(),
-//             tradeMark: Joi.string().required(),
-//             agreement: Joi.string().required(),
-//             gstAttachment: Joi.any().required(),
-//             bankAttachment: Joi.any().required(),
-//             coiAttachment: Joi.any().required(),
-//             msmeAttachment: Joi.any().required(),
-//             tradeAttachment: Joi.any().required(),
-//             agreementAttachment: Joi.any().required(),
-//         })
-// }
+export const validateNew: RequestHandler =async (req, res, next) => {
+    try {
+        console.log(req.body, req)
+        const newVendorSchema = Joi.object({
+            companyName: Joi.string().required(),
+            gst: Joi.string().required(),
+            address: Joi.string().required(),
+            isInternational: Joi.boolean().required(),
+            beneficiary: Joi.string().required(),
+            accountNumber: Joi.string().required(),
+            ifsc: Joi.string().required(),
+            bankName: Joi.string().required(),
+            branch: Joi.string().required(),
+            coi: Joi.string(),
+            msme: Joi.string(),
+            tradeMark: Joi.string(),
+            gstAttachment: Joi.any().required(),
+            bankAttachment: Joi.any().required(),
+            coiAttachment: Joi.any(),
+            msmeAttachment: Joi.any(),
+            tradeAttachment: Joi.any(),
+            agreementAttachment: Joi.any().required(),
+            otherFields: Joi.array()
+        })
+        const value = await newVendorSchema.validateAsync(req.body);
+        next();
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
 
 // export const validateSignUp: RequestHandler = async (req, res, next) => {
 //     try {
