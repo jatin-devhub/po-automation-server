@@ -1,7 +1,7 @@
 {
-  "name": "ad-network",
+  "name": "po-automation-server",
   "version": "1.0.0",
-  "description": "Backend Service for Ad Network Platform",
+  "description": "Backend Service for PO Automation app",
   "main": "index.js",
   "scripts": {
     "start": "node build/index.js",
