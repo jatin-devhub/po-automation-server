@@ -10,12 +10,34 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
 
         const vendorCode = await getNewVendorCode(isInternational);
 
-        const decodedGstFile = Buffer.from(gstAttachment, 'base64');
-        const decodedCoiFile = Buffer.from(coiAttachment, 'base64');
-        const decodedMsmeFile = Buffer.from(msmeAttachment, 'base64');
-        const decodedTradeFile = Buffer.from(tradeAttachment, 'base64');
-        const decodedAgreementFile = Buffer.from(agreementAttachment, 'base64');
-        const decodedbankFile = Buffer.from(bankAttachment, 'base64');
+        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
+        let coiFile = null, msmeFile = null, tradeFile = null
+        if(coiAttachment){
+            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
+            coiFile = await File.create({
+                fileName: coiAttachment.originalname,
+                fileContent: decodedCoiFile,
+                fileType: 'coi'
+            })
+        }
+        if(msmeAttachment) {
+            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
+            msmeFile = await File.create({
+                fileName: msmeAttachment.originalname,
+                fileContent: decodedMsmeFile,
+                fileType: 'msme'
+            })
+        }
+        if(tradeAttachment) {
+            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
+            tradeFile = await File.create({
+                fileName: tradeAttachment.originalname,
+                fileContent: decodedTradeFile,
+                fileType: 'trade'
+            })
+        }
+        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
+        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
 
         const gstFile = await File.create({
             fileName: gstAttachment.originalname,
@@ -23,23 +45,6 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             fileType: 'gst'
         })
 
-        const coiFile = await File.create({
-            fileName: coiAttachment.originalname,
-            fileContent: decodedCoiFile,
-            fileType: 'coi'
-        })
-
-        const msmeFile = await File.create({
-            fileName: msmeAttachment.originalname,
-            fileContent: decodedMsmeFile,
-            fileType: 'msme'
-        })
-
-        const tradeFile = await File.create({
-            fileName: tradeAttachment.originalname,
-            fileContent: decodedTradeFile,
-            fileType: 'trade'
-        })
 
         const agreementFile = await File.create({
             fileName: agreementAttachment.originalname,
@@ -60,14 +65,15 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             gstAtt: gstFile.id,
             address,
             coi,
-            coiAtt: coiFile.id,
+            coiAtt: coiFile?.id,
             msme,
-            msmeAtt: msmeFile.id,
+            msmeAtt: msmeFile?.id,
             tradeMark,
-            tradeMarkAtt: tradeFile.id,
+            tradeMarkAtt: tradeFile?.id,
             agreementAtt: agreementFile.id
         })
-
+        const vendor = await newVendor.save();
+        
         const newVendorBank = new VendorBank({
             beneficiaryName: beneficiary,
             accountNumber,
@@ -75,8 +81,9 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             bankName,
             branch,
             proofAtt: bankProofFile.id,
-            vendorId: newVendor.id
+            vendorId: vendor.id
         })
+        const vendorBank = await newVendorBank.save();
 
         if(otherFields?.length > 0) {
             for (let i = 0; i < otherFields.length; i++) {
@@ -93,8 +100,9 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                     otherKey: field.key,
                     otherValue: field.value,
                     otherAtt: otherFile.id,
-                    vendorId: newVendor.id
+                    vendorId: vendor.id
                 })
+                const otherField = newOtherField.save();
             }
         }
 
@@ -108,7 +116,9 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         return res.status(504).json({
             success: false,
             message: error.message,
-            data: [],
+            data: {
+                "source": "vendor.controller.js -> vendorRegistration"
+            },
         });
     }
 };

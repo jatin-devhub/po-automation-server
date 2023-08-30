@@ -51,10 +51,8 @@ export class Vendor extends Model {
     })
     address!: string;
 
-    @AllowNull(false)
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        type: DataType.STRING
     })
     coi!: string;
 
@@ -63,10 +61,8 @@ export class Vendor extends Model {
     })
     coiAtt!: string;
 
-    @AllowNull(false)
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        type: DataType.STRING
     })
     msme!: string;
 
@@ -75,17 +71,13 @@ export class Vendor extends Model {
     })
     msmeAtt!: string;
 
-    @AllowNull(false)
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        type: DataType.STRING
     })
     tradeMark!: string;
 
-    @AllowNull(false)
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
+        type: DataType.STRING
     })
     tradeMarkAtt!: string;
 

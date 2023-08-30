@@ -19,7 +19,7 @@ class File extends Model {
   fileName!: string;
 
   @Column({
-    type: DataType.BLOB,
+    type: DataType.BLOB('medium'),
     allowNull: false,
   })
   fileContent!: Buffer;

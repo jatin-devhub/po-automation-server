@@ -5,6 +5,7 @@ import VendorOther from "../models/VendorOther";
 import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
 import BuyingOrderRecord from "../models/BuyingOrderRecord";
+import File from "../models/File";
 
 const connection = new Sequelize({
   dialect: "mysql",
@@ -13,7 +14,7 @@ const connection = new Sequelize({
   password: 'po1234',
   database: 'po_automation',
   port: 3306,
-  models: [Vendor, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord]
+  models: [Vendor, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File]
 });
 
 // connection.truncate({ cascade: true, restartIdentity: true });

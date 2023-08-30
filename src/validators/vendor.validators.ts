@@ -3,7 +3,6 @@ import Joi from "joi";
 
 export const validateNew: RequestHandler =async (req, res, next) => {
     try {
-        console.log(req.body, req)
         const newVendorSchema = Joi.object({
             companyName: Joi.string().required(),
             gst: Joi.string().required(),
@@ -25,6 +24,11 @@ export const validateNew: RequestHandler =async (req, res, next) => {
             agreementAttachment: Joi.any().required(),
             otherFields: Joi.array()
         })
+        const files = req.files as Express.Multer.File[];
+
+        for (const file of files) {
+            req.body[file.fieldname] = file
+          }
         const value = await newVendorSchema.validateAsync(req.body);
         next();
 
