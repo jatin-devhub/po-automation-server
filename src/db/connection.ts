@@ -6,9 +6,11 @@ import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
 import BuyingOrderRecord from "../models/BuyingOrderRecord";
 import File from "../models/File";
+import * as mysql from "mysql2";
 
 const connection = new Sequelize({
   dialect: "mysql",
+  dialectModule: mysql,
   host: '62.72.3.60',
   username: 'poadmin',
   password: 'po1234',
