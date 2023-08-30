@@ -85,21 +85,24 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         })
         const vendorBank = await newVendorBank.save();
 
-        if(otherFields?.length > 0) {
-            for (let i = 0; i < otherFields.length; i++) {
-                const field = otherFields[i];
-                const decodedOtherFile = Buffer.from(field.attachment, 'base64');
-
-                const otherFile = await File.create({
-                    fileName: field.attachment.originalname,
-                    fileContent: decodedOtherFile,
-                    fileType: 'other'
-                })
+        let otherFieldsObject = JSON.parse(otherFields)
+        if(otherFieldsObject?.length > 0) {
+            for (let i = 0; i < otherFieldsObject.length; i++) {
+                let field = otherFieldsObject[i], otherFile;
+                if(req.body[`otherFieldsAttachments-${field.key}`]){
+                    const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
+    
+                    otherFile = await File.create({
+                        fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
+                        fileContent: decodedOtherFile,
+                        fileType: 'other'
+                    })
+                }
 
                 const newOtherField = new VendorOther({
                     otherKey: field.key,
                     otherValue: field.value,
-                    otherAtt: otherFile.id,
+                    otherAtt: otherFile?.id,
                     vendorId: vendor.id
                 })
                 const otherField = newOtherField.save();

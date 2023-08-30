@@ -16,20 +16,25 @@ export const validateNew: RequestHandler =async (req, res, next) => {
             coi: Joi.string(),
             msme: Joi.string(),
             tradeMark: Joi.string(),
+            otherFields: Joi.any(),
             gstAttachment: Joi.any().required(),
             bankAttachment: Joi.any().required(),
             coiAttachment: Joi.any(),
             msmeAttachment: Joi.any(),
             tradeAttachment: Joi.any(),
             agreementAttachment: Joi.any().required(),
-            otherFields: Joi.array()
         })
         const files = req.files as Express.Multer.File[];
 
         for (const file of files) {
+            if(!file.fieldname.startsWith('otherFieldsAttachments-'))
             req.body[file.fieldname] = file
-          }
+        }
         const value = await newVendorSchema.validateAsync(req.body);
+        for (const file of files) {
+            if(file.fieldname.startsWith('otherFieldsAttachments-'))
+            req.body[file.fieldname] = file
+        }
         next();
 
     } catch (error: any) {
