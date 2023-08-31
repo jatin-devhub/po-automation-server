@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.vendorRegistration = void 0;
+exports.getAllVendors = exports.vendorRegistration = void 0;
 const Vendor_1 = require("../models/Vendor");
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
@@ -89,25 +89,27 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             vendorId: vendor.id
         });
         const vendorBank = yield newVendorBank.save();
-        let otherFieldsObject = JSON.parse(otherFields);
-        if ((otherFieldsObject === null || otherFieldsObject === void 0 ? void 0 : otherFieldsObject.length) > 0) {
-            for (let i = 0; i < otherFieldsObject.length; i++) {
-                let field = otherFieldsObject[i], otherFile;
-                if (req.body[`otherFieldsAttachments-${field.key}`]) {
-                    const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
-                    otherFile = yield File_1.default.create({
-                        fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
-                        fileContent: decodedOtherFile,
-                        fileType: 'other'
+        if (otherFields) {
+            let otherFieldsObject = JSON.parse(otherFields);
+            if ((otherFieldsObject === null || otherFieldsObject === void 0 ? void 0 : otherFieldsObject.length) > 0) {
+                for (let i = 0; i < otherFieldsObject.length; i++) {
+                    let field = otherFieldsObject[i], otherFile;
+                    if (req.body[`otherFieldsAttachments-${field.key}`]) {
+                        const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
+                        otherFile = yield File_1.default.create({
+                            fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
+                            fileContent: decodedOtherFile,
+                            fileType: 'other'
+                        });
+                    }
+                    const newOtherField = new VendorOther_1.default({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        otherAtt: otherFile === null || otherFile === void 0 ? void 0 : otherFile.id,
+                        vendorId: vendor.id
                     });
+                    const otherField = newOtherField.save();
                 }
-                const newOtherField = new VendorOther_1.default({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    otherAtt: otherFile === null || otherFile === void 0 ? void 0 : otherFile.id,
-                    vendorId: vendor.id
-                });
-                const otherField = newOtherField.save();
             }
         }
         return res.status(201).json({
@@ -127,6 +129,28 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.vendorRegistration = vendorRegistration;
+const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const vendors = yield Vendor_1.Vendor.findAll({
+            attributes: ['vendorCode', 'companyName']
+        });
+        return res.status(201).json({
+            success: true,
+            message: `Vendors data successfully fetched`,
+            data: { vendors },
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> vendorRegistration"
+            },
+        });
+    }
+});
+exports.getAllVendors = getAllVendors;
 const getNewVendorCode = (isInternational) => __awaiter(void 0, void 0, void 0, function* () {
     let prefix;
     if (isInternational)

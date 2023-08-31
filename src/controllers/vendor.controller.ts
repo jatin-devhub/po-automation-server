@@ -45,7 +45,6 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             fileType: 'gst'
         })
 
-
         const agreementFile = await File.create({
             fileName: agreementAttachment.originalname,
             fileContent: decodedAgreementFile,
@@ -85,27 +84,29 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         })
         const vendorBank = await newVendorBank.save();
 
-        let otherFieldsObject = JSON.parse(otherFields)
-        if(otherFieldsObject?.length > 0) {
-            for (let i = 0; i < otherFieldsObject.length; i++) {
-                let field = otherFieldsObject[i], otherFile;
-                if(req.body[`otherFieldsAttachments-${field.key}`]){
-                    const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
+        if(otherFields){
+            let otherFieldsObject = JSON.parse(otherFields)
+            if(otherFieldsObject?.length > 0) {
+                for (let i = 0; i < otherFieldsObject.length; i++) {
+                    let field = otherFieldsObject[i], otherFile;
+                    if(req.body[`otherFieldsAttachments-${field.key}`]){
+                        const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
+        
+                        otherFile = await File.create({
+                            fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
+                            fileContent: decodedOtherFile,
+                            fileType: 'other'
+                        })
+                    }
     
-                    otherFile = await File.create({
-                        fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
-                        fileContent: decodedOtherFile,
-                        fileType: 'other'
+                    const newOtherField = new VendorOther({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        otherAtt: otherFile?.id,
+                        vendorId: vendor.id
                     })
+                    const otherField = newOtherField.save();
                 }
-
-                const newOtherField = new VendorOther({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    otherAtt: otherFile?.id,
-                    vendorId: vendor.id
-                })
-                const otherField = newOtherField.save();
             }
         }
 
@@ -113,6 +114,29 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             success: true,
             message: `Your Vendor has been successfully added`,
             data: [],
+        });
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> vendorRegistration"
+            },
+        });
+    }
+};
+
+export const getAllVendors: RequestHandler = async (req, res) => {
+    try {
+        const vendors = await Vendor.findAll({
+            attributes: ['vendorCode', 'companyName']
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `Vendors data successfully fetched`,
+            data: {vendors},
         });
 
     } catch (error: any) {
