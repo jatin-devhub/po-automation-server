@@ -22,47 +22,59 @@ __decorate([
     (0, sequelize_typescript_1.Column)({ allowNull: false, unique: true, type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "skuCode", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.STRING })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "category", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.STRING })
-], SKU.prototype, "productName", void 0);
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "brand", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.STRING })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "productTitle", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "hsn", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.STRING })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "ean", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.FLOAT })
-], SKU.prototype, "mrp", void 0);
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "modelNumber", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'product_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "size", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "colorFamilyColor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ field: 'product_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productLengthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'product_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'product_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productBreadthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'product_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'product_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productHeightCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'product_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'product_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productWeightKg", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'master_carton_qty', type: sequelize_typescript_1.DataType.INTEGER })
+    (0, sequelize_typescript_1.Column)({ field: 'master_carton_qty', type: sequelize_typescript_1.DataType.INTEGER })
 ], SKU.prototype, "masterCartonQty", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'master_carton_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'master_carton_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonLengthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'master_carton_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'master_carton_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonBreadthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'master_carton_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'master_carton_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonHeightCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, field: 'master_carton_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ field: 'master_carton_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonWeightKg", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
+], SKU.prototype, "MRP", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.Vendor),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })

@@ -16,47 +16,59 @@ class SKU extends Model {
     @Column({ allowNull: false, unique: true, type: DataType.STRING })
     skuCode!: string;
 
-    @Column({ allowNull: false, type: DataType.STRING })
+    @Column({ type: DataType.STRING })
     category!: string;
 
-    @Column({ allowNull: false, type: DataType.STRING })
-    productName!: string;
+    @Column({ type: DataType.STRING })
+    brand!: string;
 
-    @Column({ allowNull: false, type: DataType.STRING })
+    @Column({ type: DataType.STRING })
+    productTitle!: string;
+
+    @Column({ type: DataType.STRING })
     hsn!: string;
 
-    @Column({ allowNull: false, type: DataType.STRING })
+    @Column({ type: DataType.STRING })
     ean!: string;
 
-    @Column({ allowNull: false, type: DataType.FLOAT })
-    mrp!: number;
+    @Column({ type: DataType.STRING })
+    modelNumber!: string;
 
-    @Column({ allowNull: false, field: 'product_length_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.STRING })
+    size!: string;
+
+    @Column({ type: DataType.STRING })
+    colorFamilyColor!: string;
+
+    @Column({ field: 'product_length_cm', type: DataType.FLOAT })
     productLengthCm!: number;
 
-    @Column({ allowNull: false, field: 'product_breadth_cm', type: DataType.FLOAT })
+    @Column({ field: 'product_breadth_cm', type: DataType.FLOAT })
     productBreadthCm!: number;
 
-    @Column({ allowNull: false, field: 'product_height_cm', type: DataType.FLOAT })
+    @Column({ field: 'product_height_cm', type: DataType.FLOAT })
     productHeightCm!: number;
 
-    @Column({ allowNull: false, field: 'product_weight_kg', type: DataType.FLOAT })
+    @Column({ field: 'product_weight_kg', type: DataType.FLOAT })
     productWeightKg!: number;
 
-    @Column({ allowNull: false, field: 'master_carton_qty', type: DataType.INTEGER })
+    @Column({ field: 'master_carton_qty', type: DataType.INTEGER })
     masterCartonQty!: number;
 
-    @Column({ allowNull: false, field: 'master_carton_length_cm', type: DataType.FLOAT })
+    @Column({ field: 'master_carton_length_cm', type: DataType.FLOAT })
     masterCartonLengthCm!: number;
 
-    @Column({ allowNull: false, field: 'master_carton_breadth_cm', type: DataType.FLOAT })
+    @Column({ field: 'master_carton_breadth_cm', type: DataType.FLOAT })
     masterCartonBreadthCm!: number;
 
-    @Column({ allowNull: false, field: 'master_carton_height_cm', type: DataType.FLOAT })
+    @Column({ field: 'master_carton_height_cm', type: DataType.FLOAT })
     masterCartonHeightCm!: number;
 
-    @Column({ allowNull: false, field: 'master_carton_weight_kg', type: DataType.FLOAT })
+    @Column({ field: 'master_carton_weight_kg', type: DataType.FLOAT })
     masterCartonWeightKg!: number;
+
+    @Column({ type: DataType.FLOAT })
+    MRP!: number;
 
     @ForeignKey(() => Vendor)
     @Column({ type: DataType.INTEGER })
