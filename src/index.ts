@@ -17,7 +17,7 @@ connection.sync().then(() => {
     console.log("Database synced successfully");
 });
 
-const allowedOrigins = ['http://localhost:3000', "https://ad-network-ui.vercel.app"];
+const allowedOrigins = ['http://localhost:3000', "https://po-automation-ui.vercel.app/"];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,

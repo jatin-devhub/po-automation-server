@@ -40,7 +40,7 @@ const upload = (0, multer_1.default)({ storage: storage });
 connection_1.default.sync().then(() => {
     console.log("Database synced successfully");
 });
-const allowedOrigins = ['http://localhost:3000', "https://ad-network-ui.vercel.app"];
+const allowedOrigins = ['http://localhost:3000', "https://po-automation-ui.vercel.app/"];
 const options = {
     origin: allowedOrigins,
     exposedHeaders: 'Token'
