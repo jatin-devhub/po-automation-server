@@ -3,12 +3,15 @@ import { Vendor } from "../models/Vendor";
 import File from "../models/File";
 import VendorBank from "../models/VendorBank";
 import VendorOther from "../models/VendorOther";
+import { ContactPerson } from "../models/ContactPerson";
+import { VendorAddress } from "../models/VendorAddress";
+import { Sequelize } from "sequelize-typescript";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
-        const { isInternational, companyName, gst, gstAttachment, address, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
 
-        const vendorCode = await getNewVendorCode(isInternational);
+        const vendorCode = await getNewVendorCode(country);
 
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         let coiFile = null, msmeFile = null, tradeFile = null
@@ -59,10 +62,10 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
 
         const newVendor = new Vendor({
             vendorCode,
+            productCategory,
             companyName,
             gst,
             gstAtt: gstFile.id,
-            address,
             coi,
             coiAtt: coiFile?.id,
             msme,
@@ -73,6 +76,25 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         })
         const vendor = await newVendor.save();
         
+        const newContactPerson = new ContactPerson({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone,
+            vendorId: vendor.id
+        })
+        const contactPerson = await newContactPerson.save();
+
+        const newAdress = new VendorAddress({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode,
+            vendorId: vendor.id
+        })
+        const address = await newAdress.save();
+
         const newVendorBank = new VendorBank({
             beneficiaryName: beneficiary,
             accountNumber,
@@ -130,7 +152,13 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
 export const getAllVendors: RequestHandler = async (req, res) => {
     try {
         const vendors = await Vendor.findAll({
-            attributes: ['vendorCode', 'companyName']
+            attributes: ['vendorCode', 'companyName', [Sequelize.col('address.state'), 'state'], [Sequelize.col('address.country'), 'country'], 'productCategory'],
+            include: [
+                {
+                  model: VendorAddress,
+                  attributes: [],
+                },
+              ]
         });
 
         return res.status(201).json({
@@ -144,15 +172,15 @@ export const getAllVendors: RequestHandler = async (req, res) => {
             success: false,
             message: error.message,
             data: {
-                "source": "vendor.controller.js -> vendorRegistration"
+                "source": "vendor.controller.js -> getAllVendors"
             },
         });
     }
 };
 
-const getNewVendorCode = async (isInternational: boolean) => {
+const getNewVendorCode = async (country: string) => {
     let prefix;
-    if(isInternational)
+    if(country != "India")
     prefix = 'VI-'
     else
     prefix = 'VD-'

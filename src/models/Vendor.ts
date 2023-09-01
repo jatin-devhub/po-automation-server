@@ -3,6 +3,8 @@ import VendorBank from "./VendorBank";
 import VendorOther from "./VendorOther";
 import SKU from "./SKU";
 import BuyingOrder from "./BuyingOrder";
+import { ContactPerson } from "./ContactPerson";
+import { VendorAddress } from "./VendorAddress";
 
 @Table({
     timestamps: true,
@@ -28,6 +30,12 @@ export class Vendor extends Model {
     @Column({
         type: DataType.STRING
     })
+    productCategory!: string
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
     companyName!: string;
 
     @AllowNull(false)
@@ -43,13 +51,6 @@ export class Vendor extends Model {
         allowNull: false,
     })
     gstAtt!: string;
-
-    @AllowNull(false)
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    address!: string;
 
     @Column({
         type: DataType.STRING
@@ -87,6 +88,12 @@ export class Vendor extends Model {
         allowNull: false,
     })
     agreementAtt!: string;
+
+    @HasOne(() => ContactPerson)
+    contactPerson!: ContactPerson;
+
+    @HasOne(() => VendorAddress)
+    address!: VendorAddress;
 
     @HasOne(() => VendorBank)
     vendorBank?: VendorBank;

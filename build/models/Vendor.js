@@ -15,6 +15,8 @@ const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
 const SKU_1 = __importDefault(require("./SKU"));
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
+const ContactPerson_1 = require("./ContactPerson");
+const VendorAddress_1 = require("./VendorAddress");
 let Vendor = exports.Vendor = class Vendor extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -37,6 +39,12 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
+], Vendor.prototype, "productCategory", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
 ], Vendor.prototype, "companyName", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -52,13 +60,6 @@ __decorate([
         allowNull: false,
     })
 ], Vendor.prototype, "gstAtt", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
-    })
-], Vendor.prototype, "address", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
@@ -96,6 +97,12 @@ __decorate([
         allowNull: false,
     })
 ], Vendor.prototype, "agreementAtt", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => ContactPerson_1.ContactPerson)
+], Vendor.prototype, "contactPerson", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => VendorAddress_1.VendorAddress)
+], Vendor.prototype, "address", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => VendorBank_1.default)
 ], Vendor.prototype, "vendorBank", void 0);

@@ -17,10 +17,13 @@ const Vendor_1 = require("../models/Vendor");
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
 const VendorOther_1 = __importDefault(require("../models/VendorOther"));
+const ContactPerson_1 = require("../models/ContactPerson");
+const VendorAddress_1 = require("../models/VendorAddress");
+const sequelize_typescript_1 = require("sequelize-typescript");
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { isInternational, companyName, gst, gstAttachment, address, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
-        const vendorCode = yield getNewVendorCode(isInternational);
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
+        const vendorCode = yield getNewVendorCode(country);
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         let coiFile = null, msmeFile = null, tradeFile = null;
         if (coiAttachment) {
@@ -66,10 +69,10 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
         const newVendor = new Vendor_1.Vendor({
             vendorCode,
+            productCategory,
             companyName,
             gst,
             gstAtt: gstFile.id,
-            address,
             coi,
             coiAtt: coiFile === null || coiFile === void 0 ? void 0 : coiFile.id,
             msme,
@@ -79,6 +82,23 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             agreementAtt: agreementFile.id
         });
         const vendor = yield newVendor.save();
+        const newContactPerson = new ContactPerson_1.ContactPerson({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone,
+            vendorId: vendor.id
+        });
+        const contactPerson = yield newContactPerson.save();
+        const newAdress = new VendorAddress_1.VendorAddress({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode,
+            vendorId: vendor.id
+        });
+        const address = yield newAdress.save();
         const newVendorBank = new VendorBank_1.default({
             beneficiaryName: beneficiary,
             accountNumber,
@@ -132,7 +152,13 @@ exports.vendorRegistration = vendorRegistration;
 const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const vendors = yield Vendor_1.Vendor.findAll({
-            attributes: ['vendorCode', 'companyName']
+            attributes: ['vendorCode', 'companyName', [sequelize_typescript_1.Sequelize.col('address.state'), 'state'], [sequelize_typescript_1.Sequelize.col('address.country'), 'country'], 'productCategory'],
+            include: [
+                {
+                    model: VendorAddress_1.VendorAddress,
+                    attributes: [],
+                },
+            ]
         });
         return res.status(201).json({
             success: true,
@@ -145,15 +171,15 @@ const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             success: false,
             message: error.message,
             data: {
-                "source": "vendor.controller.js -> vendorRegistration"
+                "source": "vendor.controller.js -> getAllVendors"
             },
         });
     }
 });
 exports.getAllVendors = getAllVendors;
-const getNewVendorCode = (isInternational) => __awaiter(void 0, void 0, void 0, function* () {
+const getNewVendorCode = (country) => __awaiter(void 0, void 0, void 0, function* () {
     let prefix;
-    if (isInternational)
+    if (country != "India")
         prefix = 'VI-';
     else
         prefix = 'VD-';

@@ -7,6 +7,8 @@ import BuyingOrder from "../models/BuyingOrder";
 import BuyingOrderRecord from "../models/BuyingOrderRecord";
 import File from "../models/File";
 import * as mysql from "mysql2";
+import { ContactPerson } from "../models/ContactPerson";
+import { VendorAddress } from "../models/VendorAddress";
 
 const connection = new Sequelize({
   dialect: "mysql",
@@ -16,9 +18,10 @@ const connection = new Sequelize({
   password: 'po1234',
   database: 'po_automation',
   port: 3306,
-  models: [Vendor, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File]
+  models: [Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File]
 });
 
+// connection.sync({force: true})
 // connection.truncate({ cascade: true, restartIdentity: true });
 
 export default connection;
