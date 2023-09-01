@@ -45,7 +45,7 @@ const options = {
     origin: allowedOrigins,
     exposedHeaders: 'Token'
 };
-app.use((0, cors_1.default)(options));
+app.use((0, cors_1.default)());
 app.use(upload.any());
 app.use('/api', routes_1.default);
 app.get("*", (req, res) => {

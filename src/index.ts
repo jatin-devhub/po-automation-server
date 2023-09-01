@@ -24,7 +24,7 @@ const options: cors.CorsOptions = {
   exposedHeaders: 'Token'
 };
 
-app.use(cors(options));
+app.use(cors());
 app.use(upload.any());
 
 app.use('/api', routes);
