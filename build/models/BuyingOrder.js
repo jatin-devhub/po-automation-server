@@ -23,6 +23,22 @@ __decorate([
     })
 ], BuyingOrder.prototype, "id", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "currency", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "paymentTerms", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "estimatedDeliveryDate", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
 ], BuyingOrder.prototype, "records", void 0);
 __decorate([

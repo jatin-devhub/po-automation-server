@@ -1,7 +1,8 @@
 import {
-    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo
+    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany
 } from 'sequelize-typescript';
 import { Vendor } from './Vendor';
+import BuyingOrderRecord from './BuyingOrderRecord';
 
 @Table
 class SKU extends Model {
@@ -76,6 +77,9 @@ class SKU extends Model {
 
     @BelongsTo(() => Vendor)
     vendor?: Vendor;
+
+    @HasMany(() => BuyingOrderRecord)
+    buyingRecords!: BuyingOrderRecord
 }
 
 export default SKU;
