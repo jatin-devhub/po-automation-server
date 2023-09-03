@@ -40,12 +40,11 @@ const upload = (0, multer_1.default)({ storage: storage });
 connection_1.default.sync().then(() => {
     console.log("Database synced successfully");
 });
-const allowedOrigins = ['http://localhost:3000', "https://po-automation-ui.vercel.app/"];
+const allowedOrigins = ['https://po-automation-ui.vercel.app', 'http://localhost:3000'];
 const options = {
-    origin: allowedOrigins,
-    exposedHeaders: 'Token'
+    origin: allowedOrigins
 };
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)(options));
 app.use(upload.any());
 app.use('/api', routes_1.default);
 app.get("*", (req, res) => {

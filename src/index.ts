@@ -17,14 +17,13 @@ connection.sync().then(() => {
     console.log("Database synced successfully");
 });
 
-const allowedOrigins = ['http://localhost:3000', "https://po-automation-ui.vercel.app/"];
+const allowedOrigins = ['https://po-automation-ui.vercel.app', 'http://localhost:3000'];
 
 const options: cors.CorsOptions = {
-  origin: allowedOrigins,
-  exposedHeaders: 'Token'
+  origin: allowedOrigins
 };
 
-app.use(cors());
+app.use(cors(options));
 app.use(upload.any());
 
 app.use('/api', routes);
