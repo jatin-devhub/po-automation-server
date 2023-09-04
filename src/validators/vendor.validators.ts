@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
+import { Vendor } from "../models/Vendor";
 
 export const validateNew: RequestHandler =async (req, res, next) => {
     try {
@@ -44,6 +45,34 @@ export const validateNew: RequestHandler =async (req, res, next) => {
             req.body[file.fieldname] = file
         }
         next();
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateVendorCode: RequestHandler =async (req, res, next) => {
+    try {
+        const validateVendorCode = Joi.object({
+            vendorCode: Joi.string().required(),
+        })
+
+        const value = await validateVendorCode.validateAsync(req.params);
+        const { vendorCode } = value;
+
+        const vendor = await Vendor.findOne({where: {vendorCode}})
+        if(vendor)
+        next();
+        else
+        return res.status(404).json({
+            success: false,
+            message: 'Vendor with this vendor code not exists',
+            data: []
+        })
 
     } catch (error: any) {
         return res.status(504).json({

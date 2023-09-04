@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateNew = void 0;
+exports.validateVendorCode = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
+const Vendor_1 = require("../models/Vendor");
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({
@@ -66,6 +67,32 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.validateNew = validateNew;
+const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validateVendorCode = joi_1.default.object({
+            vendorCode: joi_1.default.string().required(),
+        });
+        const value = yield validateVendorCode.validateAsync(req.params);
+        const { vendorCode } = value;
+        const vendor = yield Vendor_1.Vendor.findOne({ where: { vendorCode } });
+        if (vendor)
+            next();
+        else
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor with this vendor code not exists',
+                data: []
+            });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateVendorCode = validateVendorCode;
 // export const validateSignUp: RequestHandler = async (req, res, next) => {
 //     try {
 //         const signUpSchema = Joi.object({

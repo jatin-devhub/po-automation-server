@@ -6,6 +6,8 @@ import VendorOther from "../models/VendorOther";
 import { ContactPerson } from "../models/ContactPerson";
 import { VendorAddress } from "../models/VendorAddress";
 import { Sequelize } from "sequelize-typescript";
+import SKU from "../models/SKU";
+import BuyingOrder from "../models/BuyingOrder";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
@@ -165,6 +167,51 @@ export const getAllVendors: RequestHandler = async (req, res) => {
             success: true,
             message: `Vendors data successfully fetched`,
             data: {vendors},
+        });
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> getAllVendors"
+            },
+        });
+    }
+};
+
+export const getVendor: RequestHandler = async (req, res) => {
+    try {
+        const { vendorCode } = req.params;
+
+        const vendor = await Vendor.findOne({
+            where: { vendorCode },
+            include: [
+                {
+                    model: ContactPerson
+                },
+                {
+                    model: VendorAddress
+                },
+                {
+                    model: VendorBank
+                },
+                {
+                    model: VendorOther
+                },
+                {
+                    model: SKU
+                },
+                {
+                    model: BuyingOrder
+                }
+            ]
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: `Vendor data successfully fetched`,
+            data: {vendor},
         });
 
     } catch (error: any) {

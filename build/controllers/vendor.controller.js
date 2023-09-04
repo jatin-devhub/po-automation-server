@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllVendors = exports.vendorRegistration = void 0;
+exports.getVendor = exports.getAllVendors = exports.vendorRegistration = void 0;
 const Vendor_1 = require("../models/Vendor");
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
@@ -20,6 +20,8 @@ const VendorOther_1 = __importDefault(require("../models/VendorOther"));
 const ContactPerson_1 = require("../models/ContactPerson");
 const VendorAddress_1 = require("../models/VendorAddress");
 const sequelize_typescript_1 = require("sequelize-typescript");
+const SKU_1 = __importDefault(require("../models/SKU"));
+const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
@@ -177,6 +179,49 @@ const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getAllVendors = getAllVendors;
+const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { vendorCode } = req.params;
+        const vendor = yield Vendor_1.Vendor.findOne({
+            where: { vendorCode },
+            include: [
+                {
+                    model: ContactPerson_1.ContactPerson
+                },
+                {
+                    model: VendorAddress_1.VendorAddress
+                },
+                {
+                    model: VendorBank_1.default
+                },
+                {
+                    model: VendorOther_1.default
+                },
+                {
+                    model: SKU_1.default
+                },
+                {
+                    model: BuyingOrder_1.default
+                }
+            ]
+        });
+        return res.status(201).json({
+            success: true,
+            message: `Vendor data successfully fetched`,
+            data: { vendor },
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> getAllVendors"
+            },
+        });
+    }
+});
+exports.getVendor = getVendor;
 const getNewVendorCode = (country) => __awaiter(void 0, void 0, void 0, function* () {
     let prefix;
     if (country != "India")

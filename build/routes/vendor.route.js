@@ -6,4 +6,5 @@ const vendor_controller_1 = require("../controllers/vendor.controller");
 const router = (0, express_1.Router)();
 router.post('/new', vendor_validators_1.validateNew, vendor_controller_1.vendorRegistration);
 router.get('/all', vendor_controller_1.getAllVendors);
+router.get('/:vendorCode', vendor_validators_1.validateVendorCode, vendor_controller_1.getVendor);
 exports.default = router;
