@@ -1,4 +1,4 @@
-import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique } from 'sequelize-typescript';
 import BuyingOrderRecord from './BuyingOrderRecord';
 import { Vendor } from './Vendor';
 
@@ -11,6 +11,13 @@ class BuyingOrder extends Model {
         type: DataType.INTEGER
     })
     id!: number;
+
+    @AllowNull(false)
+    @Unique
+    @Column({
+        type: DataType.STRING
+    })
+    poCode!: string
 
     @AllowNull(false)
     @Column({

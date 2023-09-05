@@ -10,7 +10,10 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
         
         const vendor = await Vendor.findOne({where: { vendorCode }})
 
+        const poCode = await getUniquePOCode();
+
         const newBuyingOrder = new BuyingOrder({
+            poCode,
             currency,
             paymentTerms,
             estimatedDeliveryDate,
@@ -37,7 +40,7 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: `Your BuyingOrder has been successfully added`,
-            data: [],
+            data: {buyingOrder},
         });
 
     } catch (error: any) {
@@ -50,6 +53,19 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
         });
     }
 };
+
+const getUniquePOCode = async () => {
+    let poCode, existingPO
+    do {
+        poCode = `PO${Math.floor(1000 + Math.random() * 9000)}` 
+        existingPO = await BuyingOrder.findOne({
+            where: {
+              poCode,
+            },
+        });
+    } while(existingPO)
+    return poCode 
+}
 
 // export const getAllVendors: RequestHandler = async (req, res) => {
 //     try {

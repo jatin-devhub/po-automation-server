@@ -21,7 +21,9 @@ const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { currency, paymentTerms, estimatedDeliveryDate, records, vendorCode } = req.body;
         const vendor = yield Vendor_1.Vendor.findOne({ where: { vendorCode } });
+        const poCode = yield getUniquePOCode();
         const newBuyingOrder = new BuyingOrder_1.default({
+            poCode,
             currency,
             paymentTerms,
             estimatedDeliveryDate,
@@ -46,7 +48,7 @@ const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(201).json({
             success: true,
             message: `Your BuyingOrder has been successfully added`,
-            data: [],
+            data: { buyingOrder },
         });
     }
     catch (error) {
@@ -60,6 +62,18 @@ const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.newBuyingOrder = newBuyingOrder;
+const getUniquePOCode = () => __awaiter(void 0, void 0, void 0, function* () {
+    let poCode, existingPO;
+    do {
+        poCode = `PO${Math.floor(1000 + Math.random() * 9000)}`;
+        existingPO = yield BuyingOrder_1.default.findOne({
+            where: {
+                poCode,
+            },
+        });
+    } while (existingPO);
+    return poCode;
+});
 // export const getAllVendors: RequestHandler = async (req, res) => {
 //     try {
 //         const vendors = await Vendor.findAll({
