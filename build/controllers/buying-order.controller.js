@@ -65,7 +65,7 @@ exports.newBuyingOrder = newBuyingOrder;
 const getUniquePOCode = () => __awaiter(void 0, void 0, void 0, function* () {
     let poCode, existingPO;
     do {
-        poCode = `PO${Math.floor(1000 + Math.random() * 9000)}`;
+        poCode = `PO-${Math.floor(1000 + Math.random() * 9000)}`;
         existingPO = yield BuyingOrder_1.default.findOne({
             where: {
                 poCode,

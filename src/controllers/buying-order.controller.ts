@@ -57,7 +57,7 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
 const getUniquePOCode = async () => {
     let poCode, existingPO
     do {
-        poCode = `PO${Math.floor(1000 + Math.random() * 9000)}` 
+        poCode = `PO-${Math.floor(1000 + Math.random() * 9000)}` 
         existingPO = await BuyingOrder.findOne({
             where: {
               poCode,
