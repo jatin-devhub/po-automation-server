@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
-import { Vendor } from "../models/Vendor";
+import Vendor from "../models/Vendor";
 import VendorBank from "../models/VendorBank";
 import VendorOther from "../models/VendorOther";
 import SKU from "../models/SKU";
@@ -7,8 +7,8 @@ import BuyingOrder from "../models/BuyingOrder";
 import BuyingOrderRecord from "../models/BuyingOrderRecord";
 import File from "../models/File";
 import * as mysql from "mysql2";
-import { ContactPerson } from "../models/ContactPerson";
-import { VendorAddress } from "../models/VendorAddress";
+import ContactPerson from "../models/ContactPerson";
+import VendorAddress from "../models/VendorAddress";
 
 const connection = new Sequelize({
   dialect: "mysql",

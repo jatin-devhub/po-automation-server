@@ -1,13 +1,19 @@
 import { RequestHandler } from "express";
-import { Vendor } from "../models/Vendor";
+import { Sequelize } from "sequelize-typescript";
+import jwt from "jsonwebtoken";
+
+import Vendor from "../models/Vendor";
 import File from "../models/File";
 import VendorBank from "../models/VendorBank";
 import VendorOther from "../models/VendorOther";
-import { ContactPerson } from "../models/ContactPerson";
-import { VendorAddress } from "../models/VendorAddress";
-import { Sequelize } from "sequelize-typescript";
+import ContactPerson from "../models/ContactPerson";
+import VendorAddress from "../models/VendorAddress";
 import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
+import { MailOptions, sendMail } from "../utils/mail.service";
+
+const { VENDOR_VALIDATION_EMAIL, TEST_EMAIL } = process.env;
+const JWTKEY: string = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
@@ -77,7 +83,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             agreementAtt: agreementFile.id
         })
         const vendor = await newVendor.save();
-        
+
         const newContactPerson = new ContactPerson({
             name: contactPersonName,
             email: contactPersonEmail,
@@ -134,11 +140,19 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             }
         }
 
+        const mailSent = await sendVendorValidationMail(vendor.vendorCode);
+
+        if(mailSent)
         return res.status(201).json({
             success: true,
             message: `Your Vendor has been successfully added`,
             data: [],
         });
+         
+        return res.status(404).json({
+            success: false,
+            message: `Some error occured`
+        })
 
     } catch (error: any) {
         return res.status(504).json({
@@ -245,3 +259,17 @@ const getNewVendorCode = async (country: string) => {
 
     return vendorCode;
 }
+
+const sendVendorValidationMail = async (vendorCode: string) => {
+    const token = jwt.sign({ vendorCode, type: 'newVendor' }, JWTKEY);
+    const mailOptions: MailOptions = {
+        subject: 'Validate New Vendor Details!!',
+        title: 'Vendor Validation',
+        message: 'A new vendor is being registered. Please validate the details of the vendor so that further work can be done.',
+        actionURL: token,
+        closingMessage: ''
+    }
+    if(TEST_EMAIL)
+    return await sendMail(TEST_EMAIL, mailOptions);
+    return false;
+};

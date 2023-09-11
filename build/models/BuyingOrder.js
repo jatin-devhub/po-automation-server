@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
-const Vendor_1 = require("./Vendor");
+const Vendor_1 = __importDefault(require("./Vendor"));
 let BuyingOrder = class BuyingOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -46,16 +46,29 @@ __decorate([
     })
 ], BuyingOrder.prototype, "estimatedDeliveryDate", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN
+    })
+], BuyingOrder.prototype, "isVerified", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "createdBy", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
 ], BuyingOrder.prototype, "records", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.Vendor),
+    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], BuyingOrder.prototype, "vendorId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.Vendor)
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
 ], BuyingOrder.prototype, "vendor", void 0);
 BuyingOrder = __decorate([
     sequelize_typescript_1.Table

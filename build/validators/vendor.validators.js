@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateVendorCode = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
-const Vendor_1 = require("../models/Vendor");
+const Vendor_1 = __importDefault(require("../models/Vendor"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({
@@ -74,7 +74,7 @@ const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0,
         });
         const value = yield validateVendorCode.validateAsync(req.params);
         const { vendorCode } = value;
-        const vendor = yield Vendor_1.Vendor.findOne({ where: { vendorCode } });
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
         if (vendor)
             next();
         else

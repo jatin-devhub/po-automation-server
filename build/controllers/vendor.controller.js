@@ -13,15 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getVendor = exports.getAllVendors = exports.vendorRegistration = void 0;
-const Vendor_1 = require("../models/Vendor");
+const sequelize_typescript_1 = require("sequelize-typescript");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const Vendor_1 = __importDefault(require("../models/Vendor"));
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
 const VendorOther_1 = __importDefault(require("../models/VendorOther"));
-const ContactPerson_1 = require("../models/ContactPerson");
-const VendorAddress_1 = require("../models/VendorAddress");
-const sequelize_typescript_1 = require("sequelize-typescript");
+const ContactPerson_1 = __importDefault(require("../models/ContactPerson"));
+const VendorAddress_1 = __importDefault(require("../models/VendorAddress"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
+const mail_service_1 = require("../utils/mail.service");
+const { VENDOR_VALIDATION_EMAIL, TEST_EMAIL } = process.env;
+const JWTKEY = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
@@ -69,7 +73,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             fileContent: decodedbankFile,
             fileType: 'bankProof'
         });
-        const newVendor = new Vendor_1.Vendor({
+        const newVendor = new Vendor_1.default({
             vendorCode,
             productCategory,
             companyName,
@@ -84,14 +88,14 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             agreementAtt: agreementFile.id
         });
         const vendor = yield newVendor.save();
-        const newContactPerson = new ContactPerson_1.ContactPerson({
+        const newContactPerson = new ContactPerson_1.default({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
             vendorId: vendor.id
         });
         const contactPerson = yield newContactPerson.save();
-        const newAdress = new VendorAddress_1.VendorAddress({
+        const newAdress = new VendorAddress_1.default({
             addressLine1,
             addressLine2,
             country,
@@ -134,10 +138,16 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 }
             }
         }
-        return res.status(201).json({
-            success: true,
-            message: `Your Vendor has been successfully added`,
-            data: [],
+        const mailSent = yield sendVendorValidationMail(vendor.vendorCode);
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your Vendor has been successfully added`,
+                data: [],
+            });
+        return res.status(404).json({
+            success: false,
+            message: `Some error occured`
         });
     }
     catch (error) {
@@ -153,11 +163,11 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.vendorRegistration = vendorRegistration;
 const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const vendors = yield Vendor_1.Vendor.findAll({
+        const vendors = yield Vendor_1.default.findAll({
             attributes: ['vendorCode', 'companyName', [sequelize_typescript_1.Sequelize.col('address.state'), 'state'], [sequelize_typescript_1.Sequelize.col('address.country'), 'country'], 'productCategory'],
             include: [
                 {
-                    model: VendorAddress_1.VendorAddress,
+                    model: VendorAddress_1.default,
                     attributes: [],
                 },
             ]
@@ -182,14 +192,14 @@ exports.getAllVendors = getAllVendors;
 const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { vendorCode } = req.params;
-        const vendor = yield Vendor_1.Vendor.findOne({
+        const vendor = yield Vendor_1.default.findOne({
             where: { vendorCode },
             include: [
                 {
-                    model: ContactPerson_1.ContactPerson
+                    model: ContactPerson_1.default
                 },
                 {
-                    model: VendorAddress_1.VendorAddress
+                    model: VendorAddress_1.default
                 },
                 {
                     model: VendorBank_1.default
@@ -232,11 +242,24 @@ const getNewVendorCode = (country) => __awaiter(void 0, void 0, void 0, function
     do {
         vendorNum = Math.floor(1000 + Math.random() * 9000);
         vendorCode = prefix + vendorNum;
-        existingVendor = yield Vendor_1.Vendor.findOne({
+        existingVendor = yield Vendor_1.default.findOne({
             where: {
                 vendorCode,
             },
         });
     } while (existingVendor);
     return vendorCode;
+});
+const sendVendorValidationMail = (vendorCode) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = jsonwebtoken_1.default.sign({ vendorCode, type: 'newVendor' }, JWTKEY);
+    const mailOptions = {
+        subject: 'Validate New Vendor Details!!',
+        title: 'Vendor Validation',
+        message: 'A new vendor is being registered. Please validate the details of the vendor so that further work can be done.',
+        actionURL: token,
+        closingMessage: ''
+    };
+    if (TEST_EMAIL)
+        return yield (0, mail_service_1.sendMail)(TEST_EMAIL, mailOptions);
+    return false;
 });

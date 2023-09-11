@@ -13,12 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.skuRegistration = void 0;
-const Vendor_1 = require("../models/Vendor");
+const Vendor_1 = __importDefault(require("../models/Vendor"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const skuRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { skuCode, category, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, vendorCode } = req.body;
-        const vendor = yield Vendor_1.Vendor.findOne({ where: { vendorCode } });
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
         const newSkU = new SKU_1.default({
             skuCode,
             category,

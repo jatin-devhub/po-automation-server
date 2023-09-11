@@ -3,7 +3,7 @@ import BuyingOrder from './BuyingOrder'; // Assuming you have a BuyingOrder mode
 import SKU from './SKU';
 
 @Table
-class BuyingOrderRecord extends Model {
+export default class BuyingOrderRecord extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
@@ -39,5 +39,3 @@ class BuyingOrderRecord extends Model {
     @BelongsTo(() => BuyingOrder)
     buyingOrder!: BuyingOrder
 }
-
-export default BuyingOrderRecord;

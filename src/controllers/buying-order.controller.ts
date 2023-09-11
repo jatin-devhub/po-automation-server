@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { Vendor } from "../models/Vendor";
+import Vendor from "../models/Vendor";
 import BuyingOrder from "../models/BuyingOrder";
 import BuyingOrderRecord from "../models/BuyingOrderRecord";
 import SKU from "../models/SKU";

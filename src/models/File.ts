@@ -3,7 +3,7 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize
 @Table({
   tableName: 'files',
 })
-class File extends Model {
+export default class File extends Model {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -29,5 +29,3 @@ class File extends Model {
   })
   fileType!: string;
 }
-
-export default File;

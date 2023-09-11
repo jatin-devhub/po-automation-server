@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { Vendor } from "../models/Vendor";
+import Vendor from "../models/Vendor";
 import SKU from "../models/SKU";
 
 export const skuRegistration: RequestHandler = async (req, res) => {

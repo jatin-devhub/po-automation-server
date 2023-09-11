@@ -1,9 +1,9 @@
-import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique } from 'sequelize-typescript';
+import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique, Default } from 'sequelize-typescript';
 import BuyingOrderRecord from './BuyingOrderRecord';
-import { Vendor } from './Vendor';
+import Vendor from './Vendor';
 
 @Table
-class BuyingOrder extends Model {
+export default class BuyingOrder extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
@@ -34,6 +34,19 @@ class BuyingOrder extends Model {
         type: DataType.STRING
     })
     estimatedDeliveryDate!: string
+    
+    @Default(false)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN
+    })
+    isVerified!: boolean
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
+    createdBy!: string
 
     @HasMany(() => BuyingOrderRecord)
     records?: BuyingOrderRecord[];
@@ -47,5 +60,3 @@ class BuyingOrder extends Model {
     @BelongsTo(() => Vendor)
     vendor?: Vendor;
 }
-
-export default BuyingOrder;

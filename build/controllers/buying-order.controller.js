@@ -13,14 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.newBuyingOrder = void 0;
-const Vendor_1 = require("../models/Vendor");
+const Vendor_1 = __importDefault(require("../models/Vendor"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { currency, paymentTerms, estimatedDeliveryDate, records, vendorCode } = req.body;
-        const vendor = yield Vendor_1.Vendor.findOne({ where: { vendorCode } });
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
         const poCode = yield getUniquePOCode();
         const newBuyingOrder = new BuyingOrder_1.default({
             poCode,

@@ -1,11 +1,11 @@
 import {
-    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany
+    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany, Default
 } from 'sequelize-typescript';
-import { Vendor } from './Vendor';
+import Vendor from './Vendor';
 import BuyingOrderRecord from './BuyingOrderRecord';
 
 @Table
-class SKU extends Model {
+export default class SKU extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
@@ -71,6 +71,19 @@ class SKU extends Model {
     @Column({ type: DataType.FLOAT })
     MRP!: number;
 
+    @Default(false)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN
+    })
+    isVerified!: boolean
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
+    createdBy!: string
+
     @ForeignKey(() => Vendor)
     @Column({ type: DataType.INTEGER })
     vendorId!: number;
@@ -81,5 +94,3 @@ class SKU extends Model {
     @HasMany(() => BuyingOrderRecord)
     buyingRecords!: BuyingOrderRecord
 }
-
-export default SKU;

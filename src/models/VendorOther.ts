@@ -1,8 +1,8 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Vendor } from './Vendor';
+import Vendor from './Vendor';
 
 @Table
-class VendorOther extends Model {
+export default class VendorOther extends Model {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -35,5 +35,3 @@ class VendorOther extends Model {
   @BelongsTo(() => Vendor)
   vendor?: Vendor;
 }
-
-export default VendorOther;

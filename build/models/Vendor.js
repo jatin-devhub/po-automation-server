@@ -9,15 +9,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vendor = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
 const SKU_1 = __importDefault(require("./SKU"));
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
-const ContactPerson_1 = require("./ContactPerson");
-const VendorAddress_1 = require("./VendorAddress");
-let Vendor = exports.Vendor = class Vendor extends sequelize_typescript_1.Model {
+const ContactPerson_1 = __importDefault(require("./ContactPerson"));
+const VendorAddress_1 = __importDefault(require("./VendorAddress"));
+let Vendor = class Vendor extends sequelize_typescript_1.Model {
 };
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -98,10 +97,17 @@ __decorate([
     })
 ], Vendor.prototype, "agreementAtt", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => ContactPerson_1.ContactPerson)
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN
+    })
+], Vendor.prototype, "isVerified", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => ContactPerson_1.default)
 ], Vendor.prototype, "contactPerson", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => VendorAddress_1.VendorAddress)
+    (0, sequelize_typescript_1.HasOne)(() => VendorAddress_1.default)
 ], Vendor.prototype, "address", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => VendorBank_1.default)
@@ -121,9 +127,10 @@ __decorate([
 __decorate([
     sequelize_typescript_1.UpdatedAt
 ], Vendor.prototype, "updatedAt", void 0);
-exports.Vendor = Vendor = __decorate([
+Vendor = __decorate([
     (0, sequelize_typescript_1.Table)({
         timestamps: true,
         tableName: 'vendor'
     })
 ], Vendor);
+exports.default = Vendor;

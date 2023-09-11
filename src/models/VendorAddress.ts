@@ -1,12 +1,11 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, AllowNull, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
-import { ContactPerson } from './ContactPerson';
-import { Vendor } from './Vendor';
+import Vendor from './Vendor';
 
 @Table({
     tableName: 'vendor-address',
     timestamps: true,
 })
-export class VendorAddress extends Model {
+export default class VendorAddress extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey

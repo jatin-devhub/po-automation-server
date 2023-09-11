@@ -1,11 +1,11 @@
 import { Model, Column, Table, DataType, AllowNull, Unique, IsEmail, AutoIncrement, PrimaryKey, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Vendor } from './Vendor';
+import Vendor from './Vendor';
 
 @Table({
     tableName: 'contact-person',
     timestamps: true
 })
-export class ContactPerson extends Model {
+export default class ContactPerson extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey

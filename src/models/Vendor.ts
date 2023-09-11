@@ -1,16 +1,16 @@
-import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, HasMany, HasOne, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
+import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, Default, HasMany, HasOne, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
 import VendorBank from "./VendorBank";
 import VendorOther from "./VendorOther";
 import SKU from "./SKU";
 import BuyingOrder from "./BuyingOrder";
-import { ContactPerson } from "./ContactPerson";
-import { VendorAddress } from "./VendorAddress";
+import ContactPerson from "./ContactPerson";
+import VendorAddress from "./VendorAddress";
 
 @Table({
     timestamps: true,
     tableName: 'vendor'
 })
-export class Vendor extends Model {
+export default class Vendor extends Model {
     @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
@@ -88,6 +88,13 @@ export class Vendor extends Model {
         allowNull: false,
     })
     agreementAtt!: string;
+    
+    @Default(false)
+    @AllowNull(false)
+    @Column({
+        type: DataType.BOOLEAN
+    })
+    isVerified!: boolean
 
     @HasOne(() => ContactPerson)
     contactPerson!: ContactPerson;
