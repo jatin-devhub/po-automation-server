@@ -16,10 +16,10 @@ const SKU_1 = __importDefault(require("./SKU"));
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
 const ContactPerson_1 = __importDefault(require("./ContactPerson"));
 const VendorAddress_1 = __importDefault(require("./VendorAddress"));
+const File_1 = __importDefault(require("./File"));
 let Vendor = class Vendor extends sequelize_typescript_1.Model {
 };
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
@@ -54,10 +54,7 @@ __decorate([
 ], Vendor.prototype, "gst", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "gstAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -65,9 +62,7 @@ __decorate([
     })
 ], Vendor.prototype, "coi", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "coiAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -75,9 +70,7 @@ __decorate([
     })
 ], Vendor.prototype, "msme", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "msmeAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -85,16 +78,11 @@ __decorate([
     })
 ], Vendor.prototype, "tradeMark", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "tradeMarkAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "agreementAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
@@ -103,6 +91,11 @@ __decorate([
         type: sequelize_typescript_1.DataType.BOOLEAN
     })
 ], Vendor.prototype, "isVerified", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], Vendor.prototype, "createdBy", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => ContactPerson_1.default)
 ], Vendor.prototype, "contactPerson", void 0);

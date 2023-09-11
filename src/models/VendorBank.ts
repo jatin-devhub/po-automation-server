@@ -1,51 +1,49 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AutoIncrement, PrimaryKey, AllowNull, HasOne } from 'sequelize-typescript';
 import Vendor from './Vendor';
+import File from './File';
 
 @Table
 export default class VendorBank extends Model {
+  @AutoIncrement
+  @PrimaryKey
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
   })
   id!: number;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   beneficiaryName!: string;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   accountNumber!: string;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   ifsc!: string;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   bankName!: string;
 
+  @AllowNull(false)
   @Column({
     type: DataType.STRING,
-    allowNull: false,
   })
   branch!: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  proofAtt!: string;
+  @AllowNull(false)
+  @HasOne(() => File)
+  proofAtt!: File;
 
   @ForeignKey(() => Vendor)
   @Column({

@@ -15,7 +15,6 @@ const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
 let SKU = class SKU extends sequelize_typescript_1.Model {
 };
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
@@ -23,7 +22,11 @@ __decorate([
     })
 ], SKU.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, unique: true, type: sequelize_typescript_1.DataType.STRING })
+    (0, sequelize_typescript_1.AllowNull)(false),
+    sequelize_typescript_1.Unique,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
 ], SKU.prototype, "skuCode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
@@ -50,31 +53,31 @@ __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "colorFamilyColor", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'product_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productLengthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'product_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productBreadthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'product_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productHeightCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'product_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "productWeightKg", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'master_carton_qty', type: sequelize_typescript_1.DataType.INTEGER })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
 ], SKU.prototype, "masterCartonQty", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'master_carton_length_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonLengthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'master_carton_breadth_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonBreadthCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'master_carton_height_cm', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonHeightCm", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ field: 'master_carton_weight_kg', type: sequelize_typescript_1.DataType.FLOAT })
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
 ], SKU.prototype, "masterCartonWeightKg", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })

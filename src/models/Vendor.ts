@@ -5,13 +5,13 @@ import SKU from "./SKU";
 import BuyingOrder from "./BuyingOrder";
 import ContactPerson from "./ContactPerson";
 import VendorAddress from "./VendorAddress";
+import File from "./File";
 
 @Table({
     timestamps: true,
     tableName: 'vendor'
 })
 export default class Vendor extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({
@@ -46,48 +46,36 @@ export default class Vendor extends Model {
     gst!: string;
 
     @AllowNull(false)
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    gstAtt!: string;
+    @HasOne(() => File)
+    gstAtt!: File;
 
     @Column({
         type: DataType.STRING
     })
     coi!: string;
 
-    @Column({
-        type: DataType.STRING
-    })
-    coiAtt!: string;
+    @HasOne(() => File)
+    coiAtt!: File;
 
     @Column({
         type: DataType.STRING
     })
     msme!: string;
 
-    @Column({
-        type: DataType.STRING,
-    })
-    msmeAtt!: string;
+    @HasOne(() => File)
+    msmeAtt!: File;
 
     @Column({
         type: DataType.STRING
     })
     tradeMark!: string;
 
-    @Column({
-        type: DataType.STRING
-    })
-    tradeMarkAtt!: string;
+    @HasOne(() => File)
+    tradeMarkAtt!: File;
 
     @AllowNull(false)
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    agreementAtt!: string;
+    @HasOne(() => File)
+    agreementAtt!: File;
     
     @Default(false)
     @AllowNull(false)
@@ -95,6 +83,11 @@ export default class Vendor extends Model {
         type: DataType.BOOLEAN
     })
     isVerified!: boolean
+
+    @Column({
+        type: DataType.STRING
+    })
+    createdBy!: string
 
     @HasOne(() => ContactPerson)
     contactPerson!: ContactPerson;

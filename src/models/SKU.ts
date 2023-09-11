@@ -1,12 +1,11 @@
 import {
-    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany, Default
+    Model, Table, Column, AllowNull, AutoIncrement, PrimaryKey, DataType, ForeignKey, BelongsTo, HasMany, Default, Unique
 } from 'sequelize-typescript';
 import Vendor from './Vendor';
 import BuyingOrderRecord from './BuyingOrderRecord';
 
 @Table
 export default class SKU extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({
@@ -14,7 +13,11 @@ export default class SKU extends Model {
     })
     id!: number;
 
-    @Column({ allowNull: false, unique: true, type: DataType.STRING })
+    @AllowNull(false)
+    @Unique
+    @Column({
+        type: DataType.STRING
+    })
     skuCode!: string;
 
     @Column({ type: DataType.STRING })
@@ -41,31 +44,31 @@ export default class SKU extends Model {
     @Column({ type: DataType.STRING })
     colorFamilyColor!: string;
 
-    @Column({ field: 'product_length_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     productLengthCm!: number;
 
-    @Column({ field: 'product_breadth_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     productBreadthCm!: number;
 
-    @Column({ field: 'product_height_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     productHeightCm!: number;
 
-    @Column({ field: 'product_weight_kg', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     productWeightKg!: number;
 
-    @Column({ field: 'master_carton_qty', type: DataType.INTEGER })
+    @Column({ type: DataType.INTEGER })
     masterCartonQty!: number;
 
-    @Column({ field: 'master_carton_length_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     masterCartonLengthCm!: number;
 
-    @Column({ field: 'master_carton_breadth_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     masterCartonBreadthCm!: number;
 
-    @Column({ field: 'master_carton_height_cm', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     masterCartonHeightCm!: number;
 
-    @Column({ field: 'master_carton_weight_kg', type: DataType.FLOAT })
+    @Column({ type: DataType.FLOAT })
     masterCartonWeightKg!: number;
 
     @Column({ type: DataType.FLOAT })

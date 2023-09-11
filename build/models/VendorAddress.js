@@ -14,7 +14,6 @@ const Vendor_1 = __importDefault(require("./Vendor"));
 let VendorAddress = class VendorAddress extends sequelize_typescript_1.Model {
 };
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({

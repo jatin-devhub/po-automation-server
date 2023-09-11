@@ -8,67 +8,70 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var Comment_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
 const SKU_1 = __importDefault(require("./SKU"));
 const Vendor_1 = __importDefault(require("./Vendor"));
-let File = class File extends sequelize_typescript_1.Model {
+let Comment = Comment_1 = class Comment extends sequelize_typescript_1.Model {
 };
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER,
+    })
+], Comment.prototype, "id", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+    })
+], Comment.prototype, "comment", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Comment_1),
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "id", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
-], File.prototype, "fileName", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.BLOB('medium')
-    })
-], File.prototype, "fileContent", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
-], File.prototype, "fileType", void 0);
+], Comment.prototype, "commentId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "buyingOrderId", void 0);
+], Comment.prototype, "buyingOrderId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => SKU_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "skuId", void 0);
+], Comment.prototype, "skuId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "vendorId", void 0);
+], Comment.prototype, "vendorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Comment_1)
+], Comment.prototype, "comments", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Comment_1)
+], Comment.prototype, "parentComment", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
-], File.prototype, "buyingOrder", void 0);
+], Comment.prototype, "buyingOrder", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
-], File.prototype, "sku", void 0);
+], Comment.prototype, "sku", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], File.prototype, "vendor", void 0);
-File = __decorate([
+], Comment.prototype, "vendor", void 0);
+Comment = Comment_1 = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: 'files',
+        tableName: 'comments',
     })
-], File);
-exports.default = File;
+], Comment);
+exports.default = Comment;

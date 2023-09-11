@@ -15,7 +15,6 @@ const SKU_1 = __importDefault(require("./SKU"));
 let BuyingOrderRecord = class BuyingOrderRecord extends sequelize_typescript_1.Model {
 };
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
@@ -23,13 +22,16 @@ __decorate([
     })
 ], BuyingOrderRecord.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.INTEGER })
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
 ], BuyingOrderRecord.prototype, "expectedQty", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.DECIMAL(10, 2) })
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.DECIMAL(10, 2) })
 ], BuyingOrderRecord.prototype, "unitCost", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, type: sequelize_typescript_1.DataType.DECIMAL(5, 2) })
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.DECIMAL(5, 2) })
 ], BuyingOrderRecord.prototype, "gst", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => SKU_1.default),

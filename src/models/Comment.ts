@@ -1,35 +1,31 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AutoIncrement, PrimaryKey, AllowNull } from 'sequelize-typescript';
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasMany, AllowNull, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
 import BuyingOrder from './BuyingOrder';
 import SKU from './SKU';
 import Vendor from './Vendor';
 
 @Table({
-  tableName: 'files',
+  tableName: 'comments',
 })
-export default class File extends Model {
+export default class Comment extends Model {
+  @AllowNull(false)
   @AutoIncrement
   @PrimaryKey
   @Column({
-    type: DataType.INTEGER
+    type: DataType.INTEGER,
   })
   id!: number;
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING
+    type: DataType.STRING,
   })
-  fileName!: string;
+  comment!: string;
 
-  @AllowNull(false)
+  @ForeignKey(() => Comment)
   @Column({
-    type: DataType.BLOB('medium')
+    type: DataType.INTEGER
   })
-  fileContent!: Buffer;
-
-  @Column({
-    type: DataType.STRING
-  })
-  fileType!: string;
+  commentId!: number
 
   @ForeignKey(() => BuyingOrder)
   @Column({
@@ -47,7 +43,13 @@ export default class File extends Model {
   @Column({
     type: DataType.INTEGER
   })
-  vendorId!: number;
+  vendorId!: number
+
+  @HasMany(() => Comment)
+  comments!: Comment[]
+
+  @BelongsTo(() => Comment)
+  parentComment!: Comment;
 
   @BelongsTo(() => BuyingOrder)
   buyingOrder!: BuyingOrder;
@@ -57,4 +59,5 @@ export default class File extends Model {
 
   @BelongsTo(() => Vendor)
   vendor!: Vendor;
+  
 }

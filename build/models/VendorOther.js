@@ -11,17 +11,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const Vendor_1 = __importDefault(require("./Vendor"));
+const File_1 = __importDefault(require("./File"));
 let VendorOther = class VendorOther extends sequelize_typescript_1.Model {
 };
 __decorate([
+    sequelize_typescript_1.AutoIncrement,
+    sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
+        type: sequelize_typescript_1.DataType.INTEGER
     })
 ], VendorOther.prototype, "id", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
     })
@@ -32,9 +33,7 @@ __decorate([
     })
 ], VendorOther.prototype, "otherValue", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], VendorOther.prototype, "otherAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),

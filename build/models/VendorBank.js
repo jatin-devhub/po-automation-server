@@ -11,51 +11,49 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const Vendor_1 = __importDefault(require("./Vendor"));
+const File_1 = __importDefault(require("./File"));
 let VendorBank = class VendorBank extends sequelize_typescript_1.Model {
 };
 __decorate([
+    sequelize_typescript_1.AutoIncrement,
+    sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
     })
 ], VendorBank.prototype, "id", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
     })
 ], VendorBank.prototype, "beneficiaryName", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
     })
 ], VendorBank.prototype, "accountNumber", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
     })
 ], VendorBank.prototype, "ifsc", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
     })
 ], VendorBank.prototype, "bankName", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
     })
 ], VendorBank.prototype, "branch", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-        allowNull: false,
-    })
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], VendorBank.prototype, "proofAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),

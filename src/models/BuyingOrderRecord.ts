@@ -4,7 +4,6 @@ import SKU from './SKU';
 
 @Table
 export default class BuyingOrderRecord extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({
@@ -12,13 +11,16 @@ export default class BuyingOrderRecord extends Model {
     })
     id!: number;
 
-    @Column({ allowNull: false, type: DataType.INTEGER })
+    @AllowNull(false)
+    @Column({ type: DataType.INTEGER })
     expectedQty!: number;
     
-    @Column({ allowNull: false, type: DataType.DECIMAL(10, 2) })
+    @AllowNull(false)
+    @Column({ type: DataType.DECIMAL(10, 2) })
     unitCost!: number;
   
-    @Column({ allowNull: false, type: DataType.DECIMAL(5, 2) })
+    @AllowNull(false)
+    @Column({ type: DataType.DECIMAL(5, 2) })
     gst!: number;
 
     @ForeignKey(() => SKU)

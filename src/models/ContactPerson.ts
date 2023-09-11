@@ -6,7 +6,6 @@ import Vendor from './Vendor';
     timestamps: true
 })
 export default class ContactPerson extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({

@@ -1,10 +1,10 @@
 import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique, Default } from 'sequelize-typescript';
 import BuyingOrderRecord from './BuyingOrderRecord';
 import Vendor from './Vendor';
+import Comment from './Comment';
 
 @Table
 export default class BuyingOrder extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({
@@ -50,6 +50,9 @@ export default class BuyingOrder extends Model {
 
     @HasMany(() => BuyingOrderRecord)
     records?: BuyingOrderRecord[];
+
+    @HasMany(() => Comment)
+    comments!: Comment[];
 
     @ForeignKey(() => Vendor)
     @Column({

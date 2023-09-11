@@ -6,7 +6,6 @@ import Vendor from './Vendor';
     timestamps: true,
 })
 export default class VendorAddress extends Model {
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column({

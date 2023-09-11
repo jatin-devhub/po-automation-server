@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateVendorCode = exports.validateNew = void 0;
+exports.validateVendorCode = exports.validateToken = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
+let JWTKEY = process.env.JWTKEY || 'MYNAME-IS-HELLOWORLD-AND-I-AM-FROM-PLUTO-))!!@@-NAME-IS-PLUTO';
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({
@@ -67,6 +69,43 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.validateNew = validateNew;
+const validateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const tokenSchema = joi_1.default.object({
+            validateToken: joi_1.default.string().required(),
+        });
+        const value = yield tokenSchema.validateAsync(req.params);
+        const { validateToken } = value;
+        jsonwebtoken_1.default.verify(validateToken, JWTKEY, (err, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
+            if (err) {
+                return res.status(400).json({
+                    success: false,
+                    message: err.message,
+                    data: [],
+                });
+            }
+            const vendor = yield Vendor_1.default.findOne({ where: { vendorCode: decodedToken.vendorCode } });
+            if (vendor) {
+                req.body.vendor = vendor;
+                next();
+            }
+            else
+                return res.status(404).json({
+                    success: false,
+                    message: 'Vendor with this vendor code not exists',
+                    data: []
+                });
+        }));
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateToken = validateToken;
 const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const validateVendorCode = joi_1.default.object({
