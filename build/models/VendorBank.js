@@ -52,7 +52,6 @@ __decorate([
     })
 ], VendorBank.prototype, "branch", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], VendorBank.prototype, "proofAtt", void 0);
 __decorate([

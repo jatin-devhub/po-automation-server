@@ -1,4 +1,4 @@
-import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, Default, HasMany, HasOne, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
+import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, Default, HasMany, HasOne, IsEmail, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
 import VendorBank from "./VendorBank";
 import VendorOther from "./VendorOther";
 import SKU from "./SKU";
@@ -45,7 +45,6 @@ export default class Vendor extends Model {
     })
     gst!: string;
 
-    @AllowNull(false)
     @HasOne(() => File)
     gstAtt!: File;
 
@@ -73,7 +72,6 @@ export default class Vendor extends Model {
     @HasOne(() => File)
     tradeMarkAtt!: File;
 
-    @AllowNull(false)
     @HasOne(() => File)
     agreementAtt!: File;
     
@@ -84,6 +82,7 @@ export default class Vendor extends Model {
     })
     isVerified!: boolean
 
+    @IsEmail
     @Column({
         type: DataType.STRING
     })

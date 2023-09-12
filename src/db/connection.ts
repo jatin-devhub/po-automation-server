@@ -9,6 +9,7 @@ import File from "../models/File";
 import * as mysql from "mysql2";
 import ContactPerson from "../models/ContactPerson";
 import VendorAddress from "../models/VendorAddress";
+import Comment from "../models/Comment";
 
 const connection = new Sequelize({
   dialect: "mysql",
@@ -18,7 +19,7 @@ const connection = new Sequelize({
   password: 'po1234',
   database: 'po_automation',
   port: 3306,
-  models: [Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File]
+  models: [Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File, Comment]
 });
 
 // connection.sync({force: true})

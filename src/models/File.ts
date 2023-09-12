@@ -2,6 +2,8 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AutoIncrement, P
 import BuyingOrder from './BuyingOrder';
 import SKU from './SKU';
 import Vendor from './Vendor';
+import VendorBank from './VendorBank';
+import VendorOther from './VendorOther';
 
 @Table({
   tableName: 'files',
@@ -49,6 +51,18 @@ export default class File extends Model {
   })
   vendorId!: number;
 
+  @ForeignKey(() => VendorBank)
+  @Column({
+    type: DataType.INTEGER
+  })
+  vendorBankId!: number;
+
+  @ForeignKey(() => VendorOther)
+  @Column({
+    type: DataType.INTEGER
+  })
+  vendorOtherId!: number;
+
   @BelongsTo(() => BuyingOrder)
   buyingOrder!: BuyingOrder;
 
@@ -57,4 +71,10 @@ export default class File extends Model {
 
   @BelongsTo(() => Vendor)
   vendor!: Vendor;
+
+  @BelongsTo(() => VendorBank)
+  vendorBank!: VendorBank
+
+  @BelongsTo(() => VendorOther)
+  vendorOther!: VendorOther
 }

@@ -17,80 +17,75 @@ const JWTKEY: string = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
-
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
+        
         const vendorCode = await getNewVendorCode(country);
-
-        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
-        let coiFile = null, msmeFile = null, tradeFile = null
-        if(coiAttachment){
-            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
-            coiFile = await File.create({
-                fileName: coiAttachment.originalname,
-                fileContent: decodedCoiFile,
-                fileType: 'coi'
-            })
-        }
-        if(msmeAttachment) {
-            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
-            msmeFile = await File.create({
-                fileName: msmeAttachment.originalname,
-                fileContent: decodedMsmeFile,
-                fileType: 'msme'
-            })
-        }
-        if(tradeAttachment) {
-            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
-            tradeFile = await File.create({
-                fileName: tradeAttachment.originalname,
-                fileContent: decodedTradeFile,
-                fileType: 'trade'
-            })
-        }
-        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
-
-        const gstFile = await File.create({
-            fileName: gstAttachment.originalname,
-            fileContent: decodedGstFile,
-            fileType: 'gst'
-        })
-
-        const agreementFile = await File.create({
-            fileName: agreementAttachment.originalname,
-            fileContent: decodedAgreementFile,
-            fileType: 'agreement'
-        })
-
-        const bankProofFile = await File.create({
-            fileName: bankAttachment.originalname,
-            fileContent: decodedbankFile,
-            fileType: 'bankProof'
-        })
-
+        
         const newVendor = new Vendor({
             vendorCode,
             productCategory,
             companyName,
             gst,
-            gstAtt: gstFile.id,
             coi,
-            coiAtt: coiFile?.id,
             msme,
-            msmeAtt: msmeFile?.id,
             tradeMark,
-            tradeMarkAtt: tradeFile?.id,
-            agreementAtt: agreementFile.id
+            createdBy
         })
         const vendor = await newVendor.save();
+        
+        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
+        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
+        if(coiAttachment){
+            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
+            await File.create({
+                fileName: coiAttachment.originalname,
+                fileContent: decodedCoiFile,
+                fileType: 'coi',
+                vendorId: vendor.id
+            })    
+        }    
+        if(msmeAttachment) {
+            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
+            await File.create({
+                fileName: msmeAttachment.originalname,
+                fileContent: decodedMsmeFile,
+                fileType: 'msme',
+                vendorId: vendor.id
+            })    
+        }    
+        if(tradeAttachment) {
+            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
+            await File.create({
+                fileName: tradeAttachment.originalname,
+                fileContent: decodedTradeFile,
+                fileType: 'trade',
+                vendorId: vendor.id
+            })    
+        }    
+        
+        await File.create({
+            fileName: gstAttachment.originalname,
+            fileContent: decodedGstFile,
+            fileType: 'gst',
+            vendorId: vendor.id
+        })    
 
+        await File.create({
+            fileName: agreementAttachment.originalname,
+            fileContent: decodedAgreementFile,
+            fileType: 'agreement',
+            vendorId: vendor.id
+        })    
+        
         const newContactPerson = new ContactPerson({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
             vendorId: vendor.id
         })
-        const contactPerson = await newContactPerson.save();
+        await newContactPerson.save();
+
+        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
 
         const newAdress = new VendorAddress({
             addressLine1,
@@ -101,7 +96,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             postalCode,
             vendorId: vendor.id
         })
-        const address = await newAdress.save();
+        await newAdress.save();
 
         const newVendorBank = new VendorBank({
             beneficiaryName: beneficiary,
@@ -109,33 +104,41 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             ifsc,
             bankName,
             branch,
-            proofAtt: bankProofFile.id,
             vendorId: vendor.id
         })
         const vendorBank = await newVendorBank.save();
+
+
+        const bankProofFile = await File.create({
+            fileName: bankAttachment.originalname,
+            fileContent: decodedbankFile,
+            fileType: 'bankProof',
+            vendorBankId: vendorBank.id
+        })    
 
         if(otherFields){
             let otherFieldsObject = JSON.parse(otherFields)
             if(otherFieldsObject?.length > 0) {
                 for (let i = 0; i < otherFieldsObject.length; i++) {
                     let field = otherFieldsObject[i], otherFile;
+
+                    const newOtherField = new VendorOther({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorId: vendor.id
+                    })
+                    const otherField = await newOtherField.save();
                     if(req.body[`otherFieldsAttachments-${field.key}`]){
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
         
                         otherFile = await File.create({
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
-                            fileType: 'other'
+                            fileType: 'other',
+                            vendorOtherId: otherField.id
                         })
                     }
     
-                    const newOtherField = new VendorOther({
-                        otherKey: field.key,
-                        otherValue: field.value,
-                        otherAtt: otherFile?.id,
-                        vendorId: vendor.id
-                    })
-                    const otherField = newOtherField.save();
                 }
             }
         }

@@ -1,8 +1,11 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
+import jwt from 'jsonwebtoken';
 import Vendor from "../models/Vendor";
 
-export const validateNew: RequestHandler =async (req, res, next) => {
+let JWTKEY = process.env.JWTKEY || 'MYNAME-IS-HELLOWORLD-AND-I-AM-FROM-PLUTO-))!!@@-NAME-IS-PLUTO';
+
+export const validateNew: RequestHandler = async (req, res, next) => {
     try {
         const newVendorSchema = Joi.object({
             companyName: Joi.string().required(),
@@ -25,6 +28,7 @@ export const validateNew: RequestHandler =async (req, res, next) => {
             coi: Joi.string(),
             msme: Joi.string(),
             tradeMark: Joi.string(),
+            createdBy: Joi.string().email(),
             otherFields: Joi.any(),
             gstAttachment: Joi.any().required(),
             bankAttachment: Joi.any().required(),
@@ -36,13 +40,13 @@ export const validateNew: RequestHandler =async (req, res, next) => {
         const files = req.files as Express.Multer.File[];
 
         for (const file of files) {
-            if(!file.fieldname.startsWith('otherFieldsAttachments-'))
-            req.body[file.fieldname] = file
+            if (!file.fieldname.startsWith('otherFieldsAttachments-'))
+                req.body[file.fieldname] = file
         }
         const value = await newVendorSchema.validateAsync(req.body);
         for (const file of files) {
-            if(file.fieldname.startsWith('otherFieldsAttachments-'))
-            req.body[file.fieldname] = file
+            if (file.fieldname.startsWith('otherFieldsAttachments-'))
+                req.body[file.fieldname] = file
         }
         next();
 
@@ -55,7 +59,47 @@ export const validateNew: RequestHandler =async (req, res, next) => {
     }
 }
 
-export const validateVendorCode: RequestHandler =async (req, res, next) => {
+export const validateToken: RequestHandler = async (req, res, next) => {
+    try {
+        const tokenSchema = Joi.object({
+            validateToken: Joi.string().required(),
+        })
+
+        const value = await tokenSchema.validateAsync(req.params);
+        const { validateToken } = value;
+
+        jwt.verify(validateToken, JWTKEY, async (err: any, decodedToken: any) => {
+            if (err) {
+                return res.status(400).json({
+                    success: false,
+                    message: err.message,
+                    data: [],
+                });
+            }
+
+            const vendor = await Vendor.findOne({ where: { vendorCode: decodedToken.vendorCode } })
+            if (vendor) {
+                req.body.vendor = vendor
+                next();
+            }
+            else
+                return res.status(404).json({
+                    success: false,
+                    message: 'Vendor with this vendor code not exists',
+                    data: []
+                })
+        });
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateVendorCode: RequestHandler = async (req, res, next) => {
     try {
         const validateVendorCode = Joi.object({
             vendorCode: Joi.string().required(),
@@ -64,15 +108,15 @@ export const validateVendorCode: RequestHandler =async (req, res, next) => {
         const value = await validateVendorCode.validateAsync(req.params);
         const { vendorCode } = value;
 
-        const vendor = await Vendor.findOne({where: {vendorCode}})
-        if(vendor)
-        next();
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if (vendor)
+            next();
         else
-        return res.status(404).json({
-            success: false,
-            message: 'Vendor with this vendor code not exists',
-            data: []
-        })
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor with this vendor code not exists',
+                data: []
+            })
 
     } catch (error: any) {
         return res.status(504).json({

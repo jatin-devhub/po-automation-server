@@ -28,73 +28,68 @@ const { VENDOR_VALIDATION_EMAIL, TEST_EMAIL } = process.env;
 const JWTKEY = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields } = req.body;
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
         const vendorCode = yield getNewVendorCode(country);
-        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
-        let coiFile = null, msmeFile = null, tradeFile = null;
-        if (coiAttachment) {
-            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
-            coiFile = yield File_1.default.create({
-                fileName: coiAttachment.originalname,
-                fileContent: decodedCoiFile,
-                fileType: 'coi'
-            });
-        }
-        if (msmeAttachment) {
-            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
-            msmeFile = yield File_1.default.create({
-                fileName: msmeAttachment.originalname,
-                fileContent: decodedMsmeFile,
-                fileType: 'msme'
-            });
-        }
-        if (tradeAttachment) {
-            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
-            tradeFile = yield File_1.default.create({
-                fileName: tradeAttachment.originalname,
-                fileContent: decodedTradeFile,
-                fileType: 'trade'
-            });
-        }
-        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
-        const gstFile = yield File_1.default.create({
-            fileName: gstAttachment.originalname,
-            fileContent: decodedGstFile,
-            fileType: 'gst'
-        });
-        const agreementFile = yield File_1.default.create({
-            fileName: agreementAttachment.originalname,
-            fileContent: decodedAgreementFile,
-            fileType: 'agreement'
-        });
-        const bankProofFile = yield File_1.default.create({
-            fileName: bankAttachment.originalname,
-            fileContent: decodedbankFile,
-            fileType: 'bankProof'
-        });
         const newVendor = new Vendor_1.default({
             vendorCode,
             productCategory,
             companyName,
             gst,
-            gstAtt: gstFile.id,
             coi,
-            coiAtt: coiFile === null || coiFile === void 0 ? void 0 : coiFile.id,
             msme,
-            msmeAtt: msmeFile === null || msmeFile === void 0 ? void 0 : msmeFile.id,
             tradeMark,
-            tradeMarkAtt: tradeFile === null || tradeFile === void 0 ? void 0 : tradeFile.id,
-            agreementAtt: agreementFile.id
+            createdBy
         });
         const vendor = yield newVendor.save();
+        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
+        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
+        if (coiAttachment) {
+            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
+            yield File_1.default.create({
+                fileName: coiAttachment.originalname,
+                fileContent: decodedCoiFile,
+                fileType: 'coi',
+                vendorId: vendor.id
+            });
+        }
+        if (msmeAttachment) {
+            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
+            yield File_1.default.create({
+                fileName: msmeAttachment.originalname,
+                fileContent: decodedMsmeFile,
+                fileType: 'msme',
+                vendorId: vendor.id
+            });
+        }
+        if (tradeAttachment) {
+            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
+            yield File_1.default.create({
+                fileName: tradeAttachment.originalname,
+                fileContent: decodedTradeFile,
+                fileType: 'trade',
+                vendorId: vendor.id
+            });
+        }
+        yield File_1.default.create({
+            fileName: gstAttachment.originalname,
+            fileContent: decodedGstFile,
+            fileType: 'gst',
+            vendorId: vendor.id
+        });
+        yield File_1.default.create({
+            fileName: agreementAttachment.originalname,
+            fileContent: decodedAgreementFile,
+            fileType: 'agreement',
+            vendorId: vendor.id
+        });
         const newContactPerson = new ContactPerson_1.default({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
             vendorId: vendor.id
         });
-        const contactPerson = yield newContactPerson.save();
+        yield newContactPerson.save();
+        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
         const newAdress = new VendorAddress_1.default({
             addressLine1,
             addressLine2,
@@ -104,37 +99,42 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             postalCode,
             vendorId: vendor.id
         });
-        const address = yield newAdress.save();
+        yield newAdress.save();
         const newVendorBank = new VendorBank_1.default({
             beneficiaryName: beneficiary,
             accountNumber,
             ifsc,
             bankName,
             branch,
-            proofAtt: bankProofFile.id,
             vendorId: vendor.id
         });
         const vendorBank = yield newVendorBank.save();
+        const bankProofFile = yield File_1.default.create({
+            fileName: bankAttachment.originalname,
+            fileContent: decodedbankFile,
+            fileType: 'bankProof',
+            vendorBankId: vendorBank.id
+        });
         if (otherFields) {
             let otherFieldsObject = JSON.parse(otherFields);
             if ((otherFieldsObject === null || otherFieldsObject === void 0 ? void 0 : otherFieldsObject.length) > 0) {
                 for (let i = 0; i < otherFieldsObject.length; i++) {
                     let field = otherFieldsObject[i], otherFile;
+                    const newOtherField = new VendorOther_1.default({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorId: vendor.id
+                    });
+                    const otherField = yield newOtherField.save();
                     if (req.body[`otherFieldsAttachments-${field.key}`]) {
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
                         otherFile = yield File_1.default.create({
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
-                            fileType: 'other'
+                            fileType: 'other',
+                            vendorOtherId: otherField.id
                         });
                     }
-                    const newOtherField = new VendorOther_1.default({
-                        otherKey: field.key,
-                        otherValue: field.value,
-                        otherAtt: otherFile === null || otherFile === void 0 ? void 0 : otherFile.id,
-                        vendorId: vendor.id
-                    });
-                    const otherField = newOtherField.save();
                 }
             }
         }

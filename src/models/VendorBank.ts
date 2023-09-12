@@ -41,7 +41,6 @@ export default class VendorBank extends Model {
   })
   branch!: string;
 
-  @AllowNull(false)
   @HasOne(() => File)
   proofAtt!: File;
 

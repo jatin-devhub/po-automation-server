@@ -13,6 +13,8 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
 const SKU_1 = __importDefault(require("./SKU"));
 const Vendor_1 = __importDefault(require("./Vendor"));
+const VendorBank_1 = __importDefault(require("./VendorBank"));
+const VendorOther_1 = __importDefault(require("./VendorOther"));
 let File = class File extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -58,6 +60,18 @@ __decorate([
     })
 ], File.prototype, "vendorId", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorBank_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "vendorBankId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorOther_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "vendorOtherId", void 0);
+__decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
 ], File.prototype, "buyingOrder", void 0);
 __decorate([
@@ -66,6 +80,12 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
 ], File.prototype, "vendor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorBank_1.default)
+], File.prototype, "vendorBank", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorOther_1.default)
+], File.prototype, "vendorOther", void 0);
 File = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: 'files',

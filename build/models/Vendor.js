@@ -53,7 +53,6 @@ __decorate([
     })
 ], Vendor.prototype, "gst", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "gstAtt", void 0);
 __decorate([
@@ -81,7 +80,6 @@ __decorate([
     (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "tradeMarkAtt", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], Vendor.prototype, "agreementAtt", void 0);
 __decorate([
@@ -92,6 +90,7 @@ __decorate([
     })
 ], Vendor.prototype, "isVerified", void 0);
 __decorate([
+    sequelize_typescript_1.IsEmail,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })

@@ -40,6 +40,7 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             coi: joi_1.default.string(),
             msme: joi_1.default.string(),
             tradeMark: joi_1.default.string(),
+            createdBy: joi_1.default.string().email(),
             otherFields: joi_1.default.any(),
             gstAttachment: joi_1.default.any().required(),
             bankAttachment: joi_1.default.any().required(),
