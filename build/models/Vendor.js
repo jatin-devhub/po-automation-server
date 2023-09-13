@@ -17,6 +17,7 @@ const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
 const ContactPerson_1 = __importDefault(require("./ContactPerson"));
 const VendorAddress_1 = __importDefault(require("./VendorAddress"));
 const File_1 = __importDefault(require("./File"));
+const Comment_1 = __importDefault(require("./Comment"));
 let Vendor = class Vendor extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -53,7 +54,7 @@ __decorate([
     })
 ], Vendor.prototype, "gst", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'gstAttVendorId' })
 ], Vendor.prototype, "gstAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -61,7 +62,7 @@ __decorate([
     })
 ], Vendor.prototype, "coi", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'coiAttVendorId' })
 ], Vendor.prototype, "coiAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -69,7 +70,7 @@ __decorate([
     })
 ], Vendor.prototype, "msme", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'msmeAttVendorId' })
 ], Vendor.prototype, "msmeAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -77,10 +78,10 @@ __decorate([
     })
 ], Vendor.prototype, "tradeMark", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'tradeMarkAttVendorId' })
 ], Vendor.prototype, "tradeMarkAtt", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'agreementAttVendorId' })
 ], Vendor.prototype, "agreementAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
@@ -107,6 +108,9 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => VendorOther_1.default)
 ], Vendor.prototype, "otherFields", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Comment_1.default)
+], Vendor.prototype, "comments", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => SKU_1.default)
 ], Vendor.prototype, "skus", void 0);

@@ -12,11 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateVendorCode = exports.validateToken = exports.validateNew = void 0;
+exports.validateValidation = exports.validateVendorCode = exports.validateUpdate = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
-let JWTKEY = process.env.JWTKEY || 'MYNAME-IS-HELLOWORLD-AND-I-AM-FROM-PLUTO-))!!@@-NAME-IS-PLUTO';
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({
@@ -70,33 +68,60 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.validateNew = validateNew;
-const validateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const validateUpdate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const tokenSchema = joi_1.default.object({
-            validateToken: joi_1.default.string().required(),
+        const updateVendorSchema = joi_1.default.object({
+            companyName: joi_1.default.string().required(),
+            productCategory: joi_1.default.string().required(),
+            contactPersonName: joi_1.default.string().required(),
+            contactPersonEmail: joi_1.default.string().required(),
+            contactPersonPhone: joi_1.default.string().required(),
+            gst: joi_1.default.string().required(),
+            addressLine1: joi_1.default.string().required(),
+            addressLine2: joi_1.default.string().allow('').optional(),
+            country: joi_1.default.string().required(),
+            state: joi_1.default.string().required(),
+            city: joi_1.default.string().required(),
+            postalCode: joi_1.default.string().required(),
+            beneficiary: joi_1.default.string().required(),
+            accountNumber: joi_1.default.string().required(),
+            ifsc: joi_1.default.string().required(),
+            bankName: joi_1.default.string().required(),
+            branch: joi_1.default.string().required(),
+            coi: joi_1.default.string(),
+            msme: joi_1.default.string(),
+            tradeMark: joi_1.default.string(),
+            createdBy: joi_1.default.string().email(),
+            otherFields: joi_1.default.any(),
+            gstAttachment: joi_1.default.any().required(),
+            bankAttachment: joi_1.default.any().required(),
+            coiAttachment: joi_1.default.any(),
+            msmeAttachment: joi_1.default.any(),
+            tradeAttachment: joi_1.default.any(),
+            agreementAttachment: joi_1.default.any().required(),
         });
-        const value = yield tokenSchema.validateAsync(req.params);
-        const { validateToken } = value;
-        jsonwebtoken_1.default.verify(validateToken, JWTKEY, (err, decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
-            if (err) {
-                return res.status(400).json({
-                    success: false,
-                    message: err.message,
-                    data: [],
-                });
+        const files = req.files;
+        for (const file of files) {
+            if (!file.fieldname.startsWith('otherFieldsAttachments-'))
+                req.body[file.fieldname] = file;
+        }
+        const { vendorCode } = req.params;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (vendor) {
+            const value = yield updateVendorSchema.validateAsync(req.body);
+            for (const file of files) {
+                if (file.fieldname.startsWith('otherFieldsAttachments-'))
+                    req.body[file.fieldname] = file;
             }
-            const vendor = yield Vendor_1.default.findOne({ where: { vendorCode: decodedToken.vendorCode } });
-            if (vendor) {
-                req.body.vendor = vendor;
-                next();
-            }
-            else
-                return res.status(404).json({
-                    success: false,
-                    message: 'Vendor with this vendor code not exists',
-                    data: []
-                });
-        }));
+            next();
+        }
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "No vendor exist with the given vendor code",
+                data: {}
+            });
+        }
     }
     catch (error) {
         return res.status(504).json({
@@ -106,7 +131,7 @@ const validateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         });
     }
 });
-exports.validateToken = validateToken;
+exports.validateUpdate = validateUpdate;
 const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const validateVendorCode = joi_1.default.object({
@@ -133,6 +158,34 @@ const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.validateVendorCode = validateVendorCode;
+const validateValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validateValidationSchema = joi_1.default.object({
+            vendorCode: joi_1.default.string().required(),
+            isValid: joi_1.default.boolean().required(),
+            reason: joi_1.default.string()
+        });
+        const value = yield validateValidationSchema.validateAsync(req.body);
+        const { vendorCode } = value;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (vendor)
+            next();
+        else
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor with this vendor code not exists',
+                data: []
+            });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateValidation = validateValidation;
 // export const validateSignUp: RequestHandler = async (req, res, next) => {
 //     try {
 //         const signUpSchema = Joi.object({

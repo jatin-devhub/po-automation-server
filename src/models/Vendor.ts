@@ -6,6 +6,7 @@ import BuyingOrder from "./BuyingOrder";
 import ContactPerson from "./ContactPerson";
 import VendorAddress from "./VendorAddress";
 import File from "./File";
+import Comment from "./Comment";
 
 @Table({
     timestamps: true,
@@ -45,7 +46,7 @@ export default class Vendor extends Model {
     })
     gst!: string;
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'gstAttVendorId' })
     gstAtt!: File;
 
     @Column({
@@ -53,7 +54,7 @@ export default class Vendor extends Model {
     })
     coi!: string;
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'coiAttVendorId' })
     coiAtt!: File;
 
     @Column({
@@ -61,7 +62,7 @@ export default class Vendor extends Model {
     })
     msme!: string;
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'msmeAttVendorId' })
     msmeAtt!: File;
 
     @Column({
@@ -69,10 +70,10 @@ export default class Vendor extends Model {
     })
     tradeMark!: string;
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'tradeMarkAttVendorId' })
     tradeMarkAtt!: File;
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'agreementAttVendorId' })
     agreementAtt!: File;
     
     @Default(false)
@@ -99,6 +100,9 @@ export default class Vendor extends Model {
 
     @HasMany(() => VendorOther)
     otherFields!: VendorOther[];
+
+    @HasMany(() => Comment)
+    comments!: Comment[]
 
     @HasMany(() => SKU)
     skus!: SKU[];

@@ -6,8 +6,11 @@ export interface MailOptions {
     subject: string,
     title: string,
     message: string,
-    actionURL: string,
-    closingMessage: string
+    actionToken: string | null,
+    closingMessage: string | undefined,
+    priority: "high"|"normal"|"low" | undefined,
+    actionRoute?: string,
+    actionText?: string
 }
 
 export const sendMail = async (email: string, mailOptions: MailOptions) => {
@@ -20,10 +23,17 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
               pass: MAIL_PASS
             }
         });
-        const mailOption = {
+        const mailOption: {
+            from: string | undefined,
+            to: string,
+            subject: string,
+            priority: "high"|"normal"|"low" | undefined,
+            html: string
+        } = {
             from: MAIL_EMAIL,
             to: email,
             subject: mailOptions.subject,
+            priority: mailOptions.priority,
             html: `<!DOCTYPE html>
             <html>
             <head>
@@ -48,6 +58,7 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
                     }
                     p {
                         color: #555555;
+                        white-space: pre;
                     }
                     a {
                         display: inline-block;
@@ -69,14 +80,14 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
                     <h1>${mailOptions.title}</h1>
                     <p>Dear User,</p>
                     <p>${mailOptions.message}</p>
-                    <p><a href="${FRONTEND_BASE_URL}validate/${mailOptions.actionURL}">Verify Account</a></p>
-                    <p>${mailOptions.closingMessage}</p>
+                    ${mailOptions.actionToken? `<p><a href="${FRONTEND_BASE_URL}/${mailOptions.actionRoute}/${mailOptions.actionToken}">${mailOptions.actionText}</a></p>`: ""}                    
+                    <p>${mailOptions.closingMessage?mailOptions.closingMessage:""}</p>
                 </div>
                 <div class="footer">
                     <p>Best regards,<br>Global Plugin</p>
                 </div>
             </body>
-            </html>`,
+            </html>`
         };
         transport.sendMail(mailOption, (err, mailed) => {
             if (err) {

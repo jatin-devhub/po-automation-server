@@ -48,6 +48,5 @@ const connection = new sequelize_typescript_1.Sequelize({
     port: 3306,
     models: [Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, SKU_1.default, BuyingOrder_1.default, BuyingOrderRecord_1.default, File_1.default, Comment_1.default]
 });
-// connection.sync({force: true})
 // connection.truncate({ cascade: true, restartIdentity: true });
 exports.default = connection;

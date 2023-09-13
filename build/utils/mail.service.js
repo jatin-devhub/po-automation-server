@@ -29,6 +29,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
             from: MAIL_EMAIL,
             to: email,
             subject: mailOptions.subject,
+            priority: mailOptions.priority,
             html: `<!DOCTYPE html>
             <html>
             <head>
@@ -53,6 +54,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
                     }
                     p {
                         color: #555555;
+                        white-space: pre;
                     }
                     a {
                         display: inline-block;
@@ -74,14 +76,14 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
                     <h1>${mailOptions.title}</h1>
                     <p>Dear User,</p>
                     <p>${mailOptions.message}</p>
-                    <p><a href="${FRONTEND_BASE_URL}validate/${mailOptions.actionURL}">Verify Account</a></p>
-                    <p>${mailOptions.closingMessage}</p>
+                    ${mailOptions.actionToken ? `<p><a href="${FRONTEND_BASE_URL}/${mailOptions.actionRoute}/${mailOptions.actionToken}">${mailOptions.actionText}</a></p>` : ""}                    
+                    <p>${mailOptions.closingMessage ? mailOptions.closingMessage : ""}</p>
                 </div>
                 <div class="footer">
                     <p>Best regards,<br>Global Plugin</p>
                 </div>
             </body>
-            </html>`,
+            </html>`
         };
         transport.sendMail(mailOption, (err, mailed) => {
             if (err) {

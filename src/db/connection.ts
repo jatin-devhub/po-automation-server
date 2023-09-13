@@ -22,7 +22,6 @@ const connection = new Sequelize({
   models: [Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File, Comment]
 });
 
-// connection.sync({force: true})
 // connection.truncate({ cascade: true, restartIdentity: true });
 
 export default connection;

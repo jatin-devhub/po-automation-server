@@ -1,9 +1,6 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
-import jwt from 'jsonwebtoken';
 import Vendor from "../models/Vendor";
-
-let JWTKEY = process.env.JWTKEY || 'MYNAME-IS-HELLOWORLD-AND-I-AM-FROM-PLUTO-))!!@@-NAME-IS-PLUTO';
 
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
@@ -59,36 +56,61 @@ export const validateNew: RequestHandler = async (req, res, next) => {
     }
 }
 
-export const validateToken: RequestHandler = async (req, res, next) => {
+export const validateUpdate: RequestHandler = async (req, res, next) => {
     try {
-        const tokenSchema = Joi.object({
-            validateToken: Joi.string().required(),
+        const updateVendorSchema = Joi.object({
+            companyName: Joi.string().required(),
+            productCategory: Joi.string().required(),
+            contactPersonName: Joi.string().required(),
+            contactPersonEmail: Joi.string().required(),
+            contactPersonPhone: Joi.string().required(),
+            gst: Joi.string().required(),
+            addressLine1: Joi.string().required(),
+            addressLine2: Joi.string().allow('').optional(),
+            country: Joi.string().required(),
+            state: Joi.string().required(),
+            city: Joi.string().required(),
+            postalCode: Joi.string().required(),
+            beneficiary: Joi.string().required(),
+            accountNumber: Joi.string().required(),
+            ifsc: Joi.string().required(),
+            bankName: Joi.string().required(),
+            branch: Joi.string().required(),
+            coi: Joi.string(),
+            msme: Joi.string(),
+            tradeMark: Joi.string(),
+            createdBy: Joi.string().email(),
+            otherFields: Joi.any(),
+            gstAttachment: Joi.any().required(),
+            bankAttachment: Joi.any().required(),
+            coiAttachment: Joi.any(),
+            msmeAttachment: Joi.any(),
+            tradeAttachment: Joi.any(),
+            agreementAttachment: Joi.any().required(),
         })
+        const files = req.files as Express.Multer.File[];
 
-        const value = await tokenSchema.validateAsync(req.params);
-        const { validateToken } = value;
-
-        jwt.verify(validateToken, JWTKEY, async (err: any, decodedToken: any) => {
-            if (err) {
-                return res.status(400).json({
-                    success: false,
-                    message: err.message,
-                    data: [],
-                });
+        for (const file of files) {
+            if (!file.fieldname.startsWith('otherFieldsAttachments-'))
+                req.body[file.fieldname] = file
+        }
+        const { vendorCode } = req.params;
+        const vendor = await Vendor.findOne({where: { vendorCode }})
+        if(vendor) {
+            const value = await updateVendorSchema.validateAsync(req.body);
+            for (const file of files) {
+                if (file.fieldname.startsWith('otherFieldsAttachments-'))
+                req.body[file.fieldname] = file
             }
-
-            const vendor = await Vendor.findOne({ where: { vendorCode: decodedToken.vendorCode } })
-            if (vendor) {
-                req.body.vendor = vendor
-                next();
-            }
-            else
-                return res.status(404).json({
-                    success: false,
-                    message: 'Vendor with this vendor code not exists',
-                    data: []
-                })
-        });
+            next();
+        }
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "No vendor exist with the given vendor code",
+                data: {}
+            })
+        }
 
     } catch (error: any) {
         return res.status(504).json({
@@ -106,6 +128,36 @@ export const validateVendorCode: RequestHandler = async (req, res, next) => {
         })
 
         const value = await validateVendorCode.validateAsync(req.params);
+        const { vendorCode } = value;
+
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if (vendor)
+            next();
+        else
+            return res.status(404).json({
+                success: false,
+                message: 'Vendor with this vendor code not exists',
+                data: []
+            })
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateValidation: RequestHandler = async (req, res, next) => {
+    try {
+        const validateValidationSchema = Joi.object({
+            vendorCode: Joi.string().required(),
+            isValid: Joi.boolean().required(),
+            reason: Joi.string()
+        });
+
+        const value = await validateValidationSchema.validateAsync(req.body);
         const { vendorCode } = value;
 
         const vendor = await Vendor.findOne({ where: { vendorCode } })

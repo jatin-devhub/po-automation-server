@@ -58,7 +58,31 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "vendorId", void 0);
+], File.prototype, "gstAttVendorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "coiAttVendorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "msmeAttVendorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "tradeMarkAttVendorId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "agreementAttVendorId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => VendorBank_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -78,8 +102,20 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
 ], File.prototype, "sku", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], File.prototype, "vendor", void 0);
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'gstAttVendorId')
+], File.prototype, "gstAttVendor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'coiAttVendorId')
+], File.prototype, "coiAttVendor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'msmeAttVendorId')
+], File.prototype, "msmeAttVendor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'tradeMarkAttVendorId')
+], File.prototype, "tradeMarkAttVendor", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'agreementAttVendorId')
+], File.prototype, "agreementAttVendor", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => VendorBank_1.default)
 ], File.prototype, "vendorBank", void 0);

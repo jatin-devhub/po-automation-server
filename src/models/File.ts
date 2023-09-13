@@ -49,7 +49,31 @@ export default class File extends Model {
   @Column({
     type: DataType.INTEGER
   })
-  vendorId!: number;
+  gstAttVendorId!: number;
+
+  @ForeignKey(() => Vendor)
+  @Column({
+    type: DataType.INTEGER
+  })
+  coiAttVendorId!: number;
+
+  @ForeignKey(() => Vendor)
+  @Column({
+    type: DataType.INTEGER
+  })
+  msmeAttVendorId!: number;
+
+  @ForeignKey(() => Vendor)
+  @Column({
+    type: DataType.INTEGER
+  })
+  tradeMarkAttVendorId!: number;
+
+  @ForeignKey(() => Vendor)
+  @Column({
+    type: DataType.INTEGER
+  })
+  agreementAttVendorId!: number;
 
   @ForeignKey(() => VendorBank)
   @Column({
@@ -69,8 +93,21 @@ export default class File extends Model {
   @BelongsTo(() => SKU)
   sku!: SKU;
 
-  @BelongsTo(() => Vendor)
-  vendor!: Vendor;
+  @BelongsTo(() => Vendor, 'gstAttVendorId')
+  gstAttVendor!: Vendor;
+
+  @BelongsTo(() => Vendor, 'coiAttVendorId')
+  coiAttVendor!: Vendor;
+
+  @BelongsTo(() => Vendor, 'msmeAttVendorId')
+  msmeAttVendor!: Vendor;
+
+  @BelongsTo(() => Vendor, 'tradeMarkAttVendorId')
+  tradeMarkAttVendor!: Vendor;
+
+  @BelongsTo(() => Vendor, 'agreementAttVendorId')
+  agreementAttVendor!: Vendor;
+
 
   @BelongsTo(() => VendorBank)
   vendorBank!: VendorBank
