@@ -375,12 +375,7 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     model: VendorAddress_1.default
                 },
                 {
-                    model: VendorBank_1.default,
-                    include: [
-                        {
-                            model: File_1.default
-                        }
-                    ]
+                    model: VendorBank_1.default
                 },
                 {
                     model: VendorOther_1.default
@@ -393,26 +388,6 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 },
                 {
                     model: Comment_1.default
-                },
-                {
-                    model: File_1.default,
-                    as: 'gstAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File_1.default,
-                    as: 'coiAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File_1.default,
-                    as: 'msmeAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File_1.default,
-                    as: 'tradeMarkAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File_1.default,
-                    as: 'agreementAtt' // Add an alias to the File model association
                 }
             ]
         });

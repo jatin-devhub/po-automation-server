@@ -411,12 +411,7 @@ export const getVendor: RequestHandler = async (req, res) => {
                     model: VendorAddress
                 },
                 {
-                    model: VendorBank,
-                    include: [
-                        {
-                            model: File
-                        }
-                    ]
+                    model: VendorBank
                 },
                 {
                     model: VendorOther
@@ -429,26 +424,6 @@ export const getVendor: RequestHandler = async (req, res) => {
                 },
                 {
                     model: Comment
-                },
-                {
-                    model: File,
-                    as: 'gstAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File,
-                    as: 'coiAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File,
-                    as: 'msmeAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File,
-                    as: 'tradeMarkAtt' // Add an alias to the File model association
-                },
-                {
-                    model: File,
-                    as: 'agreementAtt' // Add an alias to the File model association
                 }
             ]
         });

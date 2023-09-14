@@ -22,11 +22,8 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
             auth: {
               user: MAIL_EMAIL,
               pass: MAIL_PASS
-            },
-            logger: true
+            }
         });
-
-        console.log("transport", transport)
         const mailOption: {
             from: string | undefined,
             to: string,
@@ -62,7 +59,7 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
                     }
                     p {
                         color: #555555;
-                        white-space: pre;
+                        white-space: pre-wrap;
                     }
                     a {
                         display: inline-block;

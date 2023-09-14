@@ -24,10 +24,8 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
             auth: {
                 user: MAIL_EMAIL,
                 pass: MAIL_PASS
-            },
-            logger: true
+            }
         });
-        console.log("transport", transport);
         const mailOption = {
             from: MAIL_EMAIL,
             to: email,
@@ -57,7 +55,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
                     }
                     p {
                         color: #555555;
-                        white-space: pre;
+                        white-space: pre-wrap;
                     }
                     a {
                         display: inline-block;
