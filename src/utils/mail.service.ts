@@ -22,8 +22,11 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
             auth: {
               user: MAIL_EMAIL,
               pass: MAIL_PASS
-            }
+            },
+            logger: true
         });
+
+        console.log("transport", transport)
         const mailOption: {
             from: string | undefined,
             to: string,
