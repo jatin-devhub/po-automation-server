@@ -20,6 +20,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
         let transport = nodemailer_1.default.createTransport({
             host: MAIL_HOST,
             port: Number(MAIL_PORT) | 0,
+            secure: true,
             auth: {
                 user: MAIL_EMAIL,
                 pass: MAIL_PASS
