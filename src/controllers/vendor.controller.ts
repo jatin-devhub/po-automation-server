@@ -183,6 +183,8 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         }
 
         const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
+
+        console.log(mailSent)
         
         if(mailSent)
         return res.status(201).json({
@@ -193,7 +195,10 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
          
         return res.status(404).json({
             success: false,
-            message: `Unable to send email.`
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
         })
 
     } catch (error: any) {

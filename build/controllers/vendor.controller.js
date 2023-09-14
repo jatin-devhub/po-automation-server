@@ -180,6 +180,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             }
         }
         const mailSent = yield sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
+        console.log(mailSent);
         if (mailSent)
             return res.status(201).json({
                 success: true,
@@ -188,7 +189,10 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
         return res.status(404).json({
             success: false,
-            message: `Unable to send email.`
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
         });
     }
     catch (error) {
