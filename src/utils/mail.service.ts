@@ -89,15 +89,7 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
             </body>
             </html>`
         };
-        transport.sendMail(mailOption, (err, mailed) => {
-            if (err) {
-                console.log(err.message);
-                return false;
-            } else {
-                console.log(`Email has been Sent :- `, mailed.response);
-                return true;
-            }
-        });
+        return await transport.sendMail(mailOption);
     } catch (error: any) {
         console.log(error.message);
         return false;

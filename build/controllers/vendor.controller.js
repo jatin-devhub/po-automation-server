@@ -42,6 +42,11 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             createdBy
         });
         const vendor = yield newVendor.save();
+        if (!vendor)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create vendor details`
+            });
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
         if (coiAttachment) {
@@ -71,25 +76,40 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 tradeAttVendorId: vendor.id
             });
         }
-        yield File_1.default.create({
+        const gstFile = yield File_1.default.create({
             fileName: gstAttachment.originalname,
             fileContent: decodedGstFile,
             fileType: 'gst',
             gstAttVendorId: vendor.id
         });
-        yield File_1.default.create({
+        if (!gstFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            });
+        const agreementFile = yield File_1.default.create({
             fileName: agreementAttachment.originalname,
             fileContent: decodedAgreementFile,
             fileType: 'agreement',
             agreementAttVendorId: vendor.id
         });
+        if (!agreementFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            });
         const newContactPerson = new ContactPerson_1.default({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
             vendorId: vendor.id
         });
-        yield newContactPerson.save();
+        const contactPerson = yield newContactPerson.save();
+        if (!contactPerson)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create contact person details`
+            });
         const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
         const newAdress = new VendorAddress_1.default({
             addressLine1,
@@ -100,7 +120,12 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             postalCode,
             vendorId: vendor.id
         });
-        yield newAdress.save();
+        const address = yield newAdress.save();
+        if (!address)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create address details`
+            });
         const newVendorBank = new VendorBank_1.default({
             beneficiaryName: beneficiary,
             accountNumber,
@@ -110,12 +135,22 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             vendorId: vendor.id
         });
         const vendorBank = yield newVendorBank.save();
+        if (!vendorBank)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            });
         const bankProofFile = yield File_1.default.create({
             fileName: bankAttachment.originalname,
             fileContent: decodedbankFile,
             fileType: 'bankProof',
             vendorBankId: vendorBank.id
         });
+        if (!bankProofFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank proof attachments`
+            });
         if (otherFields) {
             let otherFieldsObject = JSON.parse(otherFields);
             if ((otherFieldsObject === null || otherFieldsObject === void 0 ? void 0 : otherFieldsObject.length) > 0) {
@@ -127,6 +162,11 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                         vendorId: vendor.id
                     });
                     const otherField = yield newOtherField.save();
+                    if (!otherField)
+                        return res.status(404).json({
+                            success: false,
+                            message: `Unable to create other fields`
+                        });
                     if (req.body[`otherFieldsAttachments-${field.key}`]) {
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
                         otherFile = yield File_1.default.create({
@@ -148,7 +188,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             });
         return res.status(404).json({
             success: false,
-            message: `Some error occured`
+            message: `Unable to send email.`
         });
     }
     catch (error) {

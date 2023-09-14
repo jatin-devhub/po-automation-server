@@ -32,6 +32,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             createdBy
         })
         const vendor = await newVendor.save();
+        if(!vendor)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create vendor details`
+        })
         
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
@@ -61,29 +66,44 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                 fileType: 'trade',
                 tradeAttVendorId: vendor.id
             })    
-        }    
+        }
         
-        await File.create({
+        const gstFile = await File.create({
             fileName: gstAttachment.originalname,
             fileContent: decodedGstFile,
             fileType: 'gst',
             gstAttVendorId: vendor.id
         })    
+        if(!gstFile)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create bank details`
+        })
 
-        await File.create({
+        const agreementFile = await File.create({
             fileName: agreementAttachment.originalname,
             fileContent: decodedAgreementFile,
             fileType: 'agreement',
             agreementAttVendorId: vendor.id
-        })    
-        
+        })   
+        if(!agreementFile)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create bank details`
+        })
+
         const newContactPerson = new ContactPerson({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
             vendorId: vendor.id
         })
-        await newContactPerson.save();
+        const contactPerson = await newContactPerson.save();
+        if(!contactPerson)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create contact person details`
+        })
 
         const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
 
@@ -96,7 +116,12 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             postalCode,
             vendorId: vendor.id
         })
-        await newAdress.save();
+        const address = await newAdress.save();
+        if(!address)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create address details`
+        })
 
         const newVendorBank = new VendorBank({
             beneficiaryName: beneficiary,
@@ -107,7 +132,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             vendorId: vendor.id
         })
         const vendorBank = await newVendorBank.save();
-
+        if(!vendorBank)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create bank details`
+        })
 
         const bankProofFile = await File.create({
             fileName: bankAttachment.originalname,
@@ -115,6 +144,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             fileType: 'bankProof',
             vendorBankId: vendorBank.id
         })    
+        if(!bankProofFile)
+        return res.status(404).json({
+            success: false,
+            message: `Unable to create bank proof attachments`
+        })
 
         if(otherFields){
             let otherFieldsObject = JSON.parse(otherFields)
@@ -128,6 +162,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                         vendorId: vendor.id
                     })
                     const otherField = await newOtherField.save();
+                    if(!otherField)
+                    return res.status(404).json({
+                        success: false,
+                        message: `Unable to create other fields`
+                    })
                     if(req.body[`otherFieldsAttachments-${field.key}`]){
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
         
@@ -144,7 +183,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         }
 
         const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
-
+        
         if(mailSent)
         return res.status(201).json({
             success: true,
@@ -154,7 +193,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
          
         return res.status(404).json({
             success: false,
-            message: `Some error occured`
+            message: `Unable to send email.`
         })
 
     } catch (error: any) {

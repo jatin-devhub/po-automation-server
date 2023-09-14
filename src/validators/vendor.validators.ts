@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
 import Vendor from "../models/Vendor";
+import ContactPerson from "../models/ContactPerson";
 
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
@@ -41,6 +42,12 @@ export const validateNew: RequestHandler = async (req, res, next) => {
                 req.body[file.fieldname] = file
         }
         const value = await newVendorSchema.validateAsync(req.body);
+        const tempContact = await ContactPerson.findOne({where: { email: value.contactPersonEmail }})
+        if(tempContact)
+        return res.status(404).json({
+            success: false,
+            message: 'Contact Email already exists'
+        })
         for (const file of files) {
             if (file.fieldname.startsWith('otherFieldsAttachments-'))
                 req.body[file.fieldname] = file

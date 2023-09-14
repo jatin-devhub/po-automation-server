@@ -85,16 +85,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
             </body>
             </html>`
         };
-        transport.sendMail(mailOption, (err, mailed) => {
-            if (err) {
-                console.log(err.message);
-                return false;
-            }
-            else {
-                console.log(`Email has been Sent :- `, mailed.response);
-                return true;
-            }
-        });
+        return yield transport.sendMail(mailOption);
     }
     catch (error) {
         console.log(error.message);

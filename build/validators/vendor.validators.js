@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateValidation = exports.validateVendorCode = exports.validateUpdate = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
+const ContactPerson_1 = __importDefault(require("../models/ContactPerson"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({
@@ -53,6 +54,12 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 req.body[file.fieldname] = file;
         }
         const value = yield newVendorSchema.validateAsync(req.body);
+        const tempContact = yield ContactPerson_1.default.findOne({ where: { email: value.contactPersonEmail } });
+        if (tempContact)
+            return res.status(404).json({
+                success: false,
+                message: 'Contact Email already exists'
+            });
         for (const file of files) {
             if (file.fieldname.startsWith('otherFieldsAttachments-'))
                 req.body[file.fieldname] = file;
