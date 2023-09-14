@@ -92,9 +92,9 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
             }
             else {
                 console.log(`Email has been Sent :- `, mailed.response);
+                return true;
             }
         });
-        return true;
     }
     catch (error) {
         console.log(error.message);

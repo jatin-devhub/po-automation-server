@@ -95,9 +95,9 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
                 return false;
             } else {
                 console.log(`Email has been Sent :- `, mailed.response);
+                return true;
             }
         });
-        return true;
     } catch (error: any) {
         console.log(error.message);
         return false;
