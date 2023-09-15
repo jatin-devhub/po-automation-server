@@ -238,7 +238,7 @@ const updateVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 fileName: tradeAttachment.originalname,
                 fileContent: decodedTradeFile
             }, {
-                where: { fileType: 'trade', tradeAttVendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id }
+                where: { fileType: 'trade', tradeMarkAttVendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id }
             });
         }
         yield File_1.default.update({
@@ -305,7 +305,7 @@ const updateVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
                             fileType: 'other',
-                            otherAttVendorId: otherField.id
+                            vendorOtherId: otherField.id
                         });
                     }
                 }

@@ -253,7 +253,7 @@ export const updateVendor: RequestHandler = async (req, res) => {
                 fileContent: decodedTradeFile
             },
             {
-                where: { fileType: 'trade', tradeAttVendorId: vendor?.id}
+                where: { fileType: 'trade', tradeMarkAttVendorId: vendor?.id}
             })    
         }    
         
@@ -335,7 +335,7 @@ export const updateVendor: RequestHandler = async (req, res) => {
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
                             fileType: 'other',
-                            otherAttVendorId: otherField.id
+                            vendorOtherId: otherField.id
                         })
                     }
     
