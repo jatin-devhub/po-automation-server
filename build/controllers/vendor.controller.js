@@ -73,7 +73,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 fileName: tradeAttachment.originalname,
                 fileContent: decodedTradeFile,
                 fileType: 'trade',
-                tradeAttVendorId: vendor.id
+                tradeMarkAttVendorId: vendor.id
             });
         }
         const gstFile = yield File_1.default.create({
@@ -173,7 +173,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
                             fileType: 'other',
-                            otherAttVendorId: otherField.id
+                            vendorOtherId: otherField.id
                         });
                     }
                 }

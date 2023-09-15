@@ -64,7 +64,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                 fileName: tradeAttachment.originalname,
                 fileContent: decodedTradeFile,
                 fileType: 'trade',
-                tradeAttVendorId: vendor.id
+                tradeMarkAttVendorId: vendor.id
             })    
         }
         
@@ -174,7 +174,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
                             fileType: 'other',
-                            otherAttVendorId: otherField.id
+                            vendorOtherId: otherField.id
                         })
                     }
     

@@ -8,13 +8,19 @@ export const getFile: RequestHandler = async (req, res) => {
         const condn: { [key: string]: string } = {};
         condn[idType] = id;
 
-        
+
         const file = await File.findOne({ where: condn })
+        let newFile
+        if(file)
+        newFile = file.fileContent.toString('base64');
 
         return res.status(201).json({
             success: true,
             message: `File fetched successfully`,
-            data: {file: file},
+            data: { file: {
+                fileName: file?.fileName,
+                fileContent: newFile
+            } },
         });
 
     } catch (error: any) {

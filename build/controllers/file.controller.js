@@ -20,10 +20,16 @@ const getFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const condn = {};
         condn[idType] = id;
         const file = yield File_1.default.findOne({ where: condn });
+        let newFile;
+        if (file)
+            newFile = file.fileContent.toString('base64');
         return res.status(201).json({
             success: true,
             message: `File fetched successfully`,
-            data: { file: file },
+            data: { file: {
+                    fileName: file === null || file === void 0 ? void 0 : file.fileName,
+                    fileContent: newFile
+                } },
         });
     }
     catch (error) {
