@@ -4,6 +4,7 @@ import vendorRouter from "./vendor.route"
 import skuRouter from "./sku.route"
 import buyingOrderRouter from "./buying-order.route"
 import fileRouter from "./file.route"
+import authRouter from "./auth.route"
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use("/vendor", vendorRouter)
 router.use("/sku", skuRouter)
 router.use("/buying-order", buyingOrderRouter)
 router.use("/file", fileRouter)
+router.use("/auth", authRouter)
 
 export default router;
