@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const Vendor_1 = __importDefault(require("./Vendor"));
 const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
+const Comment_1 = __importDefault(require("./Comment"));
 let SKU = class SKU extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -105,6 +106,9 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
 ], SKU.prototype, "buyingRecords", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Comment_1.default)
+], SKU.prototype, "comments", void 0);
 SKU = __decorate([
     sequelize_typescript_1.Table
 ], SKU);

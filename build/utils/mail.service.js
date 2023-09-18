@@ -12,9 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMail = void 0;
+exports.sendMailSetup = exports.sendMail = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const emailConfig_1 = require("../config/emailConfig");
 const { MAIL_HOST, MAIL_PORT, MAIL_EMAIL, MAIL_PASS, FRONTEND_BASE_URL } = process.env;
+const JWTKEY = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let transport = nodemailer_1.default.createTransport({
@@ -94,3 +97,36 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.sendMail = sendMail;
+const sendMailSetup = (vendorCode, type, variables, sendTo) => __awaiter(void 0, void 0, void 0, function* () {
+    const mailOptions = {
+        subject: emailConfig_1.mailDetails[type].subject,
+        title: emailConfig_1.mailDetails[type].title,
+        message: getMessage(emailConfig_1.mailDetails[type].message, variables),
+        actionToken: getToken(vendorCode, type),
+        closingMessage: emailConfig_1.mailDetails[type].closingMessage,
+        priority: emailConfig_1.mailDetails[type].priority,
+        actionRoute: emailConfig_1.mailDetails[type].actionRoute,
+        actionText: emailConfig_1.mailDetails[type].actionText
+    };
+    if (sendTo)
+        return yield (0, exports.sendMail)(sendTo, mailOptions);
+    else if (emailConfig_1.mailDetails[type].sendTo)
+        return yield (0, exports.sendMail)(emailConfig_1.mailDetails[type].sendTo || "", mailOptions);
+    else
+        return false;
+});
+exports.sendMailSetup = sendMailSetup;
+const getMessage = (message, variables) => {
+    if (variables) {
+        Object.entries(variables).forEach(([key, value]) => {
+            message = message.replace(`$${key}`, value);
+        });
+    }
+    return message;
+};
+const getToken = (vendorCode, type) => {
+    if (vendorCode)
+        return jsonwebtoken_1.default.sign({ vendorCode, type }, JWTKEY);
+    else
+        return null;
+};

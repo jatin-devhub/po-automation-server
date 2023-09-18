@@ -3,6 +3,7 @@ import {
 } from 'sequelize-typescript';
 import Vendor from './Vendor';
 import BuyingOrderRecord from './BuyingOrderRecord';
+import Comment from './Comment';
 
 @Table
 export default class SKU extends Model {
@@ -96,4 +97,7 @@ export default class SKU extends Model {
 
     @HasMany(() => BuyingOrderRecord)
     buyingRecords!: BuyingOrderRecord
+
+    @HasMany(() => Comment)
+    comments!: Comment[]
 }

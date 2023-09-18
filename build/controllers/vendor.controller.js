@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setValidation = exports.getVendor = exports.getAllVendors = exports.updateVendor = exports.vendorRegistration = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
@@ -24,9 +23,7 @@ const VendorAddress_1 = __importDefault(require("../models/VendorAddress"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const mail_service_1 = require("../utils/mail.service");
-const emailConfig_1 = require("../config/emailConfig");
 const Comment_1 = __importDefault(require("../models/Comment"));
-const JWTKEY = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
@@ -179,7 +176,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
                 }
             }
         }
-        const mailSent = yield sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
+        const mailSent = yield (0, mail_service_1.sendMailSetup)(vendor.vendorCode, 'new-vendor', undefined, undefined);
         console.log(mailSent);
         if (mailSent)
             return res.status(201).json({
@@ -311,7 +308,7 @@ const updateVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 }
             }
         }
-        const mailSent = yield sendMailSetup(vendorCode, 'update-vendor', undefined, undefined);
+        const mailSent = yield (0, mail_service_1.sendMailSetup)(vendorCode, 'update-vendor', undefined, undefined);
         if (mailSent)
             return res.status(201).json({
                 success: true,
@@ -343,7 +340,8 @@ const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                     model: VendorAddress_1.default,
                     attributes: [],
                 },
-            ]
+            ],
+            where: { isVerified: true }
         });
         return res.status(201).json({
             success: true,
@@ -425,7 +423,7 @@ const setValidation = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 company: vendor === null || vendor === void 0 ? void 0 : vendor.companyName,
                 vendorCode
             };
-            yield sendMailSetup(null, 'vendor-success', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
+            yield (0, mail_service_1.sendMailSetup)(null, 'vendor-success', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
             yield Vendor_1.default.update({ isVerified: true }, { where: { vendorCode } });
         }
         else {
@@ -436,7 +434,7 @@ const setValidation = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 comment: reason,
                 vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id,
             });
-            yield sendMailSetup(vendorCode, 'vendor-fail', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
+            yield (0, mail_service_1.sendMailSetup)(vendorCode, 'vendor-fail', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
         }
         return res.status(201).json({
             success: true,
@@ -473,35 +471,3 @@ const getNewVendorCode = (country) => __awaiter(void 0, void 0, void 0, function
     } while (existingVendor);
     return vendorCode;
 });
-const sendMailSetup = (vendorCode, type, variables, sendTo) => __awaiter(void 0, void 0, void 0, function* () {
-    const mailOptions = {
-        subject: emailConfig_1.mailDetails[type].subject,
-        title: emailConfig_1.mailDetails[type].title,
-        message: getMessage(emailConfig_1.mailDetails[type].message, variables),
-        actionToken: getToken(vendorCode, type),
-        closingMessage: emailConfig_1.mailDetails[type].closingMessage,
-        priority: emailConfig_1.mailDetails[type].priority,
-        actionRoute: emailConfig_1.mailDetails[type].actionRoute,
-        actionText: emailConfig_1.mailDetails[type].actionText
-    };
-    if (sendTo)
-        return yield (0, mail_service_1.sendMail)(sendTo, mailOptions);
-    else if (emailConfig_1.mailDetails[type].sendTo)
-        return yield (0, mail_service_1.sendMail)(emailConfig_1.mailDetails[type].sendTo || "", mailOptions);
-    else
-        return false;
-});
-const getMessage = (message, variables) => {
-    if (variables) {
-        Object.entries(variables).forEach(([key, value]) => {
-            message = message.replace(`$${key}`, value);
-        });
-    }
-    return message;
-};
-const getToken = (vendorCode, type) => {
-    if (vendorCode)
-        return jsonwebtoken_1.default.sign({ vendorCode, type }, JWTKEY);
-    else
-        return null;
-};

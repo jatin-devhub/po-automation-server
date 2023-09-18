@@ -1,6 +1,9 @@
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 
+import { mailDetails } from "../config/emailConfig";
 const { MAIL_HOST, MAIL_PORT, MAIL_EMAIL, MAIL_PASS, FRONTEND_BASE_URL } = process.env
+const JWTKEY: string = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 
 export interface MailOptions {
     subject: string,
@@ -13,7 +16,7 @@ export interface MailOptions {
     actionText?: string
 }
 
-export const sendMail = async (email: string, mailOptions: MailOptions) => {
+export const sendMail = async (email: string | string[], mailOptions: MailOptions) => {
     try {
         let transport = nodemailer.createTransport({
             host: MAIL_HOST,
@@ -26,7 +29,7 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
         });
         const mailOption: {
             from: string | undefined,
-            to: string,
+            to: string | string[],
             subject: string,
             priority: "high"|"normal"|"low" | undefined,
             html: string
@@ -96,3 +99,41 @@ export const sendMail = async (email: string, mailOptions: MailOptions) => {
         return false;
     }
 };
+
+export const sendMailSetup = async (vendorCode: string | null, type: string, variables: any, sendTo: string | undefined) => {
+    const mailOptions: MailOptions = {
+        subject: mailDetails[type].subject,
+        title: mailDetails[type].title,
+        message: getMessage(mailDetails[type].message, variables),
+        actionToken: getToken(vendorCode, type),
+        closingMessage: mailDetails[type].closingMessage,
+        priority: mailDetails[type].priority,
+        actionRoute: mailDetails[type].actionRoute,
+        actionText: mailDetails[type].actionText
+    }
+    if(sendTo)
+    return await sendMail(sendTo, mailOptions)
+    else if(mailDetails[type].sendTo) 
+    return await sendMail(mailDetails[type].sendTo || "", mailOptions);
+    else
+    return false;
+};
+
+
+
+const getMessage = (message: string, variables: { [key: string]: string }): string => {
+    if(variables) {
+        Object.entries(variables).forEach(([key, value]) => {
+            message = message.replace(`$${key}`, value);            
+        });
+        
+    }
+    return message;
+}
+
+const getToken = (vendorCode: string | null, type: string): string | null => {
+    if(vendorCode)
+    return jwt.sign({ vendorCode, type }, JWTKEY);
+    else
+    return null;
+}

@@ -1,7 +1,8 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
+import Vendor from "../models/Vendor";
 
-export const validateNew: RequestHandler =async (req, res, next) => {
+export const validateNew: RequestHandler = async (req, res, next) => {
     try {
         const newSkuSchema = Joi.object({
             skuCode: Joi.string().required(),
@@ -23,7 +24,8 @@ export const validateNew: RequestHandler =async (req, res, next) => {
             masterCartonHeightCm: Joi.number().min(0),
             masterCartonWeightKg: Joi.number().min(0),
             MRP: Joi.number().min(0),
-            vendorCode: Joi.string()
+            vendorCode: Joi.string().required(),
+            createdBy: Joi.string().email().required()
         });
 
         const value = await newSkuSchema.validateAsync(req.body);
@@ -38,6 +40,91 @@ export const validateNew: RequestHandler =async (req, res, next) => {
     }
 }
 
+export const validateSendVerify: RequestHandler = async (req, res, next) => {
+    try {
+        const verifyMailSchema = Joi.object({
+            vendorCode: Joi.string().required()
+        });
+
+        const value = await verifyMailSchema.validateAsync(req.params);
+        const vendorCode = value.vendorCode;
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if(vendor)
+        next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            })
+        }
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateVendorCode: RequestHandler = async (req, res, next) => {
+    try {
+        const validateVendorCode = Joi.object({
+            vendorCode: Joi.string().required()
+        });
+
+        const value = await validateVendorCode.validateAsync(req.params);
+        const vendorCode = value.vendorCode;
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if(vendor)
+        next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            })
+        }
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateReview: RequestHandler = async (req, res, next) => {
+    try {
+        const validateVendorCode = Joi.object({
+            vendorCode: Joi.string().required(),
+            isValid: Joi.boolean().required(),
+            reason: Joi.string()
+        });
+
+        const value = await validateVendorCode.validateAsync(req.body);
+        const vendorCode = value.vendorCode;
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if(vendor)
+        next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            })
+        }
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
 // export const validateSignUp: RequestHandler = async (req, res, next) => {
 //     try {
 //         const signUpSchema = Joi.object({

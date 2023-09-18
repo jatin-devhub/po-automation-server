@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { Sequelize } from "sequelize-typescript";
-import jwt from "jsonwebtoken";
 
 import Vendor from "../models/Vendor";
 import File from "../models/File";
@@ -10,10 +9,9 @@ import ContactPerson from "../models/ContactPerson";
 import VendorAddress from "../models/VendorAddress";
 import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
-import { MailOptions, sendMail } from "../utils/mail.service";
+import { sendMailSetup } from "../utils/mail.service";
 import { mailDetails } from "../config/emailConfig";
 import Comment from "../models/Comment";
-const JWTKEY: string = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
@@ -377,7 +375,8 @@ export const getAllVendors: RequestHandler = async (req, res) => {
                   model: VendorAddress,
                   attributes: [],
                 },
-              ]
+            ],
+            where: { isVerified: true }
         });
 
         return res.status(201).json({
@@ -514,40 +513,4 @@ const getNewVendorCode = async (country: string) => {
     } while(existingVendor)
 
     return vendorCode;
-}
-
-const sendMailSetup = async (vendorCode: string | null, type: string, variables: any, sendTo: string | undefined) => {
-    const mailOptions: MailOptions = {
-        subject: mailDetails[type].subject,
-        title: mailDetails[type].title,
-        message: getMessage(mailDetails[type].message, variables),
-        actionToken: getToken(vendorCode, type),
-        closingMessage: mailDetails[type].closingMessage,
-        priority: mailDetails[type].priority,
-        actionRoute: mailDetails[type].actionRoute,
-        actionText: mailDetails[type].actionText
-    }
-    if(sendTo)
-    return await sendMail(sendTo, mailOptions)
-    else if(mailDetails[type].sendTo)
-    return await sendMail(mailDetails[type].sendTo || "", mailOptions);
-    else
-    return false;
-};
-
-const getMessage = (message: string, variables: { [key: string]: string }): string => {
-    if(variables) {
-        Object.entries(variables).forEach(([key, value]) => {
-            message = message.replace(`$${key}`, value);            
-        });
-        
-    }
-    return message;
-}
-
-const getToken = (vendorCode: string | null, type: string): string | null => {
-    if(vendorCode)
-    return jwt.sign({ vendorCode, type }, JWTKEY);
-    else
-    return null;
 }

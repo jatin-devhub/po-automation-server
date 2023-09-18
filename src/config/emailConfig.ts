@@ -4,7 +4,7 @@ interface MailDetail {
     message: string,
     closingMessage?: string | undefined,
     priority: "high"|"normal"|"low" | undefined,
-    sendTo?: string,
+    sendTo?: string | string[],
     actionRoute?: string,
     actionText?: string
 }
@@ -43,6 +43,27 @@ export const mailDetails: { [key: string]: MailDetail } = {
         // sendTo: "jatina+po@evolvedigitas.com",
         actionRoute: "review-vendor",
         actionText: "Review Vendor"
+    },
+    'new-skus': {
+        subject: "Review New SKUs for the vendor",
+        title: "SKUs Verification",
+        message: "Click on the link below to view the skus entered by the user for $companyName and verify them.",
+        priority: "high",
+        sendTo: ["yogeshk@globalplugin.com", "aswanis@globalplugin.com"],
+        actionRoute: "review-skus",
+        actionText: "Review SKUs"
+    },
+    'skus-success': {
+        subject: 'SKUs Verification Successful',
+        title: 'SKUs Verification Success',
+        message: 'Congratulations your skus of $company is successful. You can start creating POs using entered skus.',
+        priority: 'normal'
+    },
+    'skus-fail': {
+        subject: 'SKUs Verification Failed',
+        title: 'SKUs Verification Failed',
+        message: 'Your skus has been rejected and following problem(s) were found:-\n$denyReason \nPlease fix the problem(s) and enter skus again.',
+        priority: 'high'
     }
 }
 

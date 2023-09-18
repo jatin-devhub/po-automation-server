@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateNew = void 0;
+exports.validateReview = exports.validateVendorCode = exports.validateSendVerify = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
+const Vendor_1 = __importDefault(require("../models/Vendor"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newSkuSchema = joi_1.default.object({
@@ -36,7 +37,8 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             masterCartonHeightCm: joi_1.default.number().min(0),
             masterCartonWeightKg: joi_1.default.number().min(0),
             MRP: joi_1.default.number().min(0),
-            vendorCode: joi_1.default.string()
+            vendorCode: joi_1.default.string().required(),
+            createdBy: joi_1.default.string().email().required()
         });
         const value = yield newSkuSchema.validateAsync(req.body);
         next();
@@ -50,6 +52,89 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.validateNew = validateNew;
+const validateSendVerify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const verifyMailSchema = joi_1.default.object({
+            vendorCode: joi_1.default.string().required()
+        });
+        const value = yield verifyMailSchema.validateAsync(req.params);
+        const vendorCode = value.vendorCode;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (vendor)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            });
+        }
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateSendVerify = validateSendVerify;
+const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validateVendorCode = joi_1.default.object({
+            vendorCode: joi_1.default.string().required()
+        });
+        const value = yield validateVendorCode.validateAsync(req.params);
+        const vendorCode = value.vendorCode;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (vendor)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            });
+        }
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateVendorCode = validateVendorCode;
+const validateReview = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validateVendorCode = joi_1.default.object({
+            vendorCode: joi_1.default.string().required(),
+            isValid: joi_1.default.boolean().required(),
+            reason: joi_1.default.string()
+        });
+        const value = yield validateVendorCode.validateAsync(req.body);
+        const vendorCode = value.vendorCode;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (vendor)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor with this vendor code doesn't exists",
+                data: {}
+            });
+        }
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateReview = validateReview;
 // export const validateSignUp: RequestHandler = async (req, res, next) => {
 //     try {
 //         const signUpSchema = Joi.object({
