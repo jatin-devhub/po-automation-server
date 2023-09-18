@@ -12,21 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newBuyingOrder = void 0;
+exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
 const SKU_1 = __importDefault(require("../models/SKU"));
+const File_1 = __importDefault(require("../models/File"));
+const mail_service_1 = require("../utils/mail.service");
 const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { currency, paymentTerms, estimatedDeliveryDate, records, vendorCode } = req.body;
+        const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy, poAttachment } = req.body;
         const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
-        const poCode = yield getUniquePOCode();
+        const decodedPOFile = Buffer.from(poAttachment.buffer, 'base64');
         const newBuyingOrder = new BuyingOrder_1.default({
             poCode,
             currency,
             paymentTerms,
             estimatedDeliveryDate,
+            createdBy,
+            verificationLevel: 'Buyer',
             vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id
         });
         const buyingOrder = yield newBuyingOrder.save();
@@ -45,11 +49,27 @@ const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 const buyingOrderRecord = yield newBuyingOrderRecord.save();
             }
         }
-        return res.status(201).json({
-            success: true,
-            message: `Your BuyingOrder has been successfully added`,
-            data: { buyingOrder },
+        const poFile = yield File_1.default.create({
+            fileName: poAttachment.originalname,
+            fileContent: decodedPOFile,
+            filetype: 'PO',
+            buyingOrderId: buyingOrder.id
         });
+        const mailSent = yield (0, mail_service_1.sendMailSetup)(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your BuyingOrder request has been successfully added`,
+                data: { buyingOrder },
+            });
+        else
+            return res.status(404).json({
+                success: false,
+                message: `Unable to send email.`,
+                data: {
+                    mailSent
+                }
+            });
     }
     catch (error) {
         return res.status(504).json({
@@ -62,6 +82,60 @@ const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.newBuyingOrder = newBuyingOrder;
+const getUniquePOCodeRoute = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const poCode = yield getUniquePOCode();
+        return res.status(201).json({
+            success: true,
+            message: `Your POCode has been created`,
+            data: { poCode },
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "buying-order.controller.js -> getUniquePOCodeRoute"
+            },
+        });
+    }
+});
+exports.getUniquePOCodeRoute = getUniquePOCodeRoute;
+const applyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { poCode, isValid, reason } = req.body;
+        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
+        const poFile = (yield File_1.default.findOne({ where: { buyingOrderId: buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.id } })) || undefined;
+        if (isValid == "true") {
+            if ((buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.verificationLevel) == "Buyer")
+                yield (0, mail_service_1.sendMailSetup)(buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.poCode, 'account-approval', undefined, undefined, poFile);
+            yield BuyingOrder_1.default.update({ verificationLevel: 'Accounts' }, { where: { poCode } });
+        }
+        else {
+            const variables = {
+                denyReason: reason
+            };
+            yield (0, mail_service_1.sendMailSetup)(null, 'po-fail', variables, buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.createdBy);
+            yield BuyingOrder_1.default.destroy({ where: { isVerified: false, poCode } });
+        }
+        return res.status(201).json({
+            success: true,
+            message: `Your review is done`,
+            data: {},
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "sku.controller.js -> applyReview"
+            },
+        });
+    }
+});
+exports.applyReview = applyReview;
 const getUniquePOCode = () => __awaiter(void 0, void 0, void 0, function* () {
     let poCode, existingPO;
     do {

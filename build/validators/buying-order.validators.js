@@ -12,17 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateNew = void 0;
+exports.validateReview = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
+const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newBuyingOrderSchema = joi_1.default.object({
+            poCode: joi_1.default.string().required(),
             currency: joi_1.default.string().required(),
             paymentTerms: joi_1.default.string(),
             estimatedDeliveryDate: joi_1.default.string(),
             records: joi_1.default.any().required(),
-            vendorCode: joi_1.default.string()
+            vendorCode: joi_1.default.string(),
+            createdBy: joi_1.default.string().email().required(),
+            poAttachment: joi_1.default.any().required()
         });
+        const files = req.files;
+        for (const file of files) {
+            req.body[file.fieldname] = file;
+        }
         const value = yield newBuyingOrderSchema.validateAsync(req.body);
         next();
     }
@@ -35,33 +43,32 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.validateNew = validateNew;
-// export const validateSignUp: RequestHandler = async (req, res, next) => {
-//     try {
-//         const signUpSchema = Joi.object({
-//             email: Joi.string()
-//                 .email()
-//                 .required(),
-//             password: Joi.string()
-//                 .min(8)
-//                 .max(20)
-//                 .required()
-//         })
-//         const value = await signUpSchema.validateAsync(req.body);
-//         const { email } = value;
-//         const existingUser = await User.findOne({ where: { email } });
-//         if (existingUser) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "User with this email already exists!",
-//                 data: [],
-//             });
-//         }
-//         next();
-//     } catch (error: any) {
-//         return res.status(504).json({
-//             success: false,
-//             message: error.message,
-//             data: [],
-//         });
-//     }
-// }
+const validateReview = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validateVendorCode = joi_1.default.object({
+            poCode: joi_1.default.string().required(),
+            isValid: joi_1.default.boolean().required(),
+            reason: joi_1.default.string()
+        });
+        const value = yield validateVendorCode.validateAsync(req.body);
+        const poCode = value.poCode;
+        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
+        if (buyingOrder)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Buying Order with this po code doesn't exists",
+                data: {}
+            });
+        }
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateReview = validateReview;

@@ -9,6 +9,13 @@ interface MailDetail {
     actionText?: string
 }
 
+export const POLevels = [
+    'Creator',
+    'Buyer',
+    'Accounts',
+    'BOHead'
+]
+
 export const mailDetails: { [key: string]: MailDetail } = {
     'new-vendor': {
         subject: 'Review New Vendor Details!!',
@@ -64,6 +71,39 @@ export const mailDetails: { [key: string]: MailDetail } = {
         title: 'SKUs Verification Failed',
         message: 'Your skus has been rejected and following problem(s) were found:-\n$denyReason \nPlease fix the problem(s) and enter skus again.',
         priority: 'high'
-    }
+    },
+    'buyer-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: "yogeshk@globalplugin.com",
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'account-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: "accounts@evolvedigitas.com",
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'bu-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: ["aparnag@evolvedigitas.com", "tarunm@evolvedigitas.com"],
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'po-fail': {
+        subject: 'PO Verification Failed',
+        title: 'PO Verification Failed',
+        message: 'Your PO has been rejected and following problem(s) were found:-\n$denyReason \nPlease fix the problem(s) and enter po again.',
+        priority: 'high'
+    },
 }
 

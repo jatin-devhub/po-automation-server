@@ -57,7 +57,7 @@ const validateSendVerify = (req, res, next) => __awaiter(void 0, void 0, void 0,
         const verifyMailSchema = joi_1.default.object({
             vendorCode: joi_1.default.string().required()
         });
-        const value = yield verifyMailSchema.validateAsync(req.params);
+        const value = yield verifyMailSchema.validateAsync(req.body);
         const vendorCode = value.vendorCode;
         const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
         if (vendor)

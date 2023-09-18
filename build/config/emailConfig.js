@@ -1,6 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mailDetails = void 0;
+exports.mailDetails = exports.POLevels = void 0;
+exports.POLevels = [
+    'Creator',
+    'Buyer',
+    'Accounts',
+    'BOHead'
+];
 exports.mailDetails = {
     'new-vendor': {
         subject: 'Review New Vendor Details!!',
@@ -56,5 +62,38 @@ exports.mailDetails = {
         title: 'SKUs Verification Failed',
         message: 'Your skus has been rejected and following problem(s) were found:-\n$denyReason \nPlease fix the problem(s) and enter skus again.',
         priority: 'high'
-    }
+    },
+    'buyer-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: "yogeshk@globalplugin.com",
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'account-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: "accounts@evolvedigitas.com",
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'bu-approval': {
+        subject: "Review PO Details",
+        title: "Review PO Details",
+        message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
+        priority: 'high',
+        sendTo: ["aparnag@evolvedigitas.com", "tarunm@evolvedigitas.com"],
+        actionRoute: "review-po",
+        actionText: "Review PO"
+    },
+    'po-fail': {
+        subject: 'PO Verification Failed',
+        title: 'PO Verification Failed',
+        message: 'Your PO has been rejected and following problem(s) were found:-\n$denyReason \nPlease fix the problem(s) and enter po again.',
+        priority: 'high'
+    },
 };

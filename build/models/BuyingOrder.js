@@ -13,6 +13,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
 const Vendor_1 = __importDefault(require("./Vendor"));
 const Comment_1 = __importDefault(require("./Comment"));
+const File_1 = __importDefault(require("./File"));
 let BuyingOrder = class BuyingOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -52,6 +53,15 @@ __decorate([
         type: sequelize_typescript_1.DataType.BOOLEAN
     })
 ], BuyingOrder.prototype, "isVerified", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "verificationLevel", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+], BuyingOrder.prototype, "poAttachment", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({

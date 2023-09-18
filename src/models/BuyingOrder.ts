@@ -1,7 +1,8 @@
-import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique, Default } from 'sequelize-typescript';
+import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, DataType, ForeignKey, BelongsTo, Unique, Default, HasOne } from 'sequelize-typescript';
 import BuyingOrderRecord from './BuyingOrderRecord';
 import Vendor from './Vendor';
 import Comment from './Comment';
+import File from './File';
 
 @Table
 export default class BuyingOrder extends Model {
@@ -41,6 +42,15 @@ export default class BuyingOrder extends Model {
         type: DataType.BOOLEAN
     })
     isVerified!: boolean
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
+    verificationLevel!: string
+
+    @HasOne(() => File)
+    poAttachment!: File;
 
     @AllowNull(false)
     @Column({

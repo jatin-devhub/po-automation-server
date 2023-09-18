@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 
 import { mailDetails } from "../config/emailConfig";
+import File from "../models/File";
 const { MAIL_HOST, MAIL_PORT, MAIL_EMAIL, MAIL_PASS, FRONTEND_BASE_URL } = process.env
 const JWTKEY: string = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
 
@@ -16,7 +17,7 @@ export interface MailOptions {
     actionText?: string
 }
 
-export const sendMail = async (email: string | string[], mailOptions: MailOptions) => {
+export const sendMail = async (email: string | string[], mailOptions: MailOptions, attachment?: File) => {
     try {
         let transport = nodemailer.createTransport({
             host: MAIL_HOST,
@@ -32,7 +33,8 @@ export const sendMail = async (email: string | string[], mailOptions: MailOption
             to: string | string[],
             subject: string,
             priority: "high"|"normal"|"low" | undefined,
-            html: string
+            html: string,
+            attachments: any[]
         } = {
             from: MAIL_EMAIL,
             to: email,
@@ -91,7 +93,13 @@ export const sendMail = async (email: string | string[], mailOptions: MailOption
                     <p>Best regards,<br>Global Plugin</p>
                 </div>
             </body>
-            </html>`
+            </html>`,
+            attachments: [
+                {
+                  filename: attachment?.fileName,
+                  content: attachment?.fileContent,
+                },
+              ]
         };
         return await transport.sendMail(mailOption);
     } catch (error: any) {
@@ -100,7 +108,7 @@ export const sendMail = async (email: string | string[], mailOptions: MailOption
     }
 };
 
-export const sendMailSetup = async (vendorCode: string | null, type: string, variables: any, sendTo: string | undefined) => {
+export const sendMailSetup = async (vendorCode: string | null, type: string, variables: any, sendTo: string | undefined, attachment?: File) => {
     const mailOptions: MailOptions = {
         subject: mailDetails[type].subject,
         title: mailDetails[type].title,
@@ -112,9 +120,9 @@ export const sendMailSetup = async (vendorCode: string | null, type: string, var
         actionText: mailDetails[type].actionText
     }
     if(sendTo)
-    return await sendMail(sendTo, mailOptions)
+    return await sendMail(sendTo, mailOptions, attachment)
     else if(mailDetails[type].sendTo) 
-    return await sendMail(mailDetails[type].sendTo || "", mailOptions);
+    return await sendMail(mailDetails[type].sendTo || "", mailOptions, attachment);
     else
     return false;
 };

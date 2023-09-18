@@ -18,7 +18,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const emailConfig_1 = require("../config/emailConfig");
 const { MAIL_HOST, MAIL_PORT, MAIL_EMAIL, MAIL_PASS, FRONTEND_BASE_URL } = process.env;
 const JWTKEY = process.env.JWTKEY || "MYNAME-IS-HELLOWORLD";
-const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMail = (email, mailOptions, attachment) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let transport = nodemailer_1.default.createTransport({
             host: MAIL_HOST,
@@ -87,7 +87,13 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
                     <p>Best regards,<br>Global Plugin</p>
                 </div>
             </body>
-            </html>`
+            </html>`,
+            attachments: [
+                {
+                    filename: attachment === null || attachment === void 0 ? void 0 : attachment.fileName,
+                    content: attachment === null || attachment === void 0 ? void 0 : attachment.fileContent,
+                },
+            ]
         };
         return yield transport.sendMail(mailOption);
     }
@@ -97,7 +103,7 @@ const sendMail = (email, mailOptions) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.sendMail = sendMail;
-const sendMailSetup = (vendorCode, type, variables, sendTo) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMailSetup = (vendorCode, type, variables, sendTo, attachment) => __awaiter(void 0, void 0, void 0, function* () {
     const mailOptions = {
         subject: emailConfig_1.mailDetails[type].subject,
         title: emailConfig_1.mailDetails[type].title,
@@ -109,9 +115,9 @@ const sendMailSetup = (vendorCode, type, variables, sendTo) => __awaiter(void 0,
         actionText: emailConfig_1.mailDetails[type].actionText
     };
     if (sendTo)
-        return yield (0, exports.sendMail)(sendTo, mailOptions);
+        return yield (0, exports.sendMail)(sendTo, mailOptions, attachment);
     else if (emailConfig_1.mailDetails[type].sendTo)
-        return yield (0, exports.sendMail)(emailConfig_1.mailDetails[type].sendTo || "", mailOptions);
+        return yield (0, exports.sendMail)(emailConfig_1.mailDetails[type].sendTo || "", mailOptions, attachment);
     else
         return false;
 });

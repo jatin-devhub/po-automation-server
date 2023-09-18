@@ -46,7 +46,7 @@ export const validateSendVerify: RequestHandler = async (req, res, next) => {
             vendorCode: Joi.string().required()
         });
 
-        const value = await verifyMailSchema.validateAsync(req.params);
+        const value = await verifyMailSchema.validateAsync(req.body);
         const vendorCode = value.vendorCode;
         const vendor = await Vendor.findOne({ where: { vendorCode } })
         if(vendor)
