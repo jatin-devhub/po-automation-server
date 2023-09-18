@@ -99,6 +99,12 @@ export const mailDetails: { [key: string]: MailDetail } = {
         actionRoute: "review-po",
         actionText: "Review PO"
     },
+    'po-success': {
+        subject: 'PO Verification Successful',
+        title: 'PO Verification Success',
+        message: 'Congratulations your po of is successful.',
+        priority: 'normal'
+    },
     'po-fail': {
         subject: 'PO Verification Failed',
         title: 'PO Verification Failed',

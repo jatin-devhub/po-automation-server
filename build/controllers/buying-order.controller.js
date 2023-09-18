@@ -108,9 +108,18 @@ const applyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
         const poFile = (yield File_1.default.findOne({ where: { buyingOrderId: buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.id } })) || undefined;
         if (isValid == "true") {
-            if ((buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.verificationLevel) == "Buyer")
+            if ((buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.verificationLevel) == "Buyer") {
                 yield (0, mail_service_1.sendMailSetup)(buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.poCode, 'account-approval', undefined, undefined, poFile);
-            yield BuyingOrder_1.default.update({ verificationLevel: 'Accounts' }, { where: { poCode } });
+                yield BuyingOrder_1.default.update({ verificationLevel: 'Accounts' }, { where: { poCode } });
+            }
+            else if ((buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.verificationLevel) == "Accounts") {
+                yield (0, mail_service_1.sendMailSetup)(buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.poCode, 'bu-approval', undefined, undefined, poFile);
+                yield BuyingOrder_1.default.update({ verificationLevel: 'BOHead' }, { where: { poCode } });
+            }
+            else if ((buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.verificationLevel) == "BOHead") {
+                yield (0, mail_service_1.sendMailSetup)(null, 'po-success', undefined, buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.createdBy);
+                yield BuyingOrder_1.default.update({ isVerified: true }, { where: { poCode } });
+            }
         }
         else {
             const variables = {

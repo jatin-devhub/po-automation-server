@@ -24,12 +24,12 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
             vendorId: vendor?.id
         })
         const buyingOrder = await newBuyingOrder.save();
-        
+
         if (buyingOrder) {
             const recordsObject = JSON.parse(records);
             for (let i = 0; i < recordsObject.length; i++) {
                 const { skuCode, expectedQty, unitCost, gst } = recordsObject[i];
-                
+
                 const sku = await SKU.findOne({ where: { skuCode } })
                 const newBuyingOrderRecord = new BuyingOrderRecord({
                     expectedQty,
@@ -51,20 +51,20 @@ export const newBuyingOrder: RequestHandler = async (req, res) => {
 
         const mailSent = await sendMailSetup(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
 
-        if(mailSent)
-        return res.status(201).json({
-            success: true,
-            message: `Your BuyingOrder request has been successfully added`,
-            data: { buyingOrder },
-        });
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your BuyingOrder request has been successfully added`,
+                data: { buyingOrder },
+            });
         else
-        return res.status(404).json({
-            success: false,
-            message: `Unable to send email.`,
-            data: {
-                mailSent
-            }
-        })
+            return res.status(404).json({
+                success: false,
+                message: `Unable to send email.`,
+                data: {
+                    mailSent
+                }
+            })
 
     } catch (error: any) {
         return res.status(504).json({
@@ -104,15 +104,30 @@ export const applyReview: RequestHandler = async (req, res) => {
 
         const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
 
-        const poFile = await File.findOne({where: {buyingOrderId: buyingOrder?.id}}) || undefined
+        const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
 
         if (isValid == "true") {
-            if(buyingOrder?.verificationLevel == "Buyer")
-            await sendMailSetup(buyingOrder?.poCode, 'account-approval', undefined, undefined, poFile);
-            await BuyingOrder.update(
-                { verificationLevel: 'Accounts' },
-                { where: { poCode } }
-            );
+            if (buyingOrder?.verificationLevel == "Buyer") {
+                await sendMailSetup(buyingOrder?.poCode, 'account-approval', undefined, undefined, poFile);
+                await BuyingOrder.update(
+                    { verificationLevel: 'Accounts' },
+                    { where: { poCode } }
+                );
+            }
+            else if(buyingOrder?.verificationLevel == "Accounts") {
+                await sendMailSetup(buyingOrder?.poCode, 'bu-approval', undefined, undefined, poFile);
+                await BuyingOrder.update(
+                    { verificationLevel: 'BOHead' },
+                    { where: { poCode } }
+                );
+            }
+            else if(buyingOrder?.verificationLevel == "BOHead") {
+                await sendMailSetup(null, 'po-success', undefined, buyingOrder?.createdBy)
+                await BuyingOrder.update(
+                    { isVerified: true },
+                    { where: { poCode } }
+                );
+            }
 
         }
         else {
