@@ -5,6 +5,7 @@ import BuyingOrderRecord from "../models/BuyingOrderRecord";
 import SKU from "../models/SKU";
 import File from "../models/File";
 import { sendMailSetup } from "../utils/mail.service";
+import VendorAddress from "../models/VendorAddress";
 
 export const newBuyingOrder: RequestHandler = async (req, res) => {
     try {
@@ -143,6 +144,44 @@ export const applyReview: RequestHandler = async (req, res) => {
             success: true,
             message: `Your review is done`,
             data: {},
+        });
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "sku.controller.js -> applyReview"
+            },
+        });
+    }
+
+}
+
+export const getPODetails: RequestHandler = async (req, res) => {
+    try {
+        const { poCode } = req.params;
+
+        const buyingOrder = await BuyingOrder.findOne({ where: { poCode }, include: [
+            {
+                model: Vendor,
+                include: [
+                    {
+                        model: VendorAddress
+                    }
+                ]
+            }
+        ] })
+
+        // const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
+
+        // const vendor = await Vendor.findOne({where: {}})
+
+
+        return res.status(201).json({
+            success: true,
+            message: `Your details have been fetched`,
+            data: {buyingOrder},
         });
 
     } catch (error: any) {

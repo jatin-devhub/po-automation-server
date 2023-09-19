@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
-import Vendor from "../models/Vendor";
 import BuyingOrder from "../models/BuyingOrder";
 
 export const validateNew: RequestHandler = async (req, res, next) => {
@@ -40,6 +39,34 @@ export const validateReview: RequestHandler = async (req, res, next) => {
         });
 
         const value = await validateVendorCode.validateAsync(req.body);
+        const poCode = value.poCode;
+        const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
+        if(buyingOrder)
+        next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Buying Order with this po code doesn't exists",
+                data: {}
+            })
+        }
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateGetPODetails: RequestHandler = async (req, res, next) => {
+    try {
+        const validatePOCode = Joi.object({
+            poCode: Joi.string().required()
+        });
+
+        const value = await validatePOCode.validateAsync(req.params);
         const poCode = value.poCode;
         const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
         if(buyingOrder)

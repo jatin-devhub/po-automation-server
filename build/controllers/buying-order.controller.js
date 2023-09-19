@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
+exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const File_1 = __importDefault(require("../models/File"));
 const mail_service_1 = require("../utils/mail.service");
+const VendorAddress_1 = __importDefault(require("../models/VendorAddress"));
 const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy, poAttachment } = req.body;
@@ -145,6 +146,38 @@ const applyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.applyReview = applyReview;
+const getPODetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { poCode } = req.params;
+        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode }, include: [
+                {
+                    model: Vendor_1.default,
+                    include: [
+                        {
+                            model: VendorAddress_1.default
+                        }
+                    ]
+                }
+            ] });
+        // const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
+        // const vendor = await Vendor.findOne({where: {}})
+        return res.status(201).json({
+            success: true,
+            message: `Your details have been fetched`,
+            data: { buyingOrder },
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "sku.controller.js -> applyReview"
+            },
+        });
+    }
+});
+exports.getPODetails = getPODetails;
 const getUniquePOCode = () => __awaiter(void 0, void 0, void 0, function* () {
     let poCode, existingPO;
     do {
