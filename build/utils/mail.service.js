@@ -29,6 +29,12 @@ const sendMail = (email, mailOptions, attachment) => __awaiter(void 0, void 0, v
                 pass: MAIL_PASS
             }
         });
+        const attachments = [];
+        if (attachment)
+            attachments.push({
+                filename: attachment === null || attachment === void 0 ? void 0 : attachment.fileName,
+                content: attachment === null || attachment === void 0 ? void 0 : attachment.fileContent,
+            });
         const mailOption = {
             from: MAIL_EMAIL,
             to: email,
@@ -88,12 +94,7 @@ const sendMail = (email, mailOptions, attachment) => __awaiter(void 0, void 0, v
                 </div>
             </body>
             </html>`,
-            attachments: [
-                {
-                    filename: attachment === null || attachment === void 0 ? void 0 : attachment.fileName,
-                    content: attachment === null || attachment === void 0 ? void 0 : attachment.fileContent,
-                },
-            ]
+            attachments
         };
         return yield transport.sendMail(mailOption);
     }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateReview = exports.validateNew = void 0;
+exports.validateGetPODetails = exports.validateReview = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -72,3 +72,30 @@ const validateReview = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.validateReview = validateReview;
+const validateGetPODetails = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const validatePOCode = joi_1.default.object({
+            poCode: joi_1.default.string().required()
+        });
+        const value = yield validatePOCode.validateAsync(req.params);
+        const poCode = value.poCode;
+        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
+        if (buyingOrder)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Buying Order with this po code doesn't exists",
+                data: {}
+            });
+        }
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateGetPODetails = validateGetPODetails;

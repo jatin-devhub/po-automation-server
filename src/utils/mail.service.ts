@@ -12,7 +12,7 @@ export interface MailOptions {
     message: string,
     actionToken: string | null,
     closingMessage: string | undefined,
-    priority: "high"|"normal"|"low" | undefined,
+    priority: "high" | "normal" | "low" | undefined,
     actionRoute?: string,
     actionText?: string
 }
@@ -24,15 +24,21 @@ export const sendMail = async (email: string | string[], mailOptions: MailOption
             port: Number(MAIL_PORT) | 0,
             secure: true,
             auth: {
-              user: MAIL_EMAIL,
-              pass: MAIL_PASS
+                user: MAIL_EMAIL,
+                pass: MAIL_PASS
             }
         });
+        const attachments = []
+        if (attachment)
+            attachments.push({
+                filename: attachment?.fileName,
+                content: attachment?.fileContent,
+            })
         const mailOption: {
             from: string | undefined,
             to: string | string[],
             subject: string,
-            priority: "high"|"normal"|"low" | undefined,
+            priority: "high" | "normal" | "low" | undefined,
             html: string,
             attachments: any[]
         } = {
@@ -86,20 +92,15 @@ export const sendMail = async (email: string | string[], mailOptions: MailOption
                     <h1>${mailOptions.title}</h1>
                     <p>Dear User,</p>
                     <p>${mailOptions.message}</p>
-                    ${mailOptions.actionToken? `<p><a href="${FRONTEND_BASE_URL}/${mailOptions.actionRoute}/${mailOptions.actionToken}">${mailOptions.actionText}</a></p>`: ""}                    
-                    <p>${mailOptions.closingMessage?mailOptions.closingMessage:""}</p>
+                    ${mailOptions.actionToken ? `<p><a href="${FRONTEND_BASE_URL}/${mailOptions.actionRoute}/${mailOptions.actionToken}">${mailOptions.actionText}</a></p>` : ""}                    
+                    <p>${mailOptions.closingMessage ? mailOptions.closingMessage : ""}</p>
                 </div>
                 <div class="footer">
                     <p>Best regards,<br>Global Plugin</p>
                 </div>
             </body>
             </html>`,
-            attachments: [
-                {
-                  filename: attachment?.fileName,
-                  content: attachment?.fileContent,
-                },
-              ]
+            attachments
         };
         return await transport.sendMail(mailOption);
     } catch (error: any) {
@@ -119,29 +120,29 @@ export const sendMailSetup = async (vendorCode: string | null, type: string, var
         actionRoute: mailDetails[type].actionRoute,
         actionText: mailDetails[type].actionText
     }
-    if(sendTo)
-    return await sendMail(sendTo, mailOptions, attachment)
-    else if(mailDetails[type].sendTo) 
-    return await sendMail(mailDetails[type].sendTo || "", mailOptions, attachment);
+    if (sendTo)
+        return await sendMail(sendTo, mailOptions, attachment)
+    else if (mailDetails[type].sendTo)
+        return await sendMail(mailDetails[type].sendTo || "", mailOptions, attachment);
     else
-    return false;
+        return false;
 };
 
 
 
 const getMessage = (message: string, variables: { [key: string]: string }): string => {
-    if(variables) {
+    if (variables) {
         Object.entries(variables).forEach(([key, value]) => {
-            message = message.replace(`$${key}`, value);            
+            message = message.replace(`$${key}`, value);
         });
-        
+
     }
     return message;
 }
 
 const getToken = (vendorCode: string | null, type: string): string | null => {
-    if(vendorCode)
-    return jwt.sign({ vendorCode, type }, JWTKEY);
+    if (vendorCode)
+        return jwt.sign({ vendorCode, type }, JWTKEY);
     else
-    return null;
+        return null;
 }
