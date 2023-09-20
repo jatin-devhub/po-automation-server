@@ -379,7 +379,8 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     model: VendorOther_1.default
                 },
                 {
-                    model: SKU_1.default
+                    model: SKU_1.default,
+                    attributes: [[sequelize_typescript_1.Sequelize.col('skuCode'), 'SKU'], [sequelize_typescript_1.Sequelize.col('category'), 'Category'], [sequelize_typescript_1.Sequelize.col('brand'), 'Brand'], [sequelize_typescript_1.Sequelize.col('productTitle'), 'Product Title'], [sequelize_typescript_1.Sequelize.col('hsn'), 'HSN'], [sequelize_typescript_1.Sequelize.col('ean'), 'EAN'], [sequelize_typescript_1.Sequelize.col('modelNumber'), 'Model Number'], [sequelize_typescript_1.Sequelize.col('size'), 'Size'], [sequelize_typescript_1.Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [sequelize_typescript_1.Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [sequelize_typescript_1.Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [sequelize_typescript_1.Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [sequelize_typescript_1.Sequelize.col('productWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [sequelize_typescript_1.Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('mrp'), 'MRP']]
                 },
                 {
                     model: BuyingOrder_1.default
