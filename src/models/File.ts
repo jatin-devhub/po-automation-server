@@ -39,12 +39,6 @@ export default class File extends Model {
   })
   buyingOrderId!: number
 
-  @ForeignKey(() => SKU)
-  @Column({
-    type: DataType.INTEGER
-  })
-  skuId!: number
-
   @ForeignKey(() => Vendor)
   @Column({
     type: DataType.INTEGER
@@ -89,9 +83,6 @@ export default class File extends Model {
 
   @BelongsTo(() => BuyingOrder)
   buyingOrder!: BuyingOrder;
-
-  @BelongsTo(() => SKU)
-  sku!: SKU;
 
   @BelongsTo(() => Vendor, 'gstAttVendorId')
   gstAttVendor!: Vendor;

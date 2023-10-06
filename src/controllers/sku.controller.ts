@@ -6,13 +6,14 @@ import { Sequelize } from "sequelize-typescript";
 
 export const skuRegistration: RequestHandler = async (req, res) => {
     try {
-        const { skuCode, category, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
+        const { skuCode, category, subCategory, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
 
         const vendor = await Vendor.findOne({ where: { vendorCode } })
 
         const newSkU = new SKU({
             skuCode,
             category,
+            subCategory,
             brand,
             productTitle,
             hsn,
@@ -102,7 +103,7 @@ export const getUnverifiedSKUs: RequestHandler = async (req, res) => {
 
         const vendor = await Vendor.findOne({ where: { vendorCode } })
 
-        const skus = await SKU.findAll({ attributes: [[Sequelize.col('skuCode'), 'SKU'], [Sequelize.col('category'), 'Category'], [Sequelize.col('brand'), 'Brand'], [Sequelize.col('productTitle'), 'Product Title'], [Sequelize.col('hsn'), 'HSN'], [Sequelize.col('ean'), 'EAN'], [Sequelize.col('modelNumber'), 'Model Number'], [Sequelize.col('size'), 'Size'], [Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [Sequelize.col('productWeightKg'), 'Wght(kg)'], [Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [Sequelize.col('mrp'), 'MRP']], where: { isVerified: false, vendorId: vendor?.id } })
+        const skus = await SKU.findAll({ attributes: [[Sequelize.col('skuCode'), 'SKU'], [Sequelize.col('category'), 'Category'], [Sequelize.col('subCategory'), 'SubCategory'], [Sequelize.col('brand'), 'Brand'], [Sequelize.col('productTitle'), 'Product Title'], [Sequelize.col('hsn'), 'HSN'], [Sequelize.col('ean'), 'EAN'], [Sequelize.col('modelNumber'), 'Model Number'], [Sequelize.col('size'), 'Size'], [Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [Sequelize.col('productWeightKg'), 'Wght(kg)'], [Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [Sequelize.col('mrp'), 'MRP']], where: { isVerified: false, vendorId: vendor?.id } })
 
         return res.status(201).json({
             success: true,

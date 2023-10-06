@@ -11,7 +11,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
-const SKU_1 = __importDefault(require("./SKU"));
 const Vendor_1 = __importDefault(require("./Vendor"));
 const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
@@ -47,12 +46,6 @@ __decorate([
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], File.prototype, "buyingOrderId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => SKU_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "skuId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -98,9 +91,6 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
 ], File.prototype, "buyingOrder", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
-], File.prototype, "sku", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'gstAttVendorId')
 ], File.prototype, "gstAttVendor", void 0);

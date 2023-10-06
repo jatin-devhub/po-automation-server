@@ -34,6 +34,9 @@ __decorate([
 ], SKU.prototype, "category", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKU.prototype, "subCategory", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "brand", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })

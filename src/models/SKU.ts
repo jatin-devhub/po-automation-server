@@ -24,6 +24,9 @@ export default class SKU extends Model {
     @Column({ type: DataType.STRING })
     category!: string;
 
+    @Column({ type: DataType.STRING})
+    subCategory!: string;
+
     @Column({ type: DataType.STRING })
     brand!: string;
 

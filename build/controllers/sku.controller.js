@@ -19,11 +19,12 @@ const mail_service_1 = require("../utils/mail.service");
 const sequelize_typescript_1 = require("sequelize-typescript");
 const skuRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { skuCode, category, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
+        const { skuCode, category, subCategory, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
         const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
         const newSkU = new SKU_1.default({
             skuCode,
             category,
+            subCategory,
             brand,
             productTitle,
             hsn,
@@ -104,7 +105,7 @@ const getUnverifiedSKUs = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const { vendorCode } = req.params;
         const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
-        const skus = yield SKU_1.default.findAll({ attributes: [[sequelize_typescript_1.Sequelize.col('skuCode'), 'SKU'], [sequelize_typescript_1.Sequelize.col('category'), 'Category'], [sequelize_typescript_1.Sequelize.col('brand'), 'Brand'], [sequelize_typescript_1.Sequelize.col('productTitle'), 'Product Title'], [sequelize_typescript_1.Sequelize.col('hsn'), 'HSN'], [sequelize_typescript_1.Sequelize.col('ean'), 'EAN'], [sequelize_typescript_1.Sequelize.col('modelNumber'), 'Model Number'], [sequelize_typescript_1.Sequelize.col('size'), 'Size'], [sequelize_typescript_1.Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [sequelize_typescript_1.Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [sequelize_typescript_1.Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [sequelize_typescript_1.Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [sequelize_typescript_1.Sequelize.col('productWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [sequelize_typescript_1.Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('mrp'), 'MRP']], where: { isVerified: false, vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id } });
+        const skus = yield SKU_1.default.findAll({ attributes: [[sequelize_typescript_1.Sequelize.col('skuCode'), 'SKU'], [sequelize_typescript_1.Sequelize.col('category'), 'Category'], [sequelize_typescript_1.Sequelize.col('subCategory'), 'SubCategory'], [sequelize_typescript_1.Sequelize.col('brand'), 'Brand'], [sequelize_typescript_1.Sequelize.col('productTitle'), 'Product Title'], [sequelize_typescript_1.Sequelize.col('hsn'), 'HSN'], [sequelize_typescript_1.Sequelize.col('ean'), 'EAN'], [sequelize_typescript_1.Sequelize.col('modelNumber'), 'Model Number'], [sequelize_typescript_1.Sequelize.col('size'), 'Size'], [sequelize_typescript_1.Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [sequelize_typescript_1.Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [sequelize_typescript_1.Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [sequelize_typescript_1.Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [sequelize_typescript_1.Sequelize.col('productWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [sequelize_typescript_1.Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [sequelize_typescript_1.Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [sequelize_typescript_1.Sequelize.col('mrp'), 'MRP']], where: { isVerified: false, vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id } });
         return res.status(201).json({
             success: true,
             message: `Your unverified skus are`,

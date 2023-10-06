@@ -7,6 +7,7 @@ export const validateNew: RequestHandler = async (req, res, next) => {
         const newSkuSchema = Joi.object({
             skuCode: Joi.string().required(),
             category: Joi.string(),
+            subCategory: Joi.string(),
             brand: Joi.string(),
             productTitle: Joi.string(),
             hsn: Joi.string(),
