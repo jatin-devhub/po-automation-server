@@ -41,7 +41,7 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             vendorCode: joi_1.default.string().required(),
             createdBy: joi_1.default.string().email().required()
         });
-        const value = yield newSkuSchema.validateAsync(req.body);
+        yield newSkuSchema.validateAsync(req.body);
         next();
     }
     catch (error) {

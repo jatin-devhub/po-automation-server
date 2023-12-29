@@ -10,7 +10,6 @@ import VendorAddress from "../models/VendorAddress";
 import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
 import { sendMailSetup } from "../utils/mail.service";
-import { mailDetails } from "../config/emailConfig";
 import Comment from "../models/Comment";
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
@@ -417,7 +416,6 @@ export const getVendor: RequestHandler = async (req, res) => {
                 },
                 {
                     model: SKU,
-                    attributes: [[Sequelize.col('skuCode'), 'SKU'], [Sequelize.col('category'), 'Category'], [Sequelize.col('brand'), 'Brand'], [Sequelize.col('productTitle'), 'Product Title'], [Sequelize.col('hsn'), 'HSN'], [Sequelize.col('ean'), 'EAN'], [Sequelize.col('modelNumber'), 'Model Number'], [Sequelize.col('size'), 'Size'], [Sequelize.col('colorFamilyColor'), 'Color Family-Color'], [Sequelize.col('productLengthCm'), 'Prdct L(cm)'], [Sequelize.col('productBreadthCm'), 'Prdct B(cm)'], [Sequelize.col('productHeightCm'), 'Prdct H(cm)'], [Sequelize.col('productWeightKg'), 'Wght(kg)'], [Sequelize.col('masterCartonQty'), 'MSTRCTN Box Qty'], [Sequelize.col('masterCartonLengthCm'), 'MSTRCTN L(cm)'], [Sequelize.col('masterCartonBreadthCm'), 'MSTRCTN B(cm)'], [Sequelize.col('masterCartonHeightCm'), 'MSTRCTN H(cm)'], [Sequelize.col('masterCartonWeightKg'), 'Wght(kg)'], [Sequelize.col('mrp'), 'MRP']]
                 },
                 {
                     model: BuyingOrder

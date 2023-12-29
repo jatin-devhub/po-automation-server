@@ -29,7 +29,7 @@ export const validateNew: RequestHandler = async (req, res, next) => {
             createdBy: Joi.string().email().required()
         });
 
-        const value = await newSkuSchema.validateAsync(req.body);
+        await newSkuSchema.validateAsync(req.body);
         next();
 
     } catch (error: any) {
@@ -50,8 +50,8 @@ export const validateSendVerify: RequestHandler = async (req, res, next) => {
         const value = await verifyMailSchema.validateAsync(req.body);
         const vendorCode = value.vendorCode;
         const vendor = await Vendor.findOne({ where: { vendorCode } })
-        if(vendor)
-        next();
+        if (vendor)
+            next();
         else {
             return res.status(404).json({
                 success: false,
@@ -78,8 +78,8 @@ export const validateVendorCode: RequestHandler = async (req, res, next) => {
         const value = await validateVendorCode.validateAsync(req.params);
         const vendorCode = value.vendorCode;
         const vendor = await Vendor.findOne({ where: { vendorCode } })
-        if(vendor)
-        next();
+        if (vendor)
+            next();
         else {
             return res.status(404).json({
                 success: false,
@@ -108,8 +108,8 @@ export const validateReview: RequestHandler = async (req, res, next) => {
         const value = await validateVendorCode.validateAsync(req.body);
         const vendorCode = value.vendorCode;
         const vendor = await Vendor.findOne({ where: { vendorCode } })
-        if(vendor)
-        next();
+        if (vendor)
+            next();
         else {
             return res.status(404).json({
                 success: false,
