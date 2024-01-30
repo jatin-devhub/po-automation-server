@@ -201,7 +201,7 @@ export const getPODetails: RequestHandler = async (req, res) => {
 export const getApprovedPOs: RequestHandler = async (req, res) => {
     try {
         const buyingOrders = await BuyingOrder.findAll({
-            where: { isVerified: true },
+            where: { isVerified: true }, 
             // include: [
             //     {
             //         model: Vendor,
