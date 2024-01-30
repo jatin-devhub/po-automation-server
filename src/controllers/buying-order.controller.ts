@@ -115,14 +115,14 @@ export const applyReview: RequestHandler = async (req, res) => {
                     { where: { poCode } }
                 );
             }
-            else if(buyingOrder?.verificationLevel == "Accounts") {
+            else if (buyingOrder?.verificationLevel == "Accounts") {
                 await sendMailSetup(buyingOrder?.poCode, 'bu-approval', undefined, undefined, poFile);
                 await BuyingOrder.update(
                     { verificationLevel: 'BOHead' },
                     { where: { poCode } }
                 );
             }
-            else if(buyingOrder?.verificationLevel == "BOHead") {
+            else if (buyingOrder?.verificationLevel == "BOHead") {
                 await sendMailSetup(null, 'po-success', undefined, buyingOrder?.createdBy)
                 await BuyingOrder.update(
                     { isVerified: true },
@@ -162,16 +162,18 @@ export const getPODetails: RequestHandler = async (req, res) => {
     try {
         const { poCode } = req.params;
 
-        const buyingOrder = await BuyingOrder.findOne({ where: { poCode }, include: [
-            {
-                model: Vendor,
-                include: [
-                    {
-                        model: VendorAddress
-                    }
-                ]
-            }
-        ] })
+        const buyingOrder = await BuyingOrder.findOne({
+            where: { poCode }, include: [
+                {
+                    model: Vendor,
+                    include: [
+                        {
+                            model: VendorAddress
+                        }
+                    ]
+                }
+            ]
+        })
 
         // const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
 
@@ -181,7 +183,7 @@ export const getPODetails: RequestHandler = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: `Your details have been fetched`,
-            data: {buyingOrder},
+            data: { buyingOrder },
         });
 
     } catch (error: any) {
@@ -196,6 +198,38 @@ export const getPODetails: RequestHandler = async (req, res) => {
 
 }
 
+export const getApprovedPOs: RequestHandler = async (req, res) => {
+    try {
+        const buyingOrders = await BuyingOrder.findAll({
+            where: { isVerified: true },
+            // include: [
+            //     {
+            //         model: Vendor,
+            //         include: [
+            //             {
+            //                 model: VendorAddress
+            //             }
+            //         ]
+            //     }
+            // ]
+        })
+
+        return res.status(201).json({
+            success: true,
+            message: `Your pos have been fetched`,
+            data: { pos: buyingOrders },
+        });
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "buying-order.controller.js -> getApprovedPOs"
+            },
+        });
+    }
+}
+
 const getUniquePOCode = async () => {
     let poCode, existingPO
     do {
@@ -208,32 +242,3 @@ const getUniquePOCode = async () => {
     } while (existingPO)
     return poCode
 }
-
-// export const getAllVendors: RequestHandler = async (req, res) => {
-//     try {
-//         const vendors = await Vendor.findAll({
-//             attributes: ['vendorCode', 'companyName', [Sequelize.col('address.state'), 'state'], [Sequelize.col('address.country'), 'country'], 'productCategory'],
-//             include: [
-//                 {
-//                   model: VendorAddress,
-//                   attributes: [],
-//                 },
-//               ]
-//         });
-
-//         return res.status(201).json({
-//             success: true,
-//             message: `Vendors data successfully fetched`,
-//             data: {vendors},
-//         });
-
-//     } catch (error: any) {
-//         return res.status(504).json({
-//             success: false,
-//             message: error.message,
-//             data: {
-//                 "source": "vendor.controller.js -> getAllVendors"
-//             },
-//         });
-//     }
-// };
