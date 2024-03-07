@@ -34,12 +34,14 @@ export default class Vendor extends Model {
     productCategory!: string
 
     @AllowNull(false)
+    @Unique
     @Column({
         type: DataType.STRING
     })
     companyName!: string;
 
     @AllowNull(false)
+    @Unique
     @Column({
         type: DataType.STRING,
         allowNull: false,

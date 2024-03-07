@@ -42,12 +42,14 @@ __decorate([
 ], Vendor.prototype, "productCategory", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
+    sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
 ], Vendor.prototype, "companyName", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
+    sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         allowNull: false,

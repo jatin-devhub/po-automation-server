@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { validateNew, validateReview, validateSendVerify, validateVendorCode } from "../validators/sku.validators";
-import { applyReview, getUnverifiedSKUs, sendVerifyMail, skuRegistration } from "../controllers/sku.controller";
+import { validateNew, validateReview, validateVendorCode } from "../validators/sku.validators";
+import { applyReview, getUnverifiedSKUs, skuRegistration } from "../controllers/sku.controller";
 
 const router = Router();
 
-router.post('/new', validateNew, skuRegistration);
-router.post('/send-verify-mail', validateSendVerify, sendVerifyMail)
+router.post('/new/:vendorCode', validateVendorCode, validateNew, skuRegistration);
 router.get('/unverified/:vendorCode', validateVendorCode, getUnverifiedSKUs)
 router.post('/review', validateReview, applyReview)
 

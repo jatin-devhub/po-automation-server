@@ -32,7 +32,7 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
         if(!vendor)
         return res.status(404).json({
             success: false,
-            message: `Unable to create vendor details`
+            message: `Some error occured while creating vendor. Please contact our team for it.`
         })
         
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
@@ -181,8 +181,6 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
 
         const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
 
-        console.log(mailSent)
-        
         if(mailSent)
         return res.status(201).json({
             success: true,

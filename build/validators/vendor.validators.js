@@ -53,12 +53,18 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             if (!file.fieldname.startsWith('otherFieldsAttachments-'))
                 req.body[file.fieldname] = file;
         }
-        const value = yield newVendorSchema.validateAsync(req.body);
-        const tempContact = yield ContactPerson_1.default.findOne({ where: { email: value.contactPersonEmail } });
+        const { contactPersonEmail, contactPersonPhone, companyName } = yield newVendorSchema.validateAsync(req.body);
+        const tempContact = yield ContactPerson_1.default.findOne({ where: { email: contactPersonEmail, phoneNumber: contactPersonPhone } });
+        const tempVendor = yield Vendor_1.default.findOne({ where: { companyName } });
+        if (tempVendor)
+            return res.status(404).json({
+                success: false,
+                message: "Company Name is already registered with us. If you feel there's an issue please contact our team."
+            });
         if (tempContact)
             return res.status(404).json({
                 success: false,
-                message: 'Contact Email already exists'
+                message: 'Contact Email or Phone Number already exist.'
             });
         for (const file of files) {
             if (file.fieldname.startsWith('otherFieldsAttachments-'))

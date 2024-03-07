@@ -42,7 +42,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!vendor)
             return res.status(404).json({
                 success: false,
-                message: `Unable to create vendor details`
+                message: `Some error occured while creating vendor. Please contact our team for it.`
             });
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
@@ -177,7 +177,6 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             }
         }
         const mailSent = yield (0, mail_service_1.sendMailSetup)(vendor.vendorCode, 'new-vendor', undefined, undefined);
-        console.log(mailSent);
         if (mailSent)
             return res.status(201).json({
                 success: true,

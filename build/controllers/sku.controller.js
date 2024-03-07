@@ -19,51 +19,42 @@ const mail_service_1 = require("../utils/mail.service");
 const sequelize_typescript_1 = require("sequelize-typescript");
 const skuRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { skuCode, category, subCategory, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
+        const { createdBy, skus } = req.body;
+        const skuJSON = JSON.parse(skus);
+        const vendorCode = req.params.vendorCode;
         const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
-        const newSkU = new SKU_1.default({
-            skuCode,
-            category,
-            subCategory,
-            brand,
-            productTitle,
-            hsn,
-            ean,
-            modelNumber,
-            size,
-            colorFamilyColor,
-            productLengthCm,
-            productBreadthCm,
-            productHeightCm,
-            productWeightKg,
-            masterCartonQty,
-            masterCartonLengthCm,
-            masterCartonBreadthCm,
-            masterCartonHeightCm,
-            masterCartonWeightKg,
-            MRP,
-            createdBy,
-            vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id
-        });
-        const sku = yield newSkU.save();
-        if (sku)
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found",
+            });
+        }
+        const vendorId = vendor.id;
+        const skusToCreate = skuJSON.map((sku) => (Object.assign(Object.assign({}, sku), { vendorId,
+            createdBy })));
+        yield SKU_1.default.bulkCreate(skusToCreate, { validate: true });
+        const variables = {
+            "companyName": vendor === null || vendor === void 0 ? void 0 : vendor.companyName
+        };
+        const mailSent = yield (0, mail_service_1.sendMailSetup)(vendorCode, 'new-skus', variables, undefined);
+        if (mailSent)
             return res.status(201).json({
                 success: true,
-                message: `Your SKU has been successfully added`,
+                message: `${skusToCreate.length} SKUs have been successfully added.`,
                 data: [],
             });
         return res.status(404).json({
             success: false,
-            message: `Some error occured in sku.controller.js -> skuRegistration`
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
         });
     }
     catch (error) {
-        return res.status(504).json({
+        return res.status(500).json({
             success: false,
             message: error.message,
-            data: {
-                "source": "sku.controller.js -> skuRegistration"
-            },
         });
     }
 });

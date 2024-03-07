@@ -6,55 +6,50 @@ import { Sequelize } from "sequelize-typescript";
 
 export const skuRegistration: RequestHandler = async (req, res) => {
     try {
-        const { skuCode, category, subCategory, brand, productTitle, hsn, ean, modelNumber, size, colorFamilyColor, productLengthCm, productBreadthCm, productHeightCm, productWeightKg, masterCartonQty, masterCartonLengthCm, masterCartonBreadthCm, masterCartonHeightCm, masterCartonWeightKg, MRP, createdBy, vendorCode } = req.body;
+        const { createdBy, skus } = req.body;
+        const skuJSON = JSON.parse(skus)
+        const vendorCode = req.params.vendorCode;
+        const vendor = await Vendor.findOne({ where: { vendorCode } });
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found",
+            });
+        }
 
-        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        const vendorId = vendor.id;
+        const skusToCreate = skuJSON.map((sku: any) => ({
+            ...sku,
+            vendorId,
+            createdBy
+        }));
 
-        const newSkU = new SKU({
-            skuCode,
-            category,
-            subCategory,
-            brand,
-            productTitle,
-            hsn,
-            ean,
-            modelNumber,
-            size,
-            colorFamilyColor,
-            productLengthCm,
-            productBreadthCm,
-            productHeightCm,
-            productWeightKg,
-            masterCartonQty,
-            masterCartonLengthCm,
-            masterCartonBreadthCm,
-            masterCartonHeightCm,
-            masterCartonWeightKg,
-            MRP,
-            createdBy,
-            vendorId: vendor?.id
-        })
-        const sku = await newSkU.save();
+        await SKU.bulkCreate(skusToCreate, { validate: true });
 
-        if (sku)
+        const variables = {
+            "companyName": vendor?.companyName
+        }
+
+        const mailSent = await sendMailSetup(vendorCode, 'new-skus', variables, undefined);
+
+        if (mailSent)
             return res.status(201).json({
                 success: true,
-                message: `Your SKU has been successfully added`,
+                message: `${skusToCreate.length} SKUs have been successfully added.`,
                 data: [],
             });
 
         return res.status(404).json({
             success: false,
-            message: `Some error occured in sku.controller.js -> skuRegistration`
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
         })
-
     } catch (error: any) {
-        return res.status(504).json({
+        return res.status(500).json({
             success: false,
             message: error.message,
-            data: {
-                "source": "sku.controller.js -> skuRegistration"
-            },
         });
     }
 };
@@ -130,7 +125,7 @@ export const applyReview: RequestHandler = async (req, res) => {
         const { vendorCode, isValid, reason } = req.body;
 
         const vendor = await Vendor.findOne({ where: { vendorCode } })
-        const sku = await SKU.findOne({where: { isVerified: false, vendorId: vendor?.id }})
+        const sku = await SKU.findOne({ where: { isVerified: false, vendorId: vendor?.id } })
 
         if (isValid == "true") {
             const variables = {

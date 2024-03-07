@@ -4,14 +4,18 @@ import Vendor from "../models/Vendor";
 
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
-        const newSkuSchema = Joi.object({
+        const schema = Joi.object({
+            createdBy: Joi.string().email().required(),
+            skus: Joi.string().required()
+        });
+        const skusSchema = Joi.array().items(Joi.object({
             skuCode: Joi.string().required(),
             category: Joi.string(),
             subCategory: Joi.string(),
             brand: Joi.string(),
             productTitle: Joi.string(),
-            hsn: Joi.string(),
-            ean: Joi.string(),
+            hsn: Joi.number(),
+            ean: Joi.number(),
             modelNumber: Joi.string(),
             size: Joi.string(),
             colorFamilyColor: Joi.string(),
@@ -25,49 +29,19 @@ export const validateNew: RequestHandler = async (req, res, next) => {
             masterCartonHeightCm: Joi.number().min(0),
             masterCartonWeightKg: Joi.number().min(0),
             MRP: Joi.number().min(0),
-            vendorCode: Joi.string().required(),
-            createdBy: Joi.string().email().required()
-        });
+        })).min(1).required()
 
-        await newSkuSchema.validateAsync(req.body);
+        const { skus } = await schema.validateAsync(req.body);
+        const skuJSON = JSON.parse(skus);
+        await skusSchema.validateAsync(skuJSON)
         next();
-
     } catch (error: any) {
-        return res.status(504).json({
+        return res.status(400).json({
             success: false,
             message: error.message,
-            data: [],
         });
     }
-}
-
-export const validateSendVerify: RequestHandler = async (req, res, next) => {
-    try {
-        const verifyMailSchema = Joi.object({
-            vendorCode: Joi.string().required()
-        });
-
-        const value = await verifyMailSchema.validateAsync(req.body);
-        const vendorCode = value.vendorCode;
-        const vendor = await Vendor.findOne({ where: { vendorCode } })
-        if (vendor)
-            next();
-        else {
-            return res.status(404).json({
-                success: false,
-                message: "Vendor with this vendor code doesn't exists",
-                data: {}
-            })
-        }
-
-    } catch (error: any) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: [],
-        });
-    }
-}
+};
 
 export const validateVendorCode: RequestHandler = async (req, res, next) => {
     try {

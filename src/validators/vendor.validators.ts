@@ -41,13 +41,19 @@ export const validateNew: RequestHandler = async (req, res, next) => {
             if (!file.fieldname.startsWith('otherFieldsAttachments-'))
                 req.body[file.fieldname] = file
         }
-        const value = await newVendorSchema.validateAsync(req.body);
-        const tempContact = await ContactPerson.findOne({where: { email: value.contactPersonEmail }})
-        if(tempContact)
-        return res.status(404).json({
-            success: false,
-            message: 'Contact Email already exists'
-        })
+        const { contactPersonEmail, contactPersonPhone, companyName } = await newVendorSchema.validateAsync(req.body);
+        const tempContact = await ContactPerson.findOne({ where: { email: contactPersonEmail, phoneNumber: contactPersonPhone } })
+        const tempVendor = await Vendor.findOne({ where: { companyName } })
+        if (tempVendor)
+            return res.status(404).json({
+                success: false,
+                message: "Company Name is already registered with us. If you feel there's an issue please contact our team."
+            })
+        if (tempContact)
+            return res.status(404).json({
+                success: false,
+                message: 'Contact Email or Phone Number already exist.'
+            })
         for (const file of files) {
             if (file.fieldname.startsWith('otherFieldsAttachments-'))
                 req.body[file.fieldname] = file
@@ -102,12 +108,12 @@ export const validateUpdate: RequestHandler = async (req, res, next) => {
                 req.body[file.fieldname] = file
         }
         const { vendorCode } = req.params;
-        const vendor = await Vendor.findOne({where: { vendorCode }})
-        if(vendor) {
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if (vendor) {
             const value = await updateVendorSchema.validateAsync(req.body);
             for (const file of files) {
                 if (file.fieldname.startsWith('otherFieldsAttachments-'))
-                req.body[file.fieldname] = file
+                    req.body[file.fieldname] = file
             }
             next();
         }

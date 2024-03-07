@@ -28,6 +28,7 @@ export default class ContactPerson extends Model {
     email!: string;
 
     @AllowNull(false)
+    @Unique
     @Column({
         type: DataType.STRING
     })

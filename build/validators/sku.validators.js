@@ -12,19 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateReview = exports.validateVendorCode = exports.validateSendVerify = exports.validateNew = void 0;
+exports.validateReview = exports.validateVendorCode = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newSkuSchema = joi_1.default.object({
+        const schema = joi_1.default.object({
+            createdBy: joi_1.default.string().email().required(),
+            skus: joi_1.default.string().required()
+        });
+        const skusSchema = joi_1.default.array().items(joi_1.default.object({
             skuCode: joi_1.default.string().required(),
             category: joi_1.default.string(),
             subCategory: joi_1.default.string(),
             brand: joi_1.default.string(),
             productTitle: joi_1.default.string(),
-            hsn: joi_1.default.string(),
-            ean: joi_1.default.string(),
+            hsn: joi_1.default.number(),
+            ean: joi_1.default.number(),
             modelNumber: joi_1.default.string(),
             size: joi_1.default.string(),
             colorFamilyColor: joi_1.default.string(),
@@ -38,48 +42,20 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             masterCartonHeightCm: joi_1.default.number().min(0),
             masterCartonWeightKg: joi_1.default.number().min(0),
             MRP: joi_1.default.number().min(0),
-            vendorCode: joi_1.default.string().required(),
-            createdBy: joi_1.default.string().email().required()
-        });
-        yield newSkuSchema.validateAsync(req.body);
+        })).min(1).required();
+        const { skus } = yield schema.validateAsync(req.body);
+        const skuJSON = JSON.parse(skus);
+        yield skusSchema.validateAsync(skuJSON);
         next();
     }
     catch (error) {
-        return res.status(504).json({
+        return res.status(400).json({
             success: false,
             message: error.message,
-            data: [],
         });
     }
 });
 exports.validateNew = validateNew;
-const validateSendVerify = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const verifyMailSchema = joi_1.default.object({
-            vendorCode: joi_1.default.string().required()
-        });
-        const value = yield verifyMailSchema.validateAsync(req.body);
-        const vendorCode = value.vendorCode;
-        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
-        if (vendor)
-            next();
-        else {
-            return res.status(404).json({
-                success: false,
-                message: "Vendor with this vendor code doesn't exists",
-                data: {}
-            });
-        }
-    }
-    catch (error) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: [],
-        });
-    }
-});
-exports.validateSendVerify = validateSendVerify;
 const validateVendorCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const validateVendorCode = joi_1.default.object({
