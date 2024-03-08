@@ -23,6 +23,15 @@ export default class BuyingOrderRecord extends Model {
     @Column({ type: DataType.DECIMAL(5, 2) })
     gst!: number;
 
+    @Column({ type: DataType.INTEGER })
+    short!: number;
+
+    @Column({ type: DataType.INTEGER })
+    damaged!: number;
+
+    @Column({ type: DataType.INTEGER })
+    excess!: number;
+
     @ForeignKey(() => SKU)
     @Column({
         type: DataType.INTEGER

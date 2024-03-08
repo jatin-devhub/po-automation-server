@@ -49,7 +49,7 @@ export default class BuyingOrder extends Model {
     })
     verificationLevel!: string
 
-    @HasOne(() => File)
+    @HasOne(() => File, { foreignKey: 'buyingOrderId'})
     poAttachment!: File;
 
     @AllowNull(false)
@@ -57,6 +57,15 @@ export default class BuyingOrder extends Model {
         type: DataType.STRING
     })
     createdBy!: string
+    
+    @Default(false)
+    @Column({
+        type: DataType.BOOLEAN
+    })
+    closed!: boolean
+
+    @HasOne(() => File, { foreignKey: 'buyingOrderIdInvoice' })
+    invoiceAtt!: File;
 
     @HasMany(() => BuyingOrderRecord)
     records?: BuyingOrderRecord[];

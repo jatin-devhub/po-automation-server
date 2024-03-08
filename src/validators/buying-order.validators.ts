@@ -60,7 +60,7 @@ export const validateReview: RequestHandler = async (req, res, next) => {
     }
 }
 
-export const validateGetPODetails: RequestHandler = async (req, res, next) => {
+export const validatePOCode: RequestHandler = async (req, res, next) => {
     try {
         const validatePOCode = Joi.object({
             poCode: Joi.string().required()

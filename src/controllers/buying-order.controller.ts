@@ -198,38 +198,6 @@ export const getPODetails: RequestHandler = async (req, res) => {
 
 }
 
-export const getApprovedPOs: RequestHandler = async (req, res) => {
-    try {
-        const buyingOrders = await BuyingOrder.findAll({
-            where: { isVerified: true }, 
-            // include: [
-            //     {
-            //         model: Vendor,
-            //         include: [
-            //             {
-            //                 model: VendorAddress
-            //             }
-            //         ]
-            //     }
-            // ]
-        })
-
-        return res.status(201).json({
-            success: true,
-            message: `Your pos have been fetched`,
-            data: { pos: buyingOrders },
-        });
-    } catch (error: any) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "buying-order.controller.js -> getApprovedPOs"
-            },
-        });
-    }
-}
-
 const getUniquePOCode = async () => {
     let poCode, existingPO
     do {

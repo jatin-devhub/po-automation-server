@@ -45,7 +45,7 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "buyingOrderId", void 0);
+], File.prototype, "buyingOrderIdInvoice", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -82,6 +82,12 @@ __decorate([
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], File.prototype, "vendorBankId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "buyingOrderId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => VendorOther_1.default),
     (0, sequelize_typescript_1.Column)({

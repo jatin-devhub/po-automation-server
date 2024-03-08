@@ -60,7 +60,7 @@ __decorate([
     })
 ], BuyingOrder.prototype, "verificationLevel", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderId' })
 ], BuyingOrder.prototype, "poAttachment", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -68,6 +68,15 @@ __decorate([
         type: sequelize_typescript_1.DataType.STRING
     })
 ], BuyingOrder.prototype, "createdBy", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.BOOLEAN
+    })
+], BuyingOrder.prototype, "closed", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdInvoice' })
+], BuyingOrder.prototype, "invoiceAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
 ], BuyingOrder.prototype, "records", void 0);

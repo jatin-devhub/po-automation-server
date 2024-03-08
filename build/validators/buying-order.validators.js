@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateGetPODetails = exports.validateReview = exports.validateNew = void 0;
+exports.validatePOCode = exports.validateReview = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -72,7 +72,7 @@ const validateReview = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.validateReview = validateReview;
-const validateGetPODetails = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const validatePOCode = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const validatePOCode = joi_1.default.object({
             poCode: joi_1.default.string().required()
@@ -98,4 +98,4 @@ const validateGetPODetails = (req, res, next) => __awaiter(void 0, void 0, void 
         });
     }
 });
-exports.validateGetPODetails = validateGetPODetails;
+exports.validatePOCode = validatePOCode;

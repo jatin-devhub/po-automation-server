@@ -37,7 +37,7 @@ export default class File extends Model {
   @Column({
     type: DataType.INTEGER
   })
-  buyingOrderId!: number
+  buyingOrderIdInvoice!: number
 
   @ForeignKey(() => Vendor)
   @Column({
@@ -74,6 +74,12 @@ export default class File extends Model {
     type: DataType.INTEGER
   })
   vendorBankId!: number;
+
+  @ForeignKey(() => BuyingOrder)
+  @Column({
+    type: DataType.INTEGER
+  })
+  buyingOrderId!: number
 
   @ForeignKey(() => VendorOther)
   @Column({

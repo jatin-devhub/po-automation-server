@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getApprovedPOs = exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
+exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
@@ -180,38 +180,6 @@ const getPODetails = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getPODetails = getPODetails;
-const getApprovedPOs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const buyingOrders = yield BuyingOrder_1.default.findAll({
-            where: { isVerified: true },
-            // include: [
-            //     {
-            //         model: Vendor,
-            //         include: [
-            //             {
-            //                 model: VendorAddress
-            //             }
-            //         ]
-            //     }
-            // ]
-        });
-        return res.status(201).json({
-            success: true,
-            message: `Your pos have been fetched`,
-            data: { pos: buyingOrders },
-        });
-    }
-    catch (error) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "buying-order.controller.js -> getApprovedPOs"
-            },
-        });
-    }
-});
-exports.getApprovedPOs = getApprovedPOs;
 const getUniquePOCode = () => __awaiter(void 0, void 0, void 0, function* () {
     let poCode, existingPO;
     do {
