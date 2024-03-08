@@ -15,7 +15,7 @@ export const POLevels = [
     'Accounts',
     'BOHead'
 ]
-
+ 
 export const mailDetails: { [key: string]: MailDetail } = {
     'new-vendor': {
         subject: 'Review New Vendor Details!!',
