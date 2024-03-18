@@ -13,8 +13,8 @@ exports.mailDetails = {
         title: 'Vendor Review',
         message: 'A new vendor is being registered. Please review the details of the vendor so that further work can be done.',
         priority: 'high',
-        // sendTo: "accounts@evolvedigitas.com",
-        sendTo: "jatina+po@evolvedigitas.com",
+        sendTo: "accounts@evolvedigitas.com",
+        // sendTo: "jatina+po@evolvedigitas.com",
         actionRoute: "review-vendor",
         actionText: "Review Vendor"
     },
@@ -37,8 +37,8 @@ exports.mailDetails = {
         title: 'Vendor Review',
         message: 'Based on your review Vendor Details have been updated please check. Please review the details of the vendor so that further work can be done.',
         priority: 'high',
-        // sendTo: "accounts@evolvedigitas.com",
-        sendTo: "jatina+po@evolvedigitas.com",
+        sendTo: "accounts@evolvedigitas.com",
+        // sendTo: "jatina+po@evolvedigitas.com",
         actionRoute: "review-vendor",
         actionText: "Review Vendor"
     },
@@ -47,8 +47,7 @@ exports.mailDetails = {
         title: "SKUs Verification",
         message: "Click on the link below to view the skus entered by the user for $companyName and verify them.",
         priority: "high",
-        sendTo: "jatina+po@evolvedigitas.com",
-        // sendTo: ["yogeshk@globalplugin.com", "aswanis@globalplugin.com"],
+        sendTo: ["yogeshk@globalplugin.com", "aswanis@globalplugin.com"],
         actionRoute: "review-skus",
         actionText: "Review SKUs"
     },
@@ -69,8 +68,7 @@ exports.mailDetails = {
         title: "Review PO Details",
         message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
         priority: 'high',
-        sendTo: "jatina+po@evolvedigitas.com",
-        // sendTo: "yogeshk@globalplugin.com",
+        sendTo: "yogeshk@globalplugin.com",
         actionRoute: "review-po",
         actionText: "Review PO"
     },
@@ -79,8 +77,7 @@ exports.mailDetails = {
         title: "Review PO Details",
         message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
         priority: 'high',
-        sendTo: "jatina+po@evolvedigitas.com",
-        // sendTo: "accounts@evolvedigitas.com",
+        sendTo: "accounts@evolvedigitas.com",
         actionRoute: "review-po",
         actionText: "Review PO"
     },
@@ -89,8 +86,7 @@ exports.mailDetails = {
         title: "Review PO Details",
         message: "You'll find PO Attachment attached with this email. Please verify the details and then submit the review by clicking button below.",
         priority: 'high',
-        sendTo: "jatina+po@evolvedigitas.com",
-        // sendTo: ["aparnag@evolvedigitas.com", "tarunm@evolvedigitas.com"],
+        sendTo: ["aparnag@evolvedigitas.com", "tarunm@evolvedigitas.com"],
         actionRoute: "review-po",
         actionText: "Review PO"
     },

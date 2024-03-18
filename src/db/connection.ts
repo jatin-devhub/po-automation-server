@@ -24,7 +24,7 @@ const connection = new Sequelize({
   port: 3306,
   models: [Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, SKU, BuyingOrder, BuyingOrderRecord, File, Comment, BOInvoices, BuyingOrderOther]
 });
-
+ 
 // connection.sync({ alter: true }); 
 
 export default connection;
