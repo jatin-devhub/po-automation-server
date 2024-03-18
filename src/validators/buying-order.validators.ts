@@ -41,8 +41,8 @@ export const validateReview: RequestHandler = async (req, res, next) => {
         const value = await validateVendorCode.validateAsync(req.body);
         const poCode = value.poCode;
         const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
-        if(buyingOrder)
-        next();
+        if (buyingOrder)
+            next();
         else {
             return res.status(404).json({
                 success: false,
@@ -69,12 +69,39 @@ export const validatePOCode: RequestHandler = async (req, res, next) => {
         const value = await validatePOCode.validateAsync(req.params);
         const poCode = value.poCode;
         const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
-        if(buyingOrder)
-        next();
+        if (buyingOrder)
+            next();
         else {
             return res.status(404).json({
                 success: false,
                 message: "Buying Order with this po code doesn't exists",
+                data: {}
+            })
+        }
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validatePOId: RequestHandler = async (req, res, next) => {
+    try {
+        const validatePOCode = Joi.object({
+            poId: Joi.number().required()
+        });
+
+        const { poId } = await validatePOCode.validateAsync(req.params);
+        const buyingOrder = await BuyingOrder.findOne({ where: { id: poId } })
+        if (buyingOrder)
+            next();
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Buying Order with this po id doesn't exists",
                 data: {}
             })
         }

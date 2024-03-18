@@ -14,6 +14,8 @@ const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
 const Vendor_1 = __importDefault(require("./Vendor"));
 const Comment_1 = __importDefault(require("./Comment"));
 const File_1 = __importDefault(require("./File"));
+const BOInvoices_1 = __importDefault(require("./BOInvoices"));
+const BuyingOrderOther_1 = __importDefault(require("./BuyingOrderOther"));
 let BuyingOrder = class BuyingOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -75,8 +77,22 @@ __decorate([
     })
 ], BuyingOrder.prototype, "closed", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdInvoice' })
-], BuyingOrder.prototype, "invoiceAtt", void 0);
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], BuyingOrder.prototype, "grnComment", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => BOInvoices_1.default)
+], BuyingOrder.prototype, "invoiceAtts", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => BuyingOrderOther_1.default)
+], BuyingOrder.prototype, "otherFields", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdPackaging' })
+], BuyingOrder.prototype, "packagingAtt", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdGRNSheet' })
+], BuyingOrder.prototype, "grnAtt", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
 ], BuyingOrder.prototype, "records", void 0);

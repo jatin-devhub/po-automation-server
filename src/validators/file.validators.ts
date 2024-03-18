@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
-import File from "../models/File";
 
 export const validateGetFile: RequestHandler = async (req, res, next) => {
     try {
@@ -12,6 +11,28 @@ export const validateGetFile: RequestHandler = async (req, res, next) => {
         const value = await validateVendorCode.validateAsync(req.params);
         next();
 
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateUpdateFile: RequestHandler = async (req, res, next) => {
+    try {
+        const updateFileBody = Joi.object({
+            attachment: Joi.any().required(), 
+            idName: Joi.string().required(), 
+            idValue: Joi.number().required()
+        })
+        const files = req.files as Express.Multer.File[];
+        for (const file of files) {
+                req.body[file.fieldname] = file
+        }
+        await updateFileBody.validateAsync(req.body)
+        next()
     } catch (error: any) {
         return res.status(504).json({
             success: false,

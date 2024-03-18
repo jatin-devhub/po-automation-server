@@ -1,9 +1,10 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AutoIncrement, PrimaryKey, AllowNull } from 'sequelize-typescript';
 import BuyingOrder from './BuyingOrder';
-import SKU from './SKU';
 import Vendor from './Vendor';
 import VendorBank from './VendorBank';
 import VendorOther from './VendorOther';
+import BOInvoices from './BOInvoices';
+import BuyingOrderOther from './BuyingOrderOther';
 
 @Table({
   tableName: 'files',
@@ -33,11 +34,23 @@ export default class File extends Model {
   })
   fileType!: string;
 
+  @ForeignKey(() => BOInvoices)
+  @Column({
+    type: DataType.INTEGER
+  })
+  invoiceAttId!: number
+
   @ForeignKey(() => BuyingOrder)
   @Column({
     type: DataType.INTEGER
   })
-  buyingOrderIdInvoice!: number
+  buyingOrderIdPackaging!: number
+
+  @ForeignKey(() => BuyingOrder)
+  @Column({
+    type: DataType.INTEGER
+  })
+  buyingOrderIdGRNSheet!: number
 
   @ForeignKey(() => Vendor)
   @Column({
@@ -86,6 +99,12 @@ export default class File extends Model {
     type: DataType.INTEGER
   })
   vendorOtherId!: number;
+
+  @ForeignKey(() => BuyingOrderOther)
+  @Column({
+    type: DataType.INTEGER
+  })
+  buyingOrderOtherId!: number;
 
   @BelongsTo(() => BuyingOrder)
   buyingOrder!: BuyingOrder;

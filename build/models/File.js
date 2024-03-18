@@ -14,6 +14,8 @@ const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
 const Vendor_1 = __importDefault(require("./Vendor"));
 const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
+const BOInvoices_1 = __importDefault(require("./BOInvoices"));
+const BuyingOrderOther_1 = __importDefault(require("./BuyingOrderOther"));
 let File = class File extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -41,11 +43,23 @@ __decorate([
     })
 ], File.prototype, "fileType", void 0);
 __decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => BOInvoices_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "invoiceAttId", void 0);
+__decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], File.prototype, "buyingOrderIdInvoice", void 0);
+], File.prototype, "buyingOrderIdPackaging", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "buyingOrderIdGRNSheet", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -94,6 +108,12 @@ __decorate([
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], File.prototype, "vendorOtherId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrderOther_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "buyingOrderOtherId", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
 ], File.prototype, "buyingOrder", void 0);

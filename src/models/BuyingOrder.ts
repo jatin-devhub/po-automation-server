@@ -3,6 +3,8 @@ import BuyingOrderRecord from './BuyingOrderRecord';
 import Vendor from './Vendor';
 import Comment from './Comment';
 import File from './File';
+import BOInvoices from './BOInvoices';
+import BuyingOrderOther from './BuyingOrderOther';
 
 @Table
 export default class BuyingOrder extends Model {
@@ -64,8 +66,22 @@ export default class BuyingOrder extends Model {
     })
     closed!: boolean
 
-    @HasOne(() => File, { foreignKey: 'buyingOrderIdInvoice' })
-    invoiceAtt!: File;
+    @Column({
+        type: DataType.STRING
+    })
+    grnComment!: string
+
+    @HasMany(() => BOInvoices)
+    invoiceAtts!: BOInvoices[];
+
+    @HasMany(() => BuyingOrderOther)
+    otherFields!: BuyingOrderOther[];
+
+    @HasOne(() => File, { foreignKey: 'buyingOrderIdPackaging' })
+    packagingAtt!: File;
+
+    @HasOne(() => File, { foreignKey: 'buyingOrderIdGRNSheet'})
+    grnAtt!: File
 
     @HasMany(() => BuyingOrderRecord)
     records?: BuyingOrderRecord[];
