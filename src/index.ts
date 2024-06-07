@@ -3,7 +3,7 @@ import cors from "cors";
 import multer from "multer";
 import * as dotenv from "dotenv";
 
-dotenv.config({path:"./src/config/config.env"});
+dotenv.config({ path: "./src/config/config.env" });
 import connection from "./db/connection"
 
 import routes from "./routes/routes";
@@ -14,10 +14,10 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 connection.sync().then(() => {
-    console.log("Database synced successfully");
+  console.log("Database synced successfully");
 });
 
-const allowedOrigins = ['https://vendor-registration.globalplugin.com','https://po-automation-ui.vercel.app', 'http://localhost:3000'];
+const allowedOrigins = ['https://vendor-registration.globalplugin.com', 'https://po-automation-ui.vercel.app', 'http://localhost:3000', 'http://localhost:3001', 'https://invoices.globalplugin.com/'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
@@ -29,8 +29,8 @@ app.use(upload.any());
 app.use('/api', routes);
 
 app.get("*", (req, res) => {
-	res.status(400).send("Page not found");
+  res.status(400).send("Page not found");
 });
 app.listen(port, () => {
-	console.log(`server is starting on port ${port}`);
+  console.log(`server is starting on port ${port}`);
 });
