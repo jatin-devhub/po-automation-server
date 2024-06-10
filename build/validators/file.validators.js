@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUpdateFile = exports.validateGetFile = void 0;
+exports.validateNewFile = exports.validateUpdateFile = exports.validateGetFile = void 0;
 const joi_1 = __importDefault(require("joi"));
 const validateGetFile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -55,3 +55,24 @@ const validateUpdateFile = (req, res, next) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.validateUpdateFile = validateUpdateFile;
+const validateNewFile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const newFileBody = joi_1.default.object({
+            attachment: joi_1.default.any().required(),
+        });
+        const files = req.files;
+        for (const file of files) {
+            req.body[file.fieldname] = file;
+        }
+        yield newFileBody.validateAsync(req.body);
+        next();
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateNewFile = validateNewFile;

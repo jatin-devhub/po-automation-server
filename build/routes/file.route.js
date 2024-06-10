@@ -6,4 +6,5 @@ const file_controller_1 = require("../controllers/file.controller");
 const router = (0, express_1.Router)();
 router.get('/:idType/:id', file_validators_1.validateGetFile, file_controller_1.getFile);
 router.put('/:idType', file_validators_1.validateUpdateFile, file_controller_1.updateFile);
+router.post('/:idType', file_validators_1.validateNewFile, file_controller_1.newFile);
 exports.default = router;

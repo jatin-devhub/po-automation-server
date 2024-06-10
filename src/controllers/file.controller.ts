@@ -100,3 +100,41 @@ export const updateFile: RequestHandler = async (req, res) => {
         });
     }
 }
+
+export const newFile: RequestHandler = async (req, res) => {
+    try {
+        const { attachment } = req.body;
+        const { idType } = req.params;
+
+        const decodedFile = Buffer.from(attachment.buffer, 'base64');
+
+        const file = await File.create({
+            fileName: attachment.originalname,
+            fileContent: decodedFile,
+            fileType: idType
+        })
+
+        if (file) {
+            return res.status(201).json({
+                success: true,
+                message: 'File created Successfully',
+                data: {
+                    fileId: file.id
+                }
+            })
+        }
+        else
+            return res.status(400).json({
+                success: false,
+                message: 'Some error occured while adding new File'
+            })
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "file.controller.js -> updateFile"
+            },
+        });
+    }
+}

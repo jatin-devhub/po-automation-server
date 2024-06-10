@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateFile = exports.getFile = void 0;
+exports.newFile = exports.updateFile = exports.getFile = void 0;
 const File_1 = __importDefault(require("../models/File"));
 const getFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -107,3 +107,39 @@ const updateFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateFile = updateFile;
+const newFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { attachment } = req.body;
+        const { idType } = req.params;
+        const decodedFile = Buffer.from(attachment.buffer, 'base64');
+        const file = yield File_1.default.create({
+            fileName: attachment.originalname,
+            fileContent: decodedFile,
+            fileType: idType
+        });
+        if (file) {
+            return res.status(201).json({
+                success: true,
+                message: 'File created Successfully',
+                data: {
+                    fileId: file.id
+                }
+            });
+        }
+        else
+            return res.status(400).json({
+                success: false,
+                message: 'Some error occured while adding new File'
+            });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "file.controller.js -> updateFile"
+            },
+        });
+    }
+});
+exports.newFile = newFile;
