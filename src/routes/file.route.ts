@@ -5,7 +5,8 @@ import { getFile, newFile, updateFile } from "../controllers/file.controller";
 const router = Router();
 
 router.get('/:idType/:id', validateGetFile, getFile);
-router.put('/:idType', validateUpdateFile, updateFile)
-router.post('/:idType', validateNewFile, newFile)
+router.put('/:idType', validateUpdateFile, updateFile);
+router.put('/:idType/:referenceIdType/:referenceId')
+// router.post('/:idType', validateNewFile, newFile);
 
 export default router;

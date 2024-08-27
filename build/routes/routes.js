@@ -14,9 +14,6 @@ const router = (0, express_1.Router)();
 router.get("/", (req, res) => {
     res.status(200).send("Api is working");
 });
-router.get("/test", (req, res) => {
-    res.status(200).send("APi is test");
-});
 router.use("/vendor", vendor_route_1.default);
 router.use("/sku", sku_route_1.default);
 router.use("/buying-order", buying_order_route_1.default);

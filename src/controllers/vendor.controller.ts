@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { Sequelize } from "sequelize-typescript";
+import connection from "../db/connection";
 
 import Vendor from "../models/Vendor";
 import File from "../models/File";
@@ -12,13 +13,104 @@ import BuyingOrder from "../models/BuyingOrder";
 import { sendMailSetup } from "../utils/mail.service";
 import Comment from "../models/Comment";
 
+export const vendorRegistrationStart: RequestHandler = async (req, res) => {
+    const t = await connection.transaction();
+
+    try {
+        const {
+            companyName,
+            productCategory,
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode,
+            gst,
+            coi,
+            msme,
+            tradeMark,
+            createdBy,
+            contactPersonName,
+            contactPersonEmail,
+            contactPersonPhone,
+            beneficiary,
+            accountNumber,
+            ifsc,
+            bankName,
+            branch,
+        } = req.body;
+
+        const vendorCode = await getNewVendorCode(country);
+
+        const vendor = await Vendor.create({
+            vendorCode,
+            productCategory,
+            companyName,
+            gst,
+            coi,
+            msme,
+            tradeMark,
+            createdBy,
+        }, { transaction: t });
+
+        await ContactPerson.create({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone,
+            vendorId: vendor.id,
+        }, { transaction: t });
+
+        await VendorAddress.create({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode,
+            vendorId: vendor.id,
+        }, { transaction: t });
+
+        await VendorBank.create({
+            beneficiaryName: beneficiary,
+            accountNumber,
+            ifsc,
+            bankName,
+            branch,
+            vendorId: vendor.id,
+        }, { transaction: t });
+
+        await t.commit();
+
+        return res.status(201).json({
+            success: true,
+            message: "Vendor created successfully. Proceed to upload attachments and other fields.",
+            data: {
+                vendorId: vendor.id,
+                vendorCode,
+            },
+        });
+
+    } catch (error: any) {
+        await t.rollback();
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: {
+                source: "vendor.controller.js -> vendorRegistrationStart",
+            },
+        });
+    }
+};
+
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
-        
+
         const vendorCode = await getNewVendorCode(country);
-        
-        const newVendor = new Vendor({
+
+        const vendor = await Vendor.create({
             vendorCode,
             productCategory,
             companyName,
@@ -28,66 +120,65 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             tradeMark,
             createdBy
         })
-        const vendor = await newVendor.save();
-        if(!vendor)
-        return res.status(404).json({
-            success: false,
-            message: `Some error occured while creating vendor. Please contact our team for it.`
-        })
-        
+        if (!vendor)
+            return res.status(404).json({
+                success: false,
+                message: `Some error occured while creating vendor. Please contact our team for it.`
+            })
+
         const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
         const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        if(coiAttachment){
+        if (coiAttachment) {
             const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
             await File.create({
                 fileName: coiAttachment.originalname,
                 fileContent: decodedCoiFile,
                 fileType: 'coi',
                 coiAttVendorId: vendor.id
-            })    
-        }    
-        if(msmeAttachment) {
+            })
+        }
+        if (msmeAttachment) {
             const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
             await File.create({
                 fileName: msmeAttachment.originalname,
                 fileContent: decodedMsmeFile,
                 fileType: 'msme',
                 msmeAttVendorId: vendor.id
-            })    
-        }    
-        if(tradeAttachment) {
+            })
+        }
+        if (tradeAttachment) {
             const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
             await File.create({
                 fileName: tradeAttachment.originalname,
                 fileContent: decodedTradeFile,
                 fileType: 'trade',
                 tradeMarkAttVendorId: vendor.id
-            })    
+            })
         }
-        
+
         const gstFile = await File.create({
             fileName: gstAttachment.originalname,
             fileContent: decodedGstFile,
             fileType: 'gst',
             gstAttVendorId: vendor.id
-        })    
-        if(!gstFile)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create bank details`
         })
+        if (!gstFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            })
 
         const agreementFile = await File.create({
             fileName: agreementAttachment.originalname,
             fileContent: decodedAgreementFile,
             fileType: 'agreement',
             agreementAttVendorId: vendor.id
-        })   
-        if(!agreementFile)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create bank details`
         })
+        if (!agreementFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            })
 
         const newContactPerson = new ContactPerson({
             name: contactPersonName,
@@ -96,11 +187,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             vendorId: vendor.id
         })
         const contactPerson = await newContactPerson.save();
-        if(!contactPerson)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create contact person details`
-        })
+        if (!contactPerson)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create contact person details`
+            })
 
         const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
 
@@ -114,11 +205,11 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             vendorId: vendor.id
         })
         const address = await newAdress.save();
-        if(!address)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create address details`
-        })
+        if (!address)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create address details`
+            })
 
         const newVendorBank = new VendorBank({
             beneficiaryName: beneficiary,
@@ -129,27 +220,27 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
             vendorId: vendor.id
         })
         const vendorBank = await newVendorBank.save();
-        if(!vendorBank)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create bank details`
-        })
+        if (!vendorBank)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank details`
+            })
 
         const bankProofFile = await File.create({
             fileName: bankAttachment.originalname,
             fileContent: decodedbankFile,
             fileType: 'bankProof',
             vendorBankId: vendorBank.id
-        })    
-        if(!bankProofFile)
-        return res.status(404).json({
-            success: false,
-            message: `Unable to create bank proof attachments`
         })
+        if (!bankProofFile)
+            return res.status(404).json({
+                success: false,
+                message: `Unable to create bank proof attachments`
+            })
 
-        if(otherFields){
+        if (otherFields) {
             let otherFieldsObject = JSON.parse(otherFields)
-            if(otherFieldsObject?.length > 0) {
+            if (otherFieldsObject?.length > 0) {
                 for (let i = 0; i < otherFieldsObject.length; i++) {
                     let field = otherFieldsObject[i], otherFile;
 
@@ -159,14 +250,14 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                         vendorId: vendor.id
                     })
                     const otherField = await newOtherField.save();
-                    if(!otherField)
-                    return res.status(404).json({
-                        success: false,
-                        message: `Unable to create other fields`
-                    })
-                    if(req.body[`otherFieldsAttachments-${field.key}`]){
+                    if (!otherField)
+                        return res.status(404).json({
+                            success: false,
+                            message: `Unable to create other fields`
+                        })
+                    if (req.body[`otherFieldsAttachments-${field.key}`]) {
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
-        
+
                         otherFile = await File.create({
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
@@ -174,20 +265,20 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
                             vendorOtherId: otherField.id
                         })
                     }
-    
+
                 }
             }
         }
 
         const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
 
-        if(mailSent)
-        return res.status(201).json({
-            success: true,
-            message: `Your Vendor has been successfully added`,
-            data: [],
-        });
-         
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your Vendor has been successfully added`,
+                data: [],
+            });
+
         return res.status(404).json({
             success: false,
             message: `Unable to send email.`,
@@ -207,73 +298,150 @@ export const vendorRegistration: RequestHandler = async (req, res) => {
     }
 };
 
-export const updateVendor: RequestHandler = async (req, res) => {
+export const updateVendorDetails: RequestHandler = async (req, res) => {
+    const t = await connection.transaction();
+
     try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, coi, msme, tradeMark, beneficiary, accountNumber, ifsc, bankName, branch, createdBy } = req.body;
         const { vendorCode } = req.params;
 
-        const vendor = await Vendor.findOne({where: { vendorCode }})
+        const vendor = await Vendor.findOne({ where: { vendorCode } });
+
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found.",
+            });
+        }
 
         await Vendor.update(
             { productCategory, companyName, gst, coi, msme, tradeMark, createdBy },
-            { where: { vendorCode } }
+            { where: { vendorCode }, transaction: t }
         );
-        
-        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
-        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        if(coiAttachment){
-            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
-            await File.update({
-                fileName: coiAttachment.originalname,
-                fileContent: decodedCoiFile
-            },
-            {
-                where: { fileType: 'coi', coiAttVendorId: vendor?.id}
-            })    
-        }    
-        if(msmeAttachment) {
-            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
-            await File.update({
-                fileName: msmeAttachment.originalname,
-                fileContent: decodedMsmeFile
-            },
-            {
-                where: { fileType: 'msme', msmeAttVendorId: vendor?.id}
-            })    
-        }    
-        if(tradeAttachment) {
-            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
-            await File.update({
-                fileName: tradeAttachment.originalname,
-                fileContent: decodedTradeFile
-            },
-            {
-                where: { fileType: 'trade', tradeMarkAttVendorId: vendor?.id}
-            })    
-        }    
-        
-        await File.update({
-            fileName: gstAttachment.originalname,
-            fileContent: decodedGstFile
-        },
-        {
-            where: { fileType: 'gst', gstAttVendorId: vendor?.id}
-        })    
-
-        await File.update({
-            fileName: agreementAttachment.originalname,
-            fileContent: decodedAgreementFile
-        },
-        {
-            where: { fileType: 'agreement', agreementAttVendorId: vendor?.id}
-        })    
 
         await ContactPerson.update({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone
-        },{
-            where: { vendorId: vendor?.id}
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+
+        await VendorAddress.update({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+
+        await VendorBank.update({
+            beneficiaryName: beneficiary,
+            accountNumber,
+            ifsc,
+            bankName,
+            branch
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+
+        await t.commit();
+
+        return res.status(200).json({
+            success: true,
+            message: "Vendor details have been successfully updated.",
+            data: {
+                vendorId: vendor.id,
+                vendorCode,
+            },
+        });
+
+    } catch (error: any) {
+        await t.rollback();
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: {
+                source: "vendor.controller.js -> updateVendorDetails",
+            },
+        });
+    }
+};
+
+export const updateVendor: RequestHandler = async (req, res) => {
+    try {
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
+        const { vendorCode } = req.params;
+
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+
+        await Vendor.update(
+            { productCategory, companyName, gst, coi, msme, tradeMark, createdBy },
+            { where: { vendorCode } }
+        );
+
+        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
+        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
+        if (coiAttachment) {
+            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
+            await File.update({
+                fileName: coiAttachment.originalname,
+                fileContent: decodedCoiFile
+            },
+                {
+                    where: { fileType: 'coi', coiAttVendorId: vendor?.id }
+                })
+        }
+        if (msmeAttachment) {
+            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
+            await File.update({
+                fileName: msmeAttachment.originalname,
+                fileContent: decodedMsmeFile
+            },
+                {
+                    where: { fileType: 'msme', msmeAttVendorId: vendor?.id }
+                })
+        }
+        if (tradeAttachment) {
+            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
+            await File.update({
+                fileName: tradeAttachment.originalname,
+                fileContent: decodedTradeFile
+            },
+                {
+                    where: { fileType: 'trade', tradeMarkAttVendorId: vendor?.id }
+                })
+        }
+
+        await File.update({
+            fileName: gstAttachment.originalname,
+            fileContent: decodedGstFile
+        },
+            {
+                where: { fileType: 'gst', gstAttVendorId: vendor?.id }
+            })
+
+        await File.update({
+            fileName: agreementAttachment.originalname,
+            fileContent: decodedAgreementFile
+        },
+            {
+                where: { fileType: 'agreement', agreementAttVendorId: vendor?.id }
+            })
+
+        await ContactPerson.update({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone
+        }, {
+            where: { vendorId: vendor?.id }
         })
 
         const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
@@ -285,8 +453,8 @@ export const updateVendor: RequestHandler = async (req, res) => {
             state,
             city,
             postalCode
-        },{
-            where: { vendorId: vendor?.id}
+        }, {
+            where: { vendorId: vendor?.id }
         })
 
         await VendorBank.update({
@@ -295,25 +463,25 @@ export const updateVendor: RequestHandler = async (req, res) => {
             ifsc,
             bankName,
             branch
-        },{
-            where: { vendorId: vendor?.id}
+        }, {
+            where: { vendorId: vendor?.id }
         })
 
-        const vendorBank = await VendorBank.findOne({where: {vendorId: vendor?.id}})
+        const vendorBank = await VendorBank.findOne({ where: { vendorId: vendor?.id } })
 
 
         await File.update({
             fileName: bankAttachment.originalname,
             fileContent: decodedbankFile
         },
-        {
-            where: { fileType: 'bankProof', vendorBankId: vendorBank?.id }
-        })    
+            {
+                where: { fileType: 'bankProof', vendorBankId: vendorBank?.id }
+            })
 
-        if(otherFields){
-            await VendorOther.destroy({where: {vendorId: vendor?.id}})
+        if (otherFields) {
+            await VendorOther.destroy({ where: { vendorId: vendor?.id } })
             let otherFieldsObject = JSON.parse(otherFields)
-            if(otherFieldsObject?.length > 0) {
+            if (otherFieldsObject?.length > 0) {
                 for (let i = 0; i < otherFieldsObject.length; i++) {
                     let field = otherFieldsObject[i], otherFile;
 
@@ -323,9 +491,9 @@ export const updateVendor: RequestHandler = async (req, res) => {
                         vendorId: vendor?.id
                     })
                     const otherField = await newOtherField.save();
-                    if(req.body[`otherFieldsAttachments-${field.key}`]){
+                    if (req.body[`otherFieldsAttachments-${field.key}`]) {
                         const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
-        
+
                         otherFile = await File.create({
                             fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
                             fileContent: decodedOtherFile,
@@ -333,20 +501,20 @@ export const updateVendor: RequestHandler = async (req, res) => {
                             vendorOtherId: otherField.id
                         })
                     }
-    
+
                 }
             }
         }
 
         const mailSent = await sendMailSetup(vendorCode, 'update-vendor', undefined, undefined);
 
-        if(mailSent)
-        return res.status(201).json({
-            success: true,
-            message: `Your Vendor has been successfully updated`,
-            data: [],
-        });
-         
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your Vendor has been successfully updated`,
+                data: [],
+            });
+
         return res.status(404).json({
             success: false,
             message: `Some error occured`
@@ -369,8 +537,8 @@ export const getAllVendors: RequestHandler = async (req, res) => {
             attributes: ['vendorCode', 'companyName', [Sequelize.col('address.state'), 'state'], [Sequelize.col('address.country'), 'country'], 'productCategory'],
             include: [
                 {
-                  model: VendorAddress,
-                  attributes: [],
+                    model: VendorAddress,
+                    attributes: [],
                 },
             ],
             where: { isVerified: true }
@@ -379,7 +547,7 @@ export const getAllVendors: RequestHandler = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: `Vendors data successfully fetched`,
-            data: {vendors},
+            data: { vendors },
         });
 
     } catch (error: any) {
@@ -427,7 +595,7 @@ export const getVendor: RequestHandler = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: `Vendor data successfully fetched`,
-            data: {vendor},
+            data: { vendor },
         });
 
     } catch (error: any) {
@@ -460,7 +628,7 @@ export const setValidation: RequestHandler = async (req, res) => {
             }
             await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
             await Vendor.update(
-                { isVerified : true },
+                { isVerified: true },
                 { where: { vendorCode } }
             );
         } else {
@@ -493,21 +661,21 @@ export const setValidation: RequestHandler = async (req, res) => {
 
 const getNewVendorCode = async (country: string) => {
     let prefix;
-    if(country != "India")
-    prefix = 'VI-'
+    if (country != "India")
+        prefix = 'VI-'
     else
-    prefix = 'VD-'
+        prefix = 'VD-'
 
-    let vendorNum, vendorCode, existingVendor; 
+    let vendorNum, vendorCode, existingVendor;
     do {
         vendorNum = Math.floor(1000 + Math.random() * 9000);
         vendorCode = prefix + vendorNum;
         existingVendor = await Vendor.findOne({
             where: {
-              vendorCode,
+                vendorCode,
             },
         });
-    } while(existingVendor)
+    } while (existingVendor)
 
     return vendorCode;
 }

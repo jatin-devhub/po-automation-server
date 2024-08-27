@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newFileChunk = exports.newFile = exports.updateOrAddFileWithReference = exports.updateFile = exports.getFile = void 0;
+exports.newFile = exports.updateOrAddFileWithReference = exports.updateFile = exports.getFile = void 0;
 const File_1 = __importDefault(require("../models/File"));
-const FileChunk_1 = __importDefault(require("../models/FileChunk"));
+// import FileChunk from "../models/FileChunk";
 const getFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idType, id } = req.params;
@@ -122,7 +122,7 @@ const updateOrAddFileWithReference = (req, res) => __awaiter(void 0, void 0, voi
         if (file[0]) {
             return res.status(201).json({
                 success: true,
-                message: 'File updated Successfully',
+                message: 'File updated pSuccessfully',
                 data: {
                     fileId: file[0].id
                 }
@@ -181,35 +181,33 @@ const newFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.newFile = newFile;
-const newFileChunk = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { attachmentChunk } = req.body;
-        const decodedFileChunk = Buffer.from(attachmentChunk.buffer, 'base64');
-        const fileChunk = yield FileChunk_1.default.create({
-            chunkContent: decodedFileChunk
-        });
-        if (fileChunk)
-            return res.status(201).json({
-                success: true,
-                message: 'File Chunk created successfully',
-                data: {
-                    chunkId: fileChunk.id
-                }
-            });
-        else
-            return res.status(400).json({
-                success: false,
-                message: 'Some error occured while adding file chunk.'
-            });
-    }
-    catch (error) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "file.controller.ts -> newFileChunk"
-            }
-        });
-    }
-});
-exports.newFileChunk = newFileChunk;
+// export const newFileChunk: RequestHandler = async (req, res) => {
+//     try {
+//         const { attachmentChunk } = req.body;
+//         const decodedFileChunk = Buffer.from(attachmentChunk.buffer, 'base64');
+//         const fileChunk = await FileChunk.create({
+//             chunkContent: decodedFileChunk
+//         })
+//         if (fileChunk)
+//             return res.status(201).json({
+//                 success: true,
+//                 message: 'File Chunk created successfully',
+//                 data: {
+//                     chunkId: fileChunk.id
+//                 }
+//             })
+//         else
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Some error occured while adding file chunk.'
+//             })
+//     } catch (error: any) {
+//         return res.status(504).json({
+//             success: false,
+//             message: error.message,
+//             data: {
+//                 "source": "file.controller.ts -> newFileChunk"
+//             }
+//         })
+//     }
+// }

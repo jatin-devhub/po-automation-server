@@ -45,7 +45,10 @@ export const validateUpdateFile: RequestHandler = async (req, res, next) => {
 export const validateNewFile: RequestHandler = async (req, res, next) => {
     try {
         const newFileBody = Joi.object({
-            attachment: Joi.any().required(), 
+            attachmentChunk: Joi.any().required(), 
+            chunkIndex: Joi.number().required(),
+            totalChunks: Joi.number().required(),
+            fileName: Joi.string().required()
         })
         const files = req.files as Express.Multer.File[];
         for (const file of files) {
@@ -61,3 +64,24 @@ export const validateNewFile: RequestHandler = async (req, res, next) => {
         });
     }
 }
+
+// export const validateNewFileChunk: RequestHandler = async (req, res, next) => {
+//     try {
+//         const newFileChunk = Joi.object({
+//             attachmentChunk: Joi.any().required()
+//         })
+//         console.log('validating')
+//         const files = req.files as Express.Multer.File[];
+//         for (const file of files) {
+//                 req.body[file.fieldname] = file
+//         }
+//         await newFileChunk.validateAsync(req.body)
+//         next()
+//     } catch (error: any) {
+//         return res.status(504).json({
+//             success: false,
+//             message: error.message,
+//             data: [],
+//         });
+//     }
+// }

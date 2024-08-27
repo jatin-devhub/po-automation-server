@@ -3,6 +3,54 @@ import Joi from "joi";
 import Vendor from "../models/Vendor";
 import ContactPerson from "../models/ContactPerson";
 
+export const validateNewStart: RequestHandler = async (req, res, next) => {
+    try {
+        const newVendorSchema = Joi.object({
+            companyName: Joi.string().required(),
+            productCategory: Joi.string().required(),
+            contactPersonName: Joi.string().required(),
+            contactPersonEmail: Joi.string().required(),
+            contactPersonPhone: Joi.string().required(),
+            gst: Joi.string().required(),
+            addressLine1: Joi.string().required(),
+            addressLine2: Joi.string().allow('').optional(),
+            country: Joi.string().required(),
+            state: Joi.string().required(),
+            city: Joi.string().required(),
+            postalCode: Joi.string().required(),
+            beneficiary: Joi.string().required(),
+            accountNumber: Joi.string().required(),
+            ifsc: Joi.string().required(),
+            bankName: Joi.string().required(),
+            branch: Joi.string().required(),
+            coi: Joi.string(),
+            msme: Joi.string(),
+            tradeMark: Joi.string(),
+            createdBy: Joi.string().email()
+        })
+        const { contactPersonEmail, contactPersonPhone, companyName } = await newVendorSchema.validateAsync(req.body);
+        const tempContact = await ContactPerson.findOne({ where: { email: contactPersonEmail, phoneNumber: contactPersonPhone } })
+        const tempVendor = await Vendor.findOne({ where: { companyName } })
+        if (tempVendor)
+            return res.status(404).json({
+                success: false,
+                message: "Company Name is already registered with us. If you feel there's an issue please contact our team."
+            })
+        if (tempContact)
+            return res.status(404).json({
+                success: false,
+                message: 'Contact Email or Phone Number already exist.'
+            })
+        next();
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
         const newVendorSchema = Joi.object({
@@ -59,6 +107,54 @@ export const validateNew: RequestHandler = async (req, res, next) => {
                 req.body[file.fieldname] = file
         }
         next();
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateUpdatedVendorDetails: RequestHandler = async (req, res, next) => {
+    try {
+        const updateVendorSchema = Joi.object({
+            companyName: Joi.string().required(),
+            productCategory: Joi.string().required(),
+            contactPersonName: Joi.string().required(),
+            contactPersonEmail: Joi.string().required(),
+            contactPersonPhone: Joi.string().required(),
+            gst: Joi.string().required(),
+            addressLine1: Joi.string().required(),
+            addressLine2: Joi.string().allow('').optional(),
+            country: Joi.string().required(),
+            state: Joi.string().required(),
+            city: Joi.string().required(),
+            postalCode: Joi.string().required(),
+            beneficiary: Joi.string().required(),
+            accountNumber: Joi.string().required(),
+            ifsc: Joi.string().required(),
+            bankName: Joi.string().required(),
+            branch: Joi.string().required(),
+            coi: Joi.string(),
+            msme: Joi.string(),
+            tradeMark: Joi.string(),
+            createdBy: Joi.string().email()
+        })
+        const { vendorCode } = req.params;
+        const vendor = await Vendor.findOne({ where: { vendorCode } })
+        if (vendor) {
+            await updateVendorSchema.validateAsync(req.body);
+            next();
+        }
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "No vendor exist with the given vendor code",
+                data: {}
+            })
+        }
 
     } catch (error: any) {
         return res.status(504).json({

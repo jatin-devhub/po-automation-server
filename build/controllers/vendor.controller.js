@@ -89,7 +89,7 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
         const vendorCode = yield getNewVendorCode(country);
-        const newVendor = yield Vendor_1.default.create({
+        const vendor = yield Vendor_1.default.create({
             vendorCode,
             productCategory,
             companyName,
@@ -99,7 +99,6 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
             tradeMark,
             createdBy
         });
-        const vendor = yield newVendor.save();
         if (!vendor)
             return res.status(404).json({
                 success: false,

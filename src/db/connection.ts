@@ -12,6 +12,7 @@ import VendorAddress from "../models/VendorAddress";
 import Comment from "../models/Comment";
 import BOInvoices from "../models/BOInvoices";
 import BuyingOrderOther from "../models/BuyingOrderOther";
+// import FileChunks from "../models/FileChunk";
 
 const connection = new Sequelize({
   dialect: "mysql",
