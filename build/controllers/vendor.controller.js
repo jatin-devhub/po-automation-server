@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setValidation = exports.getVendor = exports.getAllVendors = exports.updateVendor = exports.vendorRegistration = void 0;
+exports.setValidation = exports.getVendor = exports.getAllVendors = exports.updateVendor = exports.updateVendorDetails = exports.vendorRegistration = exports.vendorRegistrationStart = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
+const connection_1 = __importDefault(require("../db/connection"));
 const Vendor_1 = __importDefault(require("../models/Vendor"));
 const File_1 = __importDefault(require("../models/File"));
 const VendorBank_1 = __importDefault(require("../models/VendorBank"));
@@ -24,11 +25,71 @@ const SKU_1 = __importDefault(require("../models/SKU"));
 const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
 const mail_service_1 = require("../utils/mail.service");
 const Comment_1 = __importDefault(require("../models/Comment"));
+const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const t = yield connection_1.default.transaction();
+    try {
+        const { companyName, productCategory, addressLine1, addressLine2, country, state, city, postalCode, gst, coi, msme, tradeMark, createdBy, contactPersonName, contactPersonEmail, contactPersonPhone, beneficiary, accountNumber, ifsc, bankName, branch, } = req.body;
+        const vendorCode = yield getNewVendorCode(country);
+        const vendor = yield Vendor_1.default.create({
+            vendorCode,
+            productCategory,
+            companyName,
+            gst,
+            coi,
+            msme,
+            tradeMark,
+            createdBy,
+        }, { transaction: t });
+        yield ContactPerson_1.default.create({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone,
+            vendorId: vendor.id,
+        }, { transaction: t });
+        yield VendorAddress_1.default.create({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode,
+            vendorId: vendor.id,
+        }, { transaction: t });
+        yield VendorBank_1.default.create({
+            beneficiaryName: beneficiary,
+            accountNumber,
+            ifsc,
+            bankName,
+            branch,
+            vendorId: vendor.id,
+        }, { transaction: t });
+        yield t.commit();
+        return res.status(201).json({
+            success: true,
+            message: "Vendor created successfully. Proceed to upload attachments and other fields.",
+            data: {
+                vendorId: vendor.id,
+                vendorCode,
+            },
+        });
+    }
+    catch (error) {
+        yield t.rollback();
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: {
+                source: "vendor.controller.js -> vendorRegistrationStart",
+            },
+        });
+    }
+});
+exports.vendorRegistrationStart = vendorRegistrationStart;
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
         const vendorCode = yield getNewVendorCode(country);
-        const newVendor = new Vendor_1.default({
+        const newVendor = yield Vendor_1.default.create({
             vendorCode,
             productCategory,
             companyName,
@@ -202,6 +263,70 @@ const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.vendorRegistration = vendorRegistration;
+const updateVendorDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const t = yield connection_1.default.transaction();
+    try {
+        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, coi, msme, tradeMark, beneficiary, accountNumber, ifsc, bankName, branch, createdBy } = req.body;
+        const { vendorCode } = req.params;
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found.",
+            });
+        }
+        yield Vendor_1.default.update({ productCategory, companyName, gst, coi, msme, tradeMark, createdBy }, { where: { vendorCode }, transaction: t });
+        yield ContactPerson_1.default.update({
+            name: contactPersonName,
+            email: contactPersonEmail,
+            phoneNumber: contactPersonPhone
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+        yield VendorAddress_1.default.update({
+            addressLine1,
+            addressLine2,
+            country,
+            state,
+            city,
+            postalCode
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+        yield VendorBank_1.default.update({
+            beneficiaryName: beneficiary,
+            accountNumber,
+            ifsc,
+            bankName,
+            branch
+        }, {
+            where: { vendorId: vendor.id },
+            transaction: t
+        });
+        yield t.commit();
+        return res.status(200).json({
+            success: true,
+            message: "Vendor details have been successfully updated.",
+            data: {
+                vendorId: vendor.id,
+                vendorCode,
+            },
+        });
+    }
+    catch (error) {
+        yield t.rollback();
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+            data: {
+                source: "vendor.controller.js -> updateVendorDetails",
+            },
+        });
+    }
+});
+exports.updateVendorDetails = updateVendorDetails;
 const updateVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;

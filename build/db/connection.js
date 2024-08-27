@@ -40,16 +40,17 @@ const VendorAddress_1 = __importDefault(require("../models/VendorAddress"));
 const Comment_1 = __importDefault(require("../models/Comment"));
 const BOInvoices_1 = __importDefault(require("../models/BOInvoices"));
 const BuyingOrderOther_1 = __importDefault(require("../models/BuyingOrderOther"));
+const FileChunk_1 = __importDefault(require("../models/FileChunk"));
 const connection = new sequelize_typescript_1.Sequelize({
     dialect: "mysql",
     dialectModule: mysql,
     host: '62.72.3.60',
     username: 'poadmin',
     password: 'po1234',
-    // database: 'po_testing',
-    database: 'po_automation',
+    database: 'po_testing',
+    // database: 'po_automation',
     port: 3306,
-    models: [Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, SKU_1.default, BuyingOrder_1.default, BuyingOrderRecord_1.default, File_1.default, Comment_1.default, BOInvoices_1.default, BuyingOrderOther_1.default]
+    models: [Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, SKU_1.default, BuyingOrder_1.default, BuyingOrderRecord_1.default, File_1.default, Comment_1.default, BOInvoices_1.default, BuyingOrderOther_1.default, FileChunk_1.default]
 });
 // connection.sync({ alter: true }); 
 exports.default = connection;
