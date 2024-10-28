@@ -6,6 +6,7 @@ import buyingOrderRouter from "./buying-order.route"
 import fileRouter from "./file.route"
 import authRouter from "./auth.route"
 import reconcillationRouter from "./reconcillation.route"
+import utilRouter from "./util.route"
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use("/buying-order", buyingOrderRouter)
 router.use("/file", fileRouter)
 router.use("/auth", authRouter)
 router.use("/reconcillation", reconcillationRouter)
+router.use("/utils", utilRouter)
 
 export default router;

@@ -23,7 +23,7 @@ const getFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const file = yield File_1.default.findOne({ where: condn });
         let newFile;
         if (file) {
-            newFile = file.fileContent.toString('base64');
+            // newFile = file.fileContent.toString('base64');TODO file chunks update
             return res.status(201).json({
                 success: true,
                 message: `File fetched successfully`,

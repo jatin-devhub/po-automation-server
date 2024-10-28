@@ -11,11 +11,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
-const Vendor_1 = __importDefault(require("./Vendor"));
 const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
 const BOInvoices_1 = __importDefault(require("./BOInvoices"));
 const BuyingOrderOther_1 = __importDefault(require("./BuyingOrderOther"));
+const FileChunk_1 = __importDefault(require("./FileChunk"));
 let File = class File extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -32,16 +32,19 @@ __decorate([
     })
 ], File.prototype, "fileName", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.BLOB('medium')
-    })
-], File.prototype, "fileContent", void 0);
-__decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
 ], File.prototype, "fileType", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], File.prototype, "fileSizeKb", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => FileChunk_1.default)
+], File.prototype, "chunks", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => BOInvoices_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -60,36 +63,6 @@ __decorate([
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], File.prototype, "buyingOrderIdGRNSheet", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "gstAttVendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "coiAttVendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "msmeAttVendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "tradeMarkAttVendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], File.prototype, "agreementAttVendorId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => VendorBank_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -117,21 +90,6 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
 ], File.prototype, "buyingOrder", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'gstAttVendorId')
-], File.prototype, "gstAttVendor", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'coiAttVendorId')
-], File.prototype, "coiAttVendor", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'msmeAttVendorId')
-], File.prototype, "msmeAttVendor", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'tradeMarkAttVendorId')
-], File.prototype, "tradeMarkAttVendor", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default, 'agreementAttVendorId')
-], File.prototype, "agreementAttVendor", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => VendorBank_1.default)
 ], File.prototype, "vendorBank", void 0);

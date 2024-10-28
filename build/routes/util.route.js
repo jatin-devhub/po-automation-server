@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const util_controller_1 = require("../controllers/util.controller");
+const util_validator_1 = require("../validators/util.validator");
+const router = (0, express_1.Router)();
+router.get('/countries', util_controller_1.getCountries);
+router.get('/states', util_validator_1.validateGetStates, util_controller_1.getStates);
+router.get('/cities', util_validator_1.validateGetCities, util_controller_1.getCities);
+exports.default = router;
