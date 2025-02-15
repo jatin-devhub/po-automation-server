@@ -2,8 +2,13 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import * as dotenv from "dotenv";
+import * as path from "path";
 
-dotenv.config({ path: "./src/config/config.env" });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+dotenv.config({ path: path.resolve(__dirname, `../${envFile}`) });
+
 import connection from "./db/connection"
 
 import routes from "./routes/routes";
