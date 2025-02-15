@@ -13,7 +13,9 @@ import BuyingOrder from "../models/BuyingOrder";
 import { sendMailSetup } from "../utils/mail.service";
 import Comment from "../models/Comment";
 import VendorProfile from "../models/vendor/VendorProfile";
-import VendorDocuments from "../models/vendor/VendorDocuments";
+import Attachment from "../models/attachment/Attachment";
+import AttachmentMapping from "../models/attachment/AttachmentMapping";
+import VendorAttachments from "../models/vendor/VendorAttachments";
 
 export const vendorRegistrationStart: RequestHandler = async (req, res) => {
     const t = await connection.transaction();
@@ -58,7 +60,7 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             createdBy,
         }, { transaction: t });
 
-        await VendorDocuments.create({
+        const vendorAttachments =  await VendorAttachments.create({
             gstId,
             coiId,
             msmeId,
@@ -82,7 +84,7 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             vendorProfileId: vendorProfile.id,
         }, { transaction: t });
 
-        await VendorBank.create({
+        const vendorBank = await VendorBank.create({
             beneficiaryName: beneficiary,
             accountNumber,
             ifsc,
@@ -116,6 +118,8 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
                 vendorId: vendor.id,
                 vendorProfileId: vendorProfile.id,
                 vendorCode,
+                vendorAttachmentsId: vendorAttachments.id,
+                vendorBankId: vendorBank.id,
                 otherFields: otherFieldsIds
             },
         });

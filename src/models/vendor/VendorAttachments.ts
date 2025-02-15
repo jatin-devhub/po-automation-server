@@ -5,7 +5,7 @@ import VendorProfile from "./VendorProfile";
 @Table({
     tableName: 'vendor_documents'
 })
-export default class VendorDocuments extends Model {
+export default class VendorAttachments extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column(DataType.INTEGER)

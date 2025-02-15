@@ -5,7 +5,7 @@ import VendorAddress from "./VendorAddress";
 import VendorBank from "./VendorBank";
 import VendorOther from "./VendorOther";
 // import Comment from "../Comment";
-import VendorDocuments from "./VendorDocuments";
+import VendorDocuments from "./VendorAttachments";
 
 @Table({
     tableName: 'vendor_profile'

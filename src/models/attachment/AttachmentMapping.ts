@@ -22,6 +22,12 @@ export default class AttachmentMapping extends Model {
     attachmentType!: string; 
 
     @Column({
+        type: DataType.STRING,
+        allowNull: false
+    })
+    entityName!: string;
+
+    @Column({
         type: DataType.INTEGER,
         allowNull: false
     })

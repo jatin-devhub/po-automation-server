@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import Joi from "joi";
 import Vendor from "../models/vendor/Vendor";
 import ContactPerson from "../models/vendor/ContactPerson";
-import VendorDocuments from "../models/vendor/VendorDocuments";
+import VendorDocuments from "../models/vendor/VendorAttachments";
 import VendorBank from "../models/vendor/VendorBank";
 
 export const validateNewStart: RequestHandler = async (req, res, next) => {

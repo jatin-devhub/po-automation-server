@@ -7,7 +7,7 @@ import ContactPerson from "../models/vendor/ContactPerson";
 import VendorAddress from "../models/vendor/VendorAddress";
 import VendorBank from "../models/vendor/VendorBank";
 import VendorOther from "../models/vendor/VendorOther";
-import VendorDocuments from "../models/vendor/VendorDocuments";
+import VendorDocuments from "../models/vendor/VendorAttachments";
 import VendorProfile from "../models/vendor/VendorProfile";
 
 import * as mysql from "mysql2";
