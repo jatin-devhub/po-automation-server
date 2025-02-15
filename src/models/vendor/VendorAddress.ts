@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, AllowNull, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
-import Vendor from './Vendor';
+import VendorProfile from './VendorProfile';
 
 @Table({
     tableName: 'vendor-address',
@@ -48,12 +48,12 @@ export default class VendorAddress extends Model {
     })
     postalCode!: string;
 
-    @ForeignKey(() => Vendor)
+    @ForeignKey(() => VendorProfile)
     @Column({
         type: DataType.INTEGER,
     })
-    vendorId!: number;
+    vendorProfileId!: number;
 
-    @BelongsTo(() => Vendor)
-    vendor?: Vendor;
+    @BelongsTo(() => VendorProfile)
+    vendorProfile?: VendorProfile;
 }

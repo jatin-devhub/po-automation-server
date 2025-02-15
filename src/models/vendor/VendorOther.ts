@@ -1,6 +1,6 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasOne, AutoIncrement, PrimaryKey, AllowNull } from 'sequelize-typescript';
-import Vendor from './Vendor';
-import File from './File';
+import VendorProfile from './VendorProfile';
+import AttachmentMapping from '../attachment/AttachmentMapping';
 
 @Table
 export default class VendorOther extends Model {
@@ -22,15 +22,18 @@ export default class VendorOther extends Model {
   })
   otherValue!: string;
 
-  @HasOne(() => File)
-  otherAtt!: File;
+  @HasOne(() => AttachmentMapping, {
+    foreignKey: 'entityId',
+    scope: { attachmentType: 'otherField' }
+  })
+  otherAttachment!: AttachmentMapping;
 
-  @ForeignKey(() => Vendor)
+  @ForeignKey(() => VendorProfile)
   @Column({
     type: DataType.INTEGER,
   })
-  vendorId!: number;
+  vendorProfileId!: number;
 
-  @BelongsTo(() => Vendor)
-  vendor?: Vendor;
+  @BelongsTo(() => VendorProfile)
+  vendorProfile?: VendorProfile;
 }
