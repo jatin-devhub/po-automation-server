@@ -2,16 +2,18 @@ import { RequestHandler } from "express";
 import { Sequelize } from "sequelize-typescript";
 import connection from "../db/connection";
 
-import Vendor from "../models/Vendor";
+import Vendor from "../models/vendor/Vendor";
 import File from "../models/File";
-import VendorBank from "../models/VendorBank";
-import VendorOther from "../models/VendorOther";
-import ContactPerson from "../models/ContactPerson";
-import VendorAddress from "../models/VendorAddress";
+import VendorBank from "../models/vendor/VendorBank";
+import VendorOther from "../models/vendor/VendorOther";
+import ContactPerson from "../models/vendor/ContactPerson";
+import VendorAddress from "../models/vendor/VendorAddress";
 import SKU from "../models/SKU";
 import BuyingOrder from "../models/BuyingOrder";
 import { sendMailSetup } from "../utils/mail.service";
 import Comment from "../models/Comment";
+import VendorProfile from "../models/vendor/VendorProfile";
+import VendorDocuments from "../models/vendor/VendorDocuments";
 
 export const vendorRegistrationStart: RequestHandler = async (req, res) => {
     const t = await connection.transaction();
@@ -26,10 +28,10 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             state,
             city,
             postalCode,
-            gst,
-            coi,
-            msme,
-            tradeMark,
+            gstId,
+            coiId,
+            msmeId,
+            tradeMarkId,
             createdBy,
             contactPersonName,
             contactPersonEmail,
@@ -39,26 +41,35 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             ifsc,
             bankName,
             branch,
+            otherFields
         } = req.body;
+        let otherFieldsIds: { key: string, id: number }[] = []
 
         const vendorCode = await getNewVendorCode(country);
 
         const vendor = await Vendor.create({
             vendorCode,
             productCategory,
-            companyName,
-            gst,
-            coi,
-            msme,
-            tradeMark,
+            companyName
+        }, { transaction: t });
+
+        const vendorProfile = await VendorProfile.create({
+            vendorId: vendor.id,
             createdBy,
         }, { transaction: t });
+
+        await VendorDocuments.create({
+            gstId,
+            coiId,
+            msmeId,
+            tradeMarkId
+        })
 
         await ContactPerson.create({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
 
         await VendorAddress.create({
@@ -68,7 +79,7 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             state,
             city,
             postalCode,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
 
         await VendorBank.create({
@@ -77,17 +88,35 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             ifsc,
             bankName,
             branch,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
+
+        if (otherFields) {
+            if (otherFields?.length > 0) {
+                for (let i = 0; i < otherFields.length; i++) {
+                    let field = otherFields[i];
+
+                    const vendorOther = await VendorOther.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile.id,
+                    }, { transaction: t });
+
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
+            }
+        }
 
         await t.commit();
 
         return res.status(201).json({
             success: true,
-            message: "Vendor created successfully. Proceed to upload attachments and other fields.",
+            message: "Vendor created successfully. Proceed to upload attachments",
             data: {
                 vendorId: vendor.id,
+                vendorProfileId: vendorProfile.id,
                 vendorCode,
+                otherFields: otherFieldsIds
             },
         });
 
@@ -609,55 +638,55 @@ export const getVendor: RequestHandler = async (req, res) => {
     }
 };
 
-export const setValidation: RequestHandler = async (req, res) => {
-    try {
-        const { vendorCode, isValid, reason } = req.body;
-        console.log(vendorCode, isValid, reason)
-        const vendor = await Vendor.findOne({
-            where: { vendorCode },
-            include: [
-                {
-                    model: ContactPerson
-                }
-            ]
-        });
-        if (isValid == "true") {
-            const variables = {
-                company: vendor?.companyName,
-                vendorCode
-            }
-            await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
-            await Vendor.update(
-                { isVerified: true },
-                { where: { vendorCode } }
-            );
-        } else {
-            const variables = {
-                denyReason: reason
-            }
-            const comment = await Comment.create({
-                comment: reason,
-                vendorId: vendor?.id,
-            })
-            await sendMailSetup(vendorCode, 'vendor-fail', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
-        }
+// export const setValidation: RequestHandler = async (req, res) => {
+//     try {
+//         const { vendorCode, isValid, reason } = req.body;
+//         console.log(vendorCode, isValid, reason)
+//         const vendor = await Vendor.findOne({
+//             where: { vendorCode },
+//             include: [
+//                 {
+//                     model: ContactPerson
+//                 }
+//             ]
+//         });
+//         if (isValid == "true") {
+//             const variables = {
+//                 company: vendor?.companyName,
+//                 vendorCode
+//             }
+//             await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
+//             await Vendor.update(
+//                 { isVerified: true },
+//                 { where: { vendorCode } }
+//             );
+//         } else {
+//             const variables = {
+//                 denyReason: reason
+//             }
+//             const comment = await Comment.create({
+//                 comment: reason,
+//                 vendorId: vendor?.id,
+//             })
+//             await sendMailSetup(vendorCode, 'vendor-fail', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
+//         }
 
-        return res.status(201).json({
-            success: true,
-            message: `Vendor Review Done Successfully`,
-            data: {},
-        });
+//         return res.status(201).json({
+//             success: true,
+//             message: `Vendor Review Done Successfully`,
+//             data: {},
+//         });
 
-    } catch (error: any) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "vendor.controller.js -> getAllVendors"
-            },
-        });
-    }
-};
+//     } catch (error: any) {
+//         return res.status(504).json({
+//             success: false,
+//             message: error.message,
+//             data: {
+//                 "source": "vendor.controller.js -> getAllVendors"
+//             },
+//         });
+//     }
+// };
 
 const getNewVendorCode = async (country: string) => {
     let prefix;
