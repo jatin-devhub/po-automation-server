@@ -41,11 +41,10 @@ const mysql = __importStar(require("mysql2"));
 const connection = new sequelize_typescript_1.Sequelize({
     dialect: "mysql",
     dialectModule: mysql,
-    host: '62.72.3.60',
-    username: 'brand-admin',
-    password: 'Ek^fbhj0kQn1Hx',
-    database: 'brand_analytics_test',
-    // database: 'brand_analytics',
+    host: process.env.DB_HOST,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     port: 3306,
     models: [Attachment_1.default, AttachmentChunk_1.default, AttachmentMapping_1.default, Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, VendorAttachments_1.default, VendorProfile_1.default]
 });

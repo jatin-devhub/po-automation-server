@@ -15,11 +15,10 @@ import * as mysql from "mysql2";
 const connection = new Sequelize({
   dialect: "mysql",
   dialectModule: mysql,
-  host: '62.72.3.60',
-  username: 'brand-admin',
-  password: 'Ek^fbhj0kQn1Hx',
-  database: 'brand_analytics_test',
-  // database: 'brand_analytics',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   port: 3306,
   models: [Attachment, AttachmentChunk, AttachmentMapping, Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, VendorDocuments, VendorProfile]
 });
