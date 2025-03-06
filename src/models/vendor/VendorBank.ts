@@ -2,7 +2,9 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AutoIncrement, P
 import VendorProfile from './VendorProfile';
 import AttachmentMapping from '../attachment/AttachmentMapping';
 
-@Table
+@Table({
+  tableName: 'vendor_bank'
+})
 export default class VendorBank extends Model {
   @AutoIncrement
   @PrimaryKey

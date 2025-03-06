@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, AllowNull, AutoI
 import VendorProfile from './VendorProfile';
 
 @Table({
-    tableName: 'vendor-address',
+    tableName: 'vendor_address',
     timestamps: true,
 })
 export default class VendorAddress extends Model {

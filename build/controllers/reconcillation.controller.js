@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteInvoice = exports.updateInvoice = exports.newInvoice = exports.updateGRNData = exports.getPODetailsForReconcillation = exports.getAllPOs = exports.getApprovedPOs = void 0;
-const Vendor_1 = __importDefault(require("../models/Vendor"));
-const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
+const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
+const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
 const sequelize_1 = require("sequelize");
 const SKU_1 = __importDefault(require("../models/SKU"));
@@ -23,7 +23,7 @@ const BOInvoices_1 = __importDefault(require("../models/BOInvoices"));
 const File_1 = __importDefault(require("../models/File"));
 const getApprovedPOs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const buyingOrders = yield BuyingOrder_1.default.findAll({
+        const buyingOrders = yield PurchaseOrder_1.default.findAll({
             where: { isVerified: true },
             attributes: ['id', 'poCode', [sequelize_1.Sequelize.col('vendor.vendorCode'), 'vendorCode'], [sequelize_1.Sequelize.col('vendor.companyName'), 'vendorName']],
             include: [
@@ -73,7 +73,7 @@ const getApprovedPOs = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.getApprovedPOs = getApprovedPOs;
 const getAllPOs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const buyingOrders = yield BuyingOrder_1.default.findAll({
+        const buyingOrders = yield PurchaseOrder_1.default.findAll({
             attributes: ['id', 'poCode', [sequelize_1.Sequelize.col('vendor.vendorCode'), 'vendorCode'], [sequelize_1.Sequelize.col('vendor.companyName'), 'vendorName'], 'isVerified', 'closed'],
             include: [
                 {
@@ -123,7 +123,7 @@ exports.getAllPOs = getAllPOs;
 const getPODetailsForReconcillation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { poCode } = req.params;
-        const buyingOrder = yield BuyingOrder_1.default.findOne({
+        const buyingOrder = yield PurchaseOrder_1.default.findOne({
             where: { poCode }, include: [
                 {
                     model: Vendor_1.default,
@@ -170,9 +170,9 @@ const updateGRNData = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const { poCode } = req.params;
         let otherFieldsArray = otherFields ? JSON.parse(otherFields) : [];
         // Update BuyingOrder with grnComment
-        yield BuyingOrder_1.default.update({ grnComment: comment }, { where: { poCode } });
+        yield PurchaseOrder_1.default.update({ grnComment: comment }, { where: { poCode } });
         // Retrieve the updated BuyingOrder
-        const buyingOrder = yield BuyingOrder_1.default.findOne({
+        const buyingOrder = yield PurchaseOrder_1.default.findOne({
             where: { poCode }
         });
         const oldOtherFields = yield BuyingOrderOther_1.default.findAll({
@@ -243,7 +243,7 @@ const newInvoice = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             fileType: 'invoiceAtt',
             invoiceAttId: boInvoice.id
         });
-        yield BuyingOrder_1.default.update({
+        yield PurchaseOrder_1.default.update({
             closed: true
         }, {
             where: { id: poId }

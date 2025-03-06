@@ -12,19 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateValidation = exports.validateVendorCode = exports.validateUpdate = exports.validateUpdatedVendorDetails = exports.validateNew = exports.validateNewStart = void 0;
+exports.validateValidation = exports.validateVendorCode = exports.validateUpdate = exports.validateUpdatedVendorDetails = exports.validateNew = exports.validateNewComplete = exports.validateNewStart = void 0;
 const joi_1 = __importDefault(require("joi"));
-const Vendor_1 = __importDefault(require("../models/Vendor"));
-const ContactPerson_1 = __importDefault(require("../models/ContactPerson"));
+const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
+const ContactPerson_1 = __importDefault(require("../models/vendor/ContactPerson"));
+const VendorAttachments_1 = __importDefault(require("../models/vendor/VendorAttachments"));
+const VendorBank_1 = __importDefault(require("../models/vendor/VendorBank"));
 const validateNewStart = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const newVendorSchema = joi_1.default.object({
-            companyName: joi_1.default.string().required(),
+            companyName: joi_1.default.string().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempVendor = yield Vendor_1.default.findOne({ where: { companyName: value } });
+                if (tempVendor) {
+                    throw new Error("Company Name is already registered.");
+                }
+            })),
             productCategory: joi_1.default.string().required(),
             contactPersonName: joi_1.default.string().required(),
-            contactPersonEmail: joi_1.default.string().required(),
-            contactPersonPhone: joi_1.default.string().required(),
-            gst: joi_1.default.string().required(),
+            contactPersonEmail: joi_1.default.string().email().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempContact = yield ContactPerson_1.default.findOne({ where: { email: value } });
+                if (tempContact) {
+                    throw new Error("Email is already in use.");
+                }
+            })),
+            contactPersonPhone: joi_1.default.string().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempContact = yield ContactPerson_1.default.findOne({ where: { phoneNumber: value } });
+                if (tempContact) {
+                    throw new Error("Phone Number is already in use.");
+                }
+            })),
+            gstId: joi_1.default.string().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempVendorDocument = yield VendorAttachments_1.default.findOne({ where: { gstId: value } });
+                if (tempVendorDocument) {
+                    throw new Error("GST ID is already in use.");
+                }
+            })),
             addressLine1: joi_1.default.string().required(),
             addressLine2: joi_1.default.string().allow('').optional(),
             country: joi_1.default.string().required(),
@@ -32,39 +59,85 @@ const validateNewStart = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             city: joi_1.default.string().required(),
             postalCode: joi_1.default.string().required(),
             beneficiary: joi_1.default.string().required(),
-            accountNumber: joi_1.default.string().required(),
+            accountNumber: joi_1.default.string().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempVendorBank = yield VendorBank_1.default.findOne({ where: { accountNumber: value } });
+                if (tempVendorBank) {
+                    throw new Error("Account Number is already in use.");
+                }
+            })),
             ifsc: joi_1.default.string().required(),
             bankName: joi_1.default.string().required(),
             branch: joi_1.default.string().required(),
-            coi: joi_1.default.string(),
-            msme: joi_1.default.string(),
-            tradeMark: joi_1.default.string(),
-            createdBy: joi_1.default.string().email()
+            coiId: joi_1.default.string()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                if (!value)
+                    return;
+                const tempVendorDocument = yield VendorAttachments_1.default.findOne({ where: { coiId: value } });
+                if (tempVendorDocument) {
+                    throw new Error("COI ID is already in use.");
+                }
+            })),
+            msmeId: joi_1.default.string()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                if (!value)
+                    return;
+                const tempVendorDocument = yield VendorAttachments_1.default.findOne({ where: { msmeId: value } });
+                if (tempVendorDocument) {
+                    throw new Error("MSME ID is already in use.");
+                }
+            })),
+            tradeMarkId: joi_1.default.string()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                if (!value)
+                    return;
+                const tempVendorDocument = yield VendorAttachments_1.default.findOne({ where: { tradeMarkId: value } });
+                if (tempVendorDocument) {
+                    throw new Error("Trade Mark ID is already in use.");
+                }
+            })),
+            createdBy: joi_1.default.string().email(),
+            otherFields: joi_1.default.array().items(joi_1.default.object({
+                key: joi_1.default.string().required(),
+                value: joi_1.default.string()
+            }))
         });
-        const { contactPersonEmail, contactPersonPhone, companyName } = yield newVendorSchema.validateAsync(req.body);
-        const tempContact = yield ContactPerson_1.default.findOne({ where: { email: contactPersonEmail, phoneNumber: contactPersonPhone } });
-        const tempVendor = yield Vendor_1.default.findOne({ where: { companyName } });
-        if (tempVendor)
-            return res.status(404).json({
+        if (!req.body)
+            return res.status(400).json({
                 success: false,
-                message: "Company Name is already registered with us. If you feel there's an issue please contact our team."
+                message: "Request body is empty",
+                data: []
             });
-        if (tempContact)
-            return res.status(404).json({
-                success: false,
-                message: 'Contact Email or Phone Number already exist.'
-            });
+        yield newVendorSchema.validateAsync(req.body, { abortEarly: false });
         next();
     }
     catch (error) {
-        return res.status(504).json({
+        return res.status(400).json({
             success: false,
-            message: error.message,
-            data: [],
+            message: "Validation failed",
+            errors: ((_a = error.details) === null || _a === void 0 ? void 0 : _a.map((err) => err.message)) || [error.message],
         });
     }
 });
 exports.validateNewStart = validateNewStart;
+const validateNewComplete = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    try {
+        const vendorCompleteSchema = joi_1.default.object({
+            vendorId: joi_1.default.number().required()
+        });
+        yield vendorCompleteSchema.validateAsync(req.body);
+        next();
+    }
+    catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors: ((_b = error.details) === null || _b === void 0 ? void 0 : _b.map((err) => err.message)) || [error.message],
+        });
+    }
+});
+exports.validateNewComplete = validateNewComplete;
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVendorSchema = joi_1.default.object({

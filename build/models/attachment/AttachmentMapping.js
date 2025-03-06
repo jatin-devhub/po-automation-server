@@ -10,41 +10,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("./Vendor"));
-const File_1 = __importDefault(require("./File"));
-let VendorOther = class VendorOther extends sequelize_typescript_1.Model {
+const Attachment_1 = __importDefault(require("./Attachment"));
+let AttachmentMapping = class AttachmentMapping extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], VendorOther.prototype, "id", void 0);
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER)
+], AttachmentMapping.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
-], VendorOther.prototype, "otherKey", void 0);
+    (0, sequelize_typescript_1.ForeignKey)(() => Attachment_1.default),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER)
+], AttachmentMapping.prototype, "attachmentId", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
+        allowNull: false
     })
-], VendorOther.prototype, "otherValue", void 0);
+], AttachmentMapping.prototype, "attachmentType", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
-], VendorOther.prototype, "otherAtt", void 0);
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: false
+    })
+], AttachmentMapping.prototype, "entityName", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
+        allowNull: false
     })
-], VendorOther.prototype, "vendorId", void 0);
+], AttachmentMapping.prototype, "entityId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], VendorOther.prototype, "vendor", void 0);
-VendorOther = __decorate([
-    sequelize_typescript_1.Table
-], VendorOther);
-exports.default = VendorOther;
+    (0, sequelize_typescript_1.BelongsTo)(() => Attachment_1.default)
+], AttachmentMapping.prototype, "attachment", void 0);
+AttachmentMapping = __decorate([
+    (0, sequelize_typescript_1.Table)({
+        timestamps: true,
+        tableName: 'attachment_mapping'
+    })
+], AttachmentMapping);
+exports.default = AttachmentMapping;

@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const BuyingOrder_1 = __importDefault(require("./BuyingOrder")); // Assuming you have a BuyingOrder model
+const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder")); // Assuming you have a BuyingOrder model
 const SKU_1 = __importDefault(require("./SKU"));
 let BuyingOrderRecord = class BuyingOrderRecord extends sequelize_typescript_1.Model {
 };
@@ -49,7 +49,7 @@ __decorate([
     })
 ], BuyingOrderRecord.prototype, "skuId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => PurchaseOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
@@ -58,7 +58,7 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
 ], BuyingOrderRecord.prototype, "sku", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
+    (0, sequelize_typescript_1.BelongsTo)(() => PurchaseOrder_1.default)
 ], BuyingOrderRecord.prototype, "buyingOrder", void 0);
 BuyingOrderRecord = __decorate([
     sequelize_typescript_1.Table

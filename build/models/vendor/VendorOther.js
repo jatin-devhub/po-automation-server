@@ -10,9 +10,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("../vendor/Vendor"));
-const File_1 = __importDefault(require("../File"));
-let VendorFiles = class VendorFiles extends sequelize_typescript_1.Model {
+const VendorProfile_1 = __importDefault(require("./VendorProfile"));
+const AttachmentMapping_1 = __importDefault(require("../attachment/AttachmentMapping"));
+let VendorOther = class VendorOther extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
@@ -20,32 +20,36 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], VendorFiles.prototype, "id", void 0);
+], VendorOther.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
+        type: sequelize_typescript_1.DataType.STRING,
     })
-], VendorFiles.prototype, "vendorId", void 0);
+], VendorOther.prototype, "otherKey", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => File_1.default),
-    sequelize_typescript_1.Unique,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+    })
+], VendorOther.prototype, "otherValue", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => AttachmentMapping_1.default, {
+        foreignKey: 'entityId',
+        scope: { attachmentType: 'otherField' }
+    })
+], VendorOther.prototype, "otherAttachment", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorProfile_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
     })
-], VendorFiles.prototype, "fileId", void 0);
+], VendorOther.prototype, "vendorProfileId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => File_1.default)
-], VendorFiles.prototype, "file", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], VendorFiles.prototype, "vendor", void 0);
-VendorFiles = __decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorProfile_1.default)
+], VendorOther.prototype, "vendorProfile", void 0);
+VendorOther = __decorate([
     (0, sequelize_typescript_1.Table)({
-        timestamps: true,
-        tableName: 'vendor_files'
+        tableName: 'vendor_other'
     })
-], VendorFiles);
-exports.default = VendorFiles;
+], VendorOther);
+exports.default = VendorOther;

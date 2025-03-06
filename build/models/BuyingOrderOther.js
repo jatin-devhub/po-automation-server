@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const File_1 = __importDefault(require("./File"));
-const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
+const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder"));
 let BuyingOrderOther = class BuyingOrderOther extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -37,7 +37,7 @@ __decorate([
     (0, sequelize_typescript_1.HasOne)(() => File_1.default)
 ], BuyingOrderOther.prototype, "otherAtt", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => PurchaseOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
     })

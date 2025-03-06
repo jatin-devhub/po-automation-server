@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("./Vendor"));
+const Vendor_1 = __importDefault(require("./vendor/Vendor"));
 const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
 const Comment_1 = __importDefault(require("./Comment"));
 let SKU = class SKU extends sequelize_typescript_1.Model {

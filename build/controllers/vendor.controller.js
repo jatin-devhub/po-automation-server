@@ -12,39 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setValidation = exports.getVendor = exports.getAllVendors = exports.updateVendor = exports.updateVendorDetails = exports.vendorRegistration = exports.vendorRegistrationStart = void 0;
-const sequelize_typescript_1 = require("sequelize-typescript");
+exports.getVendor = exports.getAllVendors = exports.updateVendor = exports.updateVendorDetails = exports.vendorRegistration = exports.vendorRegistrationComplete = exports.vendorRegistrationStart = void 0;
 const connection_1 = __importDefault(require("../db/connection"));
-const Vendor_1 = __importDefault(require("../models/Vendor"));
+const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const File_1 = __importDefault(require("../models/File"));
-const VendorBank_1 = __importDefault(require("../models/VendorBank"));
-const VendorOther_1 = __importDefault(require("../models/VendorOther"));
-const ContactPerson_1 = __importDefault(require("../models/ContactPerson"));
-const VendorAddress_1 = __importDefault(require("../models/VendorAddress"));
+const VendorBank_1 = __importDefault(require("../models/vendor/VendorBank"));
+const VendorOther_1 = __importDefault(require("../models/vendor/VendorOther"));
+const ContactPerson_1 = __importDefault(require("../models/vendor/ContactPerson"));
+const VendorAddress_1 = __importDefault(require("../models/vendor/VendorAddress"));
 const SKU_1 = __importDefault(require("../models/SKU"));
-const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
+const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const mail_service_1 = require("../utils/mail.service");
 const Comment_1 = __importDefault(require("../models/Comment"));
+const VendorProfile_1 = __importDefault(require("../models/vendor/VendorProfile"));
+const VendorAttachments_1 = __importDefault(require("../models/vendor/VendorAttachments"));
 const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const t = yield connection_1.default.transaction();
     try {
-        const { companyName, productCategory, addressLine1, addressLine2, country, state, city, postalCode, gst, coi, msme, tradeMark, createdBy, contactPersonName, contactPersonEmail, contactPersonPhone, beneficiary, accountNumber, ifsc, bankName, branch, } = req.body;
+        const { companyName, productCategory, addressLine1, addressLine2, country, state, city, postalCode, gstId, coiId, msmeId, tradeMarkId, createdBy, contactPersonName, contactPersonEmail, contactPersonPhone, beneficiary, accountNumber, ifsc, bankName, branch, otherFields } = req.body;
+        let otherFieldsIds = [];
         const vendorCode = yield getNewVendorCode(country);
         const vendor = yield Vendor_1.default.create({
             vendorCode,
             productCategory,
-            companyName,
-            gst,
-            coi,
-            msme,
-            tradeMark,
+            companyName
+        }, { transaction: t });
+        const vendorProfile = yield VendorProfile_1.default.create({
+            vendorId: vendor.id,
             createdBy,
         }, { transaction: t });
+        const vendorAttachments = yield VendorAttachments_1.default.create({
+            gstId,
+            coiId,
+            msmeId,
+            tradeMarkId
+        });
         yield ContactPerson_1.default.create({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
         yield VendorAddress_1.default.create({
             addressLine1,
@@ -53,23 +60,40 @@ const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, 
             state,
             city,
             postalCode,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
-        yield VendorBank_1.default.create({
+        const vendorBank = yield VendorBank_1.default.create({
             beneficiaryName: beneficiary,
             accountNumber,
             ifsc,
             bankName,
             branch,
-            vendorId: vendor.id,
+            vendorProfileId: vendorProfile.id,
         }, { transaction: t });
+        if (otherFields) {
+            if ((otherFields === null || otherFields === void 0 ? void 0 : otherFields.length) > 0) {
+                for (let i = 0; i < otherFields.length; i++) {
+                    let field = otherFields[i];
+                    const vendorOther = yield VendorOther_1.default.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile.id,
+                    }, { transaction: t });
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
+            }
+        }
         yield t.commit();
         return res.status(201).json({
             success: true,
-            message: "Vendor created successfully. Proceed to upload attachments and other fields.",
+            message: "Vendor created successfully. Proceed to upload attachments",
             data: {
                 vendorId: vendor.id,
+                vendorProfileId: vendorProfile.id,
                 vendorCode,
+                vendorAttachmentsId: vendorAttachments.id,
+                vendorBankId: vendorBank.id,
+                otherFields: otherFieldsIds
             },
         });
     }
@@ -85,6 +109,42 @@ const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.vendorRegistrationStart = vendorRegistrationStart;
+const vendorRegistrationComplete = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const vendorId = req.body.vendorId;
+        const vendor = yield Vendor_1.default.findOne({ where: { id: vendorId } });
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found.",
+            });
+        }
+        const mailSent = yield (0, mail_service_1.sendMailSetup)(vendor.vendorCode, 'new-vendor', undefined, undefined);
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your Vendor has been successfully added`,
+                data: [],
+            });
+        return res.status(404).json({
+            success: false,
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> vendorRegistrationComplete"
+            },
+        });
+    }
+});
+exports.vendorRegistrationComplete = vendorRegistrationComplete;
 const vendorRegistration = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
@@ -457,14 +517,8 @@ exports.updateVendor = updateVendor;
 const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const vendors = yield Vendor_1.default.findAll({
-            attributes: ['vendorCode', 'companyName', [sequelize_typescript_1.Sequelize.col('address.state'), 'state'], [sequelize_typescript_1.Sequelize.col('address.country'), 'country'], 'productCategory'],
-            include: [
-                {
-                    model: VendorAddress_1.default,
-                    attributes: [],
-                },
-            ],
-            where: { isVerified: true }
+            attributes: ['vendorCode', 'companyName', 'productCategory'],
+            // where: { isVerified: true }
         });
         return res.status(201).json({
             success: true,
@@ -505,7 +559,7 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     model: SKU_1.default,
                 },
                 {
-                    model: BuyingOrder_1.default
+                    model: PurchaseOrder_1.default
                 },
                 {
                     model: Comment_1.default
@@ -529,53 +583,53 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getVendor = getVendor;
-const setValidation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { vendorCode, isValid, reason } = req.body;
-        console.log(vendorCode, isValid, reason);
-        const vendor = yield Vendor_1.default.findOne({
-            where: { vendorCode },
-            include: [
-                {
-                    model: ContactPerson_1.default
-                }
-            ]
-        });
-        if (isValid == "true") {
-            const variables = {
-                company: vendor === null || vendor === void 0 ? void 0 : vendor.companyName,
-                vendorCode
-            };
-            yield (0, mail_service_1.sendMailSetup)(null, 'vendor-success', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
-            yield Vendor_1.default.update({ isVerified: true }, { where: { vendorCode } });
-        }
-        else {
-            const variables = {
-                denyReason: reason
-            };
-            const comment = yield Comment_1.default.create({
-                comment: reason,
-                vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id,
-            });
-            yield (0, mail_service_1.sendMailSetup)(vendorCode, 'vendor-fail', variables, (vendor === null || vendor === void 0 ? void 0 : vendor.createdBy) ? vendor.createdBy : vendor === null || vendor === void 0 ? void 0 : vendor.contactPerson.email);
-        }
-        return res.status(201).json({
-            success: true,
-            message: `Vendor Review Done Successfully`,
-            data: {},
-        });
-    }
-    catch (error) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "vendor.controller.js -> getAllVendors"
-            },
-        });
-    }
-});
-exports.setValidation = setValidation;
+// export const setValidation: RequestHandler = async (req, res) => {
+//     try {
+//         const { vendorCode, isValid, reason } = req.body;
+//         console.log(vendorCode, isValid, reason)
+//         const vendor = await Vendor.findOne({
+//             where: { vendorCode },
+//             include: [
+//                 {
+//                     model: ContactPerson
+//                 }
+//             ]
+//         });
+//         if (isValid == "true") {
+//             const variables = {
+//                 company: vendor?.companyName,
+//                 vendorCode
+//             }
+//             await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
+//             await Vendor.update(
+//                 { isVerified: true },
+//                 { where: { vendorCode } }
+//             );
+//         } else {
+//             const variables = {
+//                 denyReason: reason
+//             }
+//             const comment = await Comment.create({
+//                 comment: reason,
+//                 vendorId: vendor?.id,
+//             })
+//             await sendMailSetup(vendorCode, 'vendor-fail', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
+//         }
+//         return res.status(201).json({
+//             success: true,
+//             message: `Vendor Review Done Successfully`,
+//             data: {},
+//         });
+//     } catch (error: any) {
+//         return res.status(504).json({
+//             success: false,
+//             message: error.message,
+//             data: {
+//                 "source": "vendor.controller.js -> getAllVendors"
+//             },
+//         });
+//     }
+// };
 const getNewVendorCode = (country) => __awaiter(void 0, void 0, void 0, function* () {
     let prefix;
     if (country != "India")

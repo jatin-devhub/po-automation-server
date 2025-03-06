@@ -10,60 +10,64 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("./Vendor"));
-const File_1 = __importDefault(require("./File"));
-let VendorBank = class VendorBank extends sequelize_typescript_1.Model {
+const VendorProfile_1 = __importDefault(require("./VendorProfile"));
+let VendorAddress = class VendorAddress extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
     sequelize_typescript_1.PrimaryKey,
     (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], VendorAddress.prototype, "id", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "addressLine1", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "addressLine2", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "country", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "state", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "city", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], VendorAddress.prototype, "postalCode", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorProfile_1.default),
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
     })
-], VendorBank.prototype, "id", void 0);
+], VendorAddress.prototype, "vendorProfileId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorProfile_1.default)
+], VendorAddress.prototype, "vendorProfile", void 0);
+VendorAddress = __decorate([
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'vendor_address',
+        timestamps: true,
     })
-], VendorBank.prototype, "beneficiaryName", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
-], VendorBank.prototype, "accountNumber", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
-], VendorBank.prototype, "ifsc", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
-], VendorBank.prototype, "bankName", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
-    })
-], VendorBank.prototype, "branch", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default)
-], VendorBank.prototype, "proofAtt", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-    })
-], VendorBank.prototype, "vendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], VendorBank.prototype, "vendor", void 0);
-VendorBank = __decorate([
-    sequelize_typescript_1.Table
-], VendorBank);
-exports.default = VendorBank;
+], VendorAddress);
+exports.default = VendorAddress;

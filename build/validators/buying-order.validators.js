@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validatePOId = exports.validatePOCode = exports.validateReview = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
-const BuyingOrder_1 = __importDefault(require("../models/BuyingOrder"));
+const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newBuyingOrderSchema = joi_1.default.object({
@@ -52,7 +52,7 @@ const validateReview = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         });
         const value = yield validateVendorCode.validateAsync(req.body);
         const poCode = value.poCode;
-        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
+        const buyingOrder = yield PurchaseOrder_1.default.findOne({ where: { poCode } });
         if (buyingOrder)
             next();
         else {
@@ -79,7 +79,7 @@ const validatePOCode = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         });
         const value = yield validatePOCode.validateAsync(req.params);
         const poCode = value.poCode;
-        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { poCode } });
+        const buyingOrder = yield PurchaseOrder_1.default.findOne({ where: { poCode } });
         if (buyingOrder)
             next();
         else {
@@ -105,7 +105,7 @@ const validatePOId = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             poId: joi_1.default.number().required()
         });
         const { poId } = yield validatePOCode.validateAsync(req.params);
-        const buyingOrder = yield BuyingOrder_1.default.findOne({ where: { id: poId } });
+        const buyingOrder = yield PurchaseOrder_1.default.findOne({ where: { id: poId } });
         if (buyingOrder)
             next();
         else {

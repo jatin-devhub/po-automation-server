@@ -25,20 +25,13 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BLOB('medium')
     })
-], FileChunk.prototype, "chunkData", void 0);
+], FileChunk.prototype, "chunkContent", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => File_1.default),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
+        type: sequelize_typescript_1.DataType.INTEGER
     })
 ], FileChunk.prototype, "fileId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
-    })
-], FileChunk.prototype, "chunkIndex", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => File_1.default)
 ], FileChunk.prototype, "file", void 0);

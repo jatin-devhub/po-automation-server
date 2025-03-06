@@ -2,7 +2,7 @@ import { Model, Column, Table, DataType, AllowNull, Unique, IsEmail, AutoIncreme
 import VendorProfile from './VendorProfile';
 
 @Table({
-    tableName: 'contact-person',
+    tableName: 'contact_person',
     timestamps: true
 })
 export default class ContactPerson extends Model {

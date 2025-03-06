@@ -5,14 +5,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("../vendor/Vendor"));
-const File_1 = __importDefault(require("../File"));
-let VendorFiles = class VendorFiles extends sequelize_typescript_1.Model {
+// import SKU from "../SKU";
+// import BuyingOrder from "../BuyingOrder";
+let Vendor = class Vendor extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
@@ -20,32 +17,37 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], VendorFiles.prototype, "id", void 0);
+], Vendor.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER
-    })
-], VendorFiles.prototype, "vendorId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => File_1.default),
     sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
+        type: sequelize_typescript_1.DataType.STRING
     })
-], VendorFiles.prototype, "fileId", void 0);
+], Vendor.prototype, "vendorCode", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => File_1.default)
-], VendorFiles.prototype, "file", void 0);
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], Vendor.prototype, "productCategory", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], VendorFiles.prototype, "vendor", void 0);
-VendorFiles = __decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    sequelize_typescript_1.Unique,
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], Vendor.prototype, "companyName", void 0);
+__decorate([
+    sequelize_typescript_1.CreatedAt
+], Vendor.prototype, "createdAt", void 0);
+__decorate([
+    sequelize_typescript_1.UpdatedAt
+], Vendor.prototype, "updatedAt", void 0);
+Vendor = __decorate([
     (0, sequelize_typescript_1.Table)({
         timestamps: true,
-        tableName: 'vendor_files'
+        tableName: 'vendor'
     })
-], VendorFiles);
-exports.default = VendorFiles;
+], Vendor);
+exports.default = Vendor;

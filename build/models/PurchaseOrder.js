@@ -11,12 +11,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
-const Vendor_1 = __importDefault(require("./Vendor"));
-const Comment_1 = __importDefault(require("./Comment"));
-const File_1 = __importDefault(require("./File"));
-const BOInvoices_1 = __importDefault(require("./BOInvoices"));
-const BuyingOrderOther_1 = __importDefault(require("./BuyingOrderOther"));
-let BuyingOrder = class BuyingOrder extends sequelize_typescript_1.Model {
+const Vendor_1 = __importDefault(require("./vendor/Vendor"));
+const AttachmentMapping_1 = __importDefault(require("./attachment/AttachmentMapping"));
+const Invoice_1 = __importDefault(require("./Invoice"));
+let PurchaseOrder = class PurchaseOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
@@ -24,91 +22,66 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], BuyingOrder.prototype, "id", void 0);
+], PurchaseOrder.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     sequelize_typescript_1.Unique,
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
-], BuyingOrder.prototype, "poCode", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
-], BuyingOrder.prototype, "currency", void 0);
+], PurchaseOrder.prototype, "poCode", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
-], BuyingOrder.prototype, "paymentTerms", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
-], BuyingOrder.prototype, "estimatedDeliveryDate", void 0);
+], PurchaseOrder.prototype, "estimatedDeliveryDate", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN
     })
-], BuyingOrder.prototype, "isVerified", void 0);
+], PurchaseOrder.prototype, "isVerified", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
-], BuyingOrder.prototype, "verificationLevel", void 0);
+], PurchaseOrder.prototype, "verificationLevel", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderId' })
-], BuyingOrder.prototype, "poAttachment", void 0);
+    (0, sequelize_typescript_1.HasOne)(() => AttachmentMapping_1.default, {
+        foreignKey: 'entityId',
+        scope: { attachmentType: 'poAttachment' }
+    })
+], PurchaseOrder.prototype, "poAttachment", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING
     })
-], BuyingOrder.prototype, "createdBy", void 0);
+], PurchaseOrder.prototype, "createdBy", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.BOOLEAN
     })
-], BuyingOrder.prototype, "closed", void 0);
+], PurchaseOrder.prototype, "closed", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING
-    })
-], BuyingOrder.prototype, "grnComment", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasMany)(() => BOInvoices_1.default)
-], BuyingOrder.prototype, "invoiceAtts", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasMany)(() => BuyingOrderOther_1.default)
-], BuyingOrder.prototype, "otherFields", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdPackaging' })
-], BuyingOrder.prototype, "packagingAtt", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasOne)(() => File_1.default, { foreignKey: 'buyingOrderIdGRNSheet' })
-], BuyingOrder.prototype, "grnAtt", void 0);
+    (0, sequelize_typescript_1.HasMany)(() => Invoice_1.default)
+], PurchaseOrder.prototype, "invoices", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
-], BuyingOrder.prototype, "records", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasMany)(() => Comment_1.default)
-], BuyingOrder.prototype, "comments", void 0);
+], PurchaseOrder.prototype, "records", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], BuyingOrder.prototype, "vendorId", void 0);
+], PurchaseOrder.prototype, "vendorId", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], BuyingOrder.prototype, "vendor", void 0);
-BuyingOrder = __decorate([
+], PurchaseOrder.prototype, "vendor", void 0);
+PurchaseOrder = __decorate([
     sequelize_typescript_1.Table
-], BuyingOrder);
-exports.default = BuyingOrder;
+], PurchaseOrder);
+exports.default = PurchaseOrder;

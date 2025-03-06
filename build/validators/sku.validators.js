@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateReview = exports.validateVendorCode = exports.validateNew = void 0;
 const joi_1 = __importDefault(require("joi"));
-const Vendor_1 = __importDefault(require("../models/Vendor"));
+const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const schema = joi_1.default.object({

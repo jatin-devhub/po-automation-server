@@ -33,7 +33,7 @@ const sendMail = (email, mailOptions, attachment) => __awaiter(void 0, void 0, v
         if (attachment)
             attachments.push({
                 filename: attachment === null || attachment === void 0 ? void 0 : attachment.fileName,
-                // content: attachment?.fileContent,TODO figure out chunks filecontent
+                content: attachment === null || attachment === void 0 ? void 0 : attachment.fileContent,
             });
         const mailOption = {
             from: MAIL_EMAIL,

@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("./Vendor"));
+const VendorProfile_1 = __importDefault(require("./VendorProfile"));
 let ContactPerson = class ContactPerson extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -42,17 +42,17 @@ __decorate([
     })
 ], ContactPerson.prototype, "phoneNumber", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorProfile_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER,
     })
-], ContactPerson.prototype, "vendorId", void 0);
+], ContactPerson.prototype, "vendorProfileId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], ContactPerson.prototype, "vendor", void 0);
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorProfile_1.default)
+], ContactPerson.prototype, "vendorProfile", void 0);
 ContactPerson = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: 'contact-person',
+        tableName: 'contact_person',
         timestamps: true
     })
 ], ContactPerson);

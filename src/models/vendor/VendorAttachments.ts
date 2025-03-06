@@ -3,7 +3,7 @@ import AttachmentMapping from "../attachment/AttachmentMapping";
 import VendorProfile from "./VendorProfile";
 
 @Table({
-    tableName: 'vendor_documents'
+    tableName: 'vendor_attachments'
 })
 export default class VendorAttachments extends Model {
     @AutoIncrement

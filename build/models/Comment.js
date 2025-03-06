@@ -11,9 +11,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var Comment_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const BuyingOrder_1 = __importDefault(require("./BuyingOrder"));
+const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder"));
 const SKU_1 = __importDefault(require("./SKU"));
-const Vendor_1 = __importDefault(require("./Vendor"));
+const VendorProfile_1 = __importDefault(require("./vendor/VendorProfile"));
 let Comment = Comment_1 = class Comment extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -37,7 +37,7 @@ __decorate([
     })
 ], Comment.prototype, "commentId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => BuyingOrder_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => PurchaseOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
@@ -49,7 +49,7 @@ __decorate([
     })
 ], Comment.prototype, "skuId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorProfile_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
@@ -61,14 +61,14 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Comment_1)
 ], Comment.prototype, "parentComment", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => BuyingOrder_1.default)
+    (0, sequelize_typescript_1.BelongsTo)(() => PurchaseOrder_1.default)
 ], Comment.prototype, "buyingOrder", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
 ], Comment.prototype, "sku", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], Comment.prototype, "vendor", void 0);
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorProfile_1.default)
+], Comment.prototype, "vendorProfile", void 0);
 Comment = Comment_1 = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: 'comments',

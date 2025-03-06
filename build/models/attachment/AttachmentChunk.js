@@ -10,9 +10,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Vendor_1 = __importDefault(require("../vendor/Vendor"));
-const File_1 = __importDefault(require("../File"));
-let VendorFiles = class VendorFiles extends sequelize_typescript_1.Model {
+const Attachment_1 = __importDefault(require("./Attachment"));
+let AttachmentChunk = class AttachmentChunk extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
@@ -20,32 +19,32 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], VendorFiles.prototype, "id", void 0);
+], AttachmentChunk.prototype, "id", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.ForeignKey)(() => Attachment_1.default),
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.INTEGER
+    })
+], AttachmentChunk.prototype, "attachmentId", void 0);
+__decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], VendorFiles.prototype, "vendorId", void 0);
+], AttachmentChunk.prototype, "chunkIndex", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => File_1.default),
-    sequelize_typescript_1.Unique,
+    (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.INTEGER,
-        allowNull: false,
+        type: sequelize_typescript_1.DataType.BLOB('medium')
     })
-], VendorFiles.prototype, "fileId", void 0);
+], AttachmentChunk.prototype, "chunkData", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => File_1.default)
-], VendorFiles.prototype, "file", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], VendorFiles.prototype, "vendor", void 0);
-VendorFiles = __decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Attachment_1.default)
+], AttachmentChunk.prototype, "attachment", void 0);
+AttachmentChunk = __decorate([
     (0, sequelize_typescript_1.Table)({
-        timestamps: true,
-        tableName: 'vendor_files'
+        tableName: 'attachment_chunk',
     })
-], VendorFiles);
-exports.default = VendorFiles;
+], AttachmentChunk);
+exports.default = AttachmentChunk;

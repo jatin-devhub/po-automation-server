@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.applyReview = exports.getUnverifiedSKUs = exports.sendVerifyMail = exports.skuRegistration = void 0;
-const Vendor_1 = __importDefault(require("../models/Vendor"));
+const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const SKU_1 = __importDefault(require("../models/SKU"));
 const mail_service_1 = require("../utils/mail.service");
 const sequelize_typescript_1 = require("sequelize-typescript");
