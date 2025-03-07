@@ -61,6 +61,7 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
         }, { transaction: t });
 
         const vendorAttachments =  await VendorAttachments.create({
+            vendorProfileId: vendorProfile.id,
             gstId,
             coiId,
             msmeId,
