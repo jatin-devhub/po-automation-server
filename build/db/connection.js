@@ -45,6 +45,7 @@ const connection = new sequelize_typescript_1.Sequelize({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    // database: 'brand_analytics',
     port: 3306,
     models: [Attachment_1.default, AttachmentChunk_1.default, AttachmentMapping_1.default, Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, VendorAttachments_1.default, VendorProfile_1.default]
 });

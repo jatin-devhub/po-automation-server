@@ -42,6 +42,7 @@ const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, 
             createdBy,
         }, { transaction: t });
         const vendorAttachments = yield VendorAttachments_1.default.create({
+            vendorProfileId: vendorProfile.id,
             gstId,
             coiId,
             msmeId,
@@ -518,7 +519,11 @@ const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const vendors = yield Vendor_1.default.findAll({
             attributes: ['vendorCode', 'companyName', 'productCategory'],
-            // where: { isVerified: true }
+            include: [{
+                    model: VendorProfile_1.default,
+                    where: { isVerified: true },
+                    attributes: []
+                }]
         });
         return res.status(201).json({
             success: true,

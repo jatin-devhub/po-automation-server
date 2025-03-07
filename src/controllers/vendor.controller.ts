@@ -9,7 +9,7 @@ import VendorOther from "../models/vendor/VendorOther";
 import ContactPerson from "../models/vendor/ContactPerson";
 import VendorAddress from "../models/vendor/VendorAddress";
 import SKU from "../models/SKU";
-import BuyingOrder from "../models/BuyingOrder";
+import BuyingOrder from "../models/PurchaseOrder";
 import { sendMailSetup } from "../utils/mail.service";
 import Comment from "../models/Comment";
 import VendorProfile from "../models/vendor/VendorProfile";
@@ -136,6 +136,47 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
         });
     }
 };
+
+export const vendorRegistrationComplete: RequestHandler = async (req, res) => {
+    try {
+        const vendorId = req.body.vendorId;
+
+        const vendor = await Vendor.findOne({ where: { id: vendorId } });
+
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "Vendor not found.",
+            });
+        }
+
+        const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
+
+        if (mailSent)
+            return res.status(201).json({
+                success: true,
+                message: `Your Vendor has been successfully added`,
+                data: [],
+            });
+
+        return res.status(404).json({
+            success: false,
+            message: `Unable to send email.`,
+            data: {
+                mailSent
+            }
+        })
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> vendorRegistrationComplete"
+            },
+        });
+    }
+};
+
 
 export const vendorRegistration: RequestHandler = async (req, res) => {
     try {
@@ -567,15 +608,13 @@ export const updateVendor: RequestHandler = async (req, res) => {
 export const getAllVendors: RequestHandler = async (req, res) => {
     try {
         const vendors = await Vendor.findAll({
-            attributes: ['vendorCode', 'companyName', [Sequelize.col('address.state'), 'state'], [Sequelize.col('address.country'), 'country'], 'productCategory'],
-            include: [
-                {
-                    model: VendorAddress,
-                    attributes: [],
-                },
-            ],
-            where: { isVerified: true }
-        });
+            attributes: ['vendorCode', 'companyName', 'productCategory'],
+            include: [{
+              model: VendorProfile,
+              where: { isVerified: true },
+              attributes: []
+            }]
+          });
 
         return res.status(201).json({
             success: true,
