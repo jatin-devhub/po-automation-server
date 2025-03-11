@@ -16,7 +16,7 @@ exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = expo
 const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
-const SKU_1 = __importDefault(require("../models/SKU"));
+const SKU_1 = __importDefault(require("../models/sku/SKU"));
 const File_1 = __importDefault(require("../models/File"));
 const mail_service_1 = require("../utils/mail.service");
 const VendorAddress_1 = __importDefault(require("../models/vendor/VendorAddress"));

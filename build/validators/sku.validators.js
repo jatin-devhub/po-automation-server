@@ -25,7 +25,6 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             skuCode: joi_1.default.string().required(),
             category: joi_1.default.string(),
             subCategory: joi_1.default.string(),
-            brand: joi_1.default.string(),
             productTitle: joi_1.default.string(),
             hsn: joi_1.default.number(),
             ean: joi_1.default.number(),

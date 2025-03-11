@@ -12,7 +12,7 @@ var Comment_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder"));
-const SKU_1 = __importDefault(require("./SKU"));
+const SKU_1 = __importDefault(require("./sku/SKU"));
 const VendorProfile_1 = __importDefault(require("./vendor/VendorProfile"));
 let Comment = Comment_1 = class Comment extends sequelize_typescript_1.Model {
 };

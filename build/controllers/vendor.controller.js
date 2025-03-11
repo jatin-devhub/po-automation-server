@@ -20,7 +20,7 @@ const VendorBank_1 = __importDefault(require("../models/vendor/VendorBank"));
 const VendorOther_1 = __importDefault(require("../models/vendor/VendorOther"));
 const ContactPerson_1 = __importDefault(require("../models/vendor/ContactPerson"));
 const VendorAddress_1 = __importDefault(require("../models/vendor/VendorAddress"));
-const SKU_1 = __importDefault(require("../models/SKU"));
+const SKU_1 = __importDefault(require("../models/sku/SKU"));
 const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const mail_service_1 = require("../utils/mail.service");
 const Comment_1 = __importDefault(require("../models/Comment"));
@@ -47,7 +47,7 @@ const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, 
             coiId,
             msmeId,
             tradeMarkId
-        });
+        }, { transaction: t });
         yield ContactPerson_1.default.create({
             name: contactPersonName,
             email: contactPersonEmail,

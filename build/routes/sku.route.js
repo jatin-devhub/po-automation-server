@@ -4,7 +4,7 @@ const express_1 = require("express");
 const sku_validators_1 = require("../validators/sku.validators");
 const sku_controller_1 = require("../controllers/sku.controller");
 const router = (0, express_1.Router)();
-router.post('/new/:vendorCode', sku_validators_1.validateVendorCode, sku_validators_1.validateNew, sku_controller_1.skuRegistration);
+router.post('/new/:vendorCode', sku_validators_1.validateVendorCode, sku_validators_1.validateNew, sku_controller_1.newSKU);
 router.get('/unverified/:vendorCode', sku_validators_1.validateVendorCode, sku_controller_1.getUnverifiedSKUs);
-router.post('/review', sku_validators_1.validateReview, sku_controller_1.applyReview);
+// router.post('/review', validateReview, applyReview)
 exports.default = router;
