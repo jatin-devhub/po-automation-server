@@ -25,7 +25,8 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             skuCode: joi_1.default.string().required(),
             category: joi_1.default.string(),
             subCategory: joi_1.default.string(),
-            productTitle: joi_1.default.string(),
+            productTitle: joi_1.default.string().required(),
+            sapCode: joi_1.default.string(),
             hsn: joi_1.default.number(),
             ean: joi_1.default.number(),
             modelNumber: joi_1.default.string(),
@@ -40,7 +41,8 @@ const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             masterCartonBreadthCm: joi_1.default.number().min(0),
             masterCartonHeightCm: joi_1.default.number().min(0),
             masterCartonWeightKg: joi_1.default.number().min(0),
-            MRP: joi_1.default.number().min(0),
+            mrp: joi_1.default.number().min(0),
+            gst: joi_1.default.number().min(0),
         })).min(1).required();
         const { skus } = yield schema.validateAsync(req.body);
         const skuJSON = JSON.parse(skus);

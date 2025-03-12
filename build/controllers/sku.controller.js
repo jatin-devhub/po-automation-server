@@ -51,9 +51,11 @@ const newSKU = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const skuDetailsData = skuJSON.map((sku) => ({
             category: sku.category,
             subCategory: sku.subCategory,
+            sapCode: sku.sapCode,
             hsn: String(sku.hsn),
             modelNumber: sku.modelNumber,
-            MRP: sku.MRP,
+            mrp: sku.mrp,
+            gst: sku.gst,
             isVerified: false,
             createdBy: createdBy || 'system',
             skuId: skuMap.get(sku.skuCode).id,

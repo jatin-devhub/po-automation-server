@@ -1,10 +1,13 @@
 import { RequestHandler } from "express";
-import Vendor from "../models/Vendor";
-import SKU from "../models/SKU";
+import Vendor from "../models/vendor/Vendor";
+import SKU from "../models/sku/SKU";
 import { sendMailSetup } from "../utils/mail.service";
 import { Sequelize } from "sequelize-typescript";
+import connection from "../db/connection";
+import SKUDetails from "../models/sku/SKUDetails";
+import SKUDimensions from "../models/sku/SKUDimensions";
 
-export const skuRegistration: RequestHandler = async (req, res) => {
+export const newSKU: RequestHandler = async (req, res) => {
     try {
         const { createdBy, skus } = req.body;
         const skuJSON = JSON.parse(skus)
@@ -16,36 +19,93 @@ export const skuRegistration: RequestHandler = async (req, res) => {
                 message: "Vendor not found",
             });
         }
+        const transaction = await connection.transaction();
 
-        const vendorId = vendor.id;
-        const skusToCreate = skuJSON.map((sku: any) => ({
-            ...sku,
-            vendorId,
-            createdBy
+        await SKU.bulkCreate(
+            skuJSON.map((sku: any) => ({
+                skuCode: sku.skuCode,
+                name: sku.productTitle,
+                ean: typeof sku.ean === 'number' && !isNaN(sku.ean) ? sku.ean.toString() : sku.ean,
+                vendorId: vendor.id,
+            })),
+            { transaction }
+        );
+
+        console.log('SKUs inserted');
+
+        // 2. Retrieve inserted SKUs using unique skuCode
+        const insertedSkus = await SKU.findAll({
+            where: { skuCode: skuJSON.map((sku: any) => sku.skuCode) },
+            transaction,
+        });
+        const skuMap = new Map(insertedSkus.map(sku => [sku.skuCode, sku]));
+
+        console.log('skuMap', skuMap);
+
+        // 3. Bulk insert SKUDetails
+        const skuDetailsData = skuJSON.map((sku: any) => ({
+            category: sku.category,
+            subCategory: sku.subCategory,
+            sapCode: sku.sapCode,
+            hsn: String(sku.hsn),
+            modelNumber: sku.modelNumber,
+            mrp: sku.mrp,
+            gst: sku.gst,
+            isVerified: false,
+            createdBy: createdBy || 'system',
+            skuId: skuMap.get(sku.skuCode)!.id,
         }));
+        await SKUDetails.bulkCreate(skuDetailsData, { transaction });
 
-        await SKU.bulkCreate(skusToCreate, { validate: true });
+        // 4. Retrieve inserted SKUDetails for dimensions linking
+        const insertedDetails = await SKUDetails.findAll({
+            where: { skuId: insertedSkus.map(sku => sku.id) },
+            transaction,
+        });
+        const detailsMap = new Map(insertedDetails.map(detail => [detail.skuId, detail]));
 
-        const variables = {
-            "companyName": vendor?.companyName
-        }
+        // 5. Bulk insert SKUDimensions
+        const skuDimensionsData = skuJSON.map((sku: any) => {
+            const skuId = skuMap.get(sku.skuCode)!.id;
+            return {
+                size: sku.size,
+                colorFamilyColor: sku.colorFamilyColor,
+                productLengthCm: sku.productLengthCm,
+                productBreadthCm: sku.productBreadthCm,
+                productHeightCm: sku.productHeightCm,
+                productWeightKg: sku.productWeightKg,
+                masterCartonQty: sku.masterCartonQty,
+                masterCartonLengthCm: sku.masterCartonLengthCm,
+                masterCartonBreadthCm: sku.masterCartonBreadthCm,
+                masterCartonHeightCm: sku.masterCartonHeightCm,
+                masterCartonWeightKg: sku.masterCartonWeightKg,
+                skuDetailsId: detailsMap.get(skuId)!.id,
+            };
+        });
+        await SKUDimensions.bulkCreate(skuDimensionsData, { transaction });
 
-        const mailSent = await sendMailSetup(vendorCode, 'new-skus', variables, undefined);
+        await transaction.commit();
 
-        if (mailSent)
-            return res.status(201).json({
-                success: true,
-                message: `${skusToCreate.length} SKUs have been successfully added.`,
-                data: [],
-            });
+        // const variables = {
+        //     "companyName": vendor?.companyName
+        // }
 
-        return res.status(404).json({
-            success: false,
-            message: `Unable to send email.`,
-            data: {
-                mailSent
-            }
-        })
+        // const mailSent = await sendMailSetup(vendorCode, 'new-skus', variables, undefined);
+
+        // if (mailSent)
+        return res.status(201).json({
+            success: true,
+            message: `${skuJSON.length} SKUs have been successfully added.`,
+            data: [],
+        });
+
+        // return res.status(404).json({
+        //     success: false,
+        //     message: `Unable to send email.`,
+        //     data: {
+        //         mailSent
+        //     }
+        // })
     } catch (error: any) {
         return res.status(500).json({
             success: false,
@@ -120,47 +180,47 @@ export const getUnverifiedSKUs: RequestHandler = async (req, res) => {
 
 }
 
-export const applyReview: RequestHandler = async (req, res) => {
-    try {
-        const { vendorCode, isValid, reason } = req.body;
+// export const applyReview: RequestHandler = async (req, res) => {
+//     try {
+//         const { vendorCode, isValid, reason } = req.body;
 
-        const vendor = await Vendor.findOne({ where: { vendorCode } })
-        const sku = await SKU.findOne({ where: { isVerified: false, vendorId: vendor?.id } })
+//         const vendor = await Vendor.findOne({ where: { vendorCode } })
+//         const sku = await SKU.findOne({ where: { isVerified: false, vendorId: vendor?.id } })
 
-        if (isValid == "true") {
-            const variables = {
-                company: vendor?.companyName
-            }
-            await sendMailSetup(null, 'skus-success', variables, sku?.createdBy)
-            await SKU.update(
-                { isVerified: true },
-                { where: { vendorId: vendor?.id } }
-            );
+//         if (isValid == "true") {
+//             const variables = {
+//                 company: vendor?.companyName
+//             }
+//             await sendMailSetup(null, 'skus-success', variables, sku?.createdBy)
+//             await SKU.update(
+//                 { isVerified: true },
+//                 { where: { vendorId: vendor?.id } }
+//             );
 
-        }
-        else {
-            const variables = {
-                denyReason: reason
-            }
-            await sendMailSetup(null, 'skus-fail', variables, sku?.createdBy)
-            await SKU.destroy({ where: { isVerified: false, vendorId: vendor?.id } })
-        }
+//         }
+//         else {
+//             const variables = {
+//                 denyReason: reason
+//             }
+//             await sendMailSetup(null, 'skus-fail', variables, sku?.createdBy)
+//             await SKU.destroy({ where: { isVerified: false, vendorId: vendor?.id } })
+//         }
 
 
-        return res.status(201).json({
-            success: true,
-            message: `Your review is done`,
-            data: {},
-        });
+//         return res.status(201).json({
+//             success: true,
+//             message: `Your review is done`,
+//             data: {},
+//         });
 
-    } catch (error: any) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "sku.controller.js -> applyReview"
-            },
-        });
-    }
+//     } catch (error: any) {
+//         return res.status(504).json({
+//             success: false,
+//             message: error.message,
+//             data: {
+//                 "source": "sku.controller.js -> applyReview"
+//             },
+//         });
+//     }
 
-}
+// }

@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
-import Vendor from "../models/Vendor";
+import Vendor from "../models/vendor/Vendor";
 
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
@@ -12,8 +12,8 @@ export const validateNew: RequestHandler = async (req, res, next) => {
             skuCode: Joi.string().required(),
             category: Joi.string(),
             subCategory: Joi.string(),
-            brand: Joi.string(),
-            productTitle: Joi.string(),
+            productTitle: Joi.string().required(),
+            sapCode: Joi.string(),
             hsn: Joi.number(),
             ean: Joi.number(),
             modelNumber: Joi.string(),
@@ -28,7 +28,8 @@ export const validateNew: RequestHandler = async (req, res, next) => {
             masterCartonBreadthCm: Joi.number().min(0),
             masterCartonHeightCm: Joi.number().min(0),
             masterCartonWeightKg: Joi.number().min(0),
-            MRP: Joi.number().min(0),
+            mrp: Joi.number().min(0),
+            gst: Joi.number().min(0),
         })).min(1).required()
 
         const { skus } = await schema.validateAsync(req.body);

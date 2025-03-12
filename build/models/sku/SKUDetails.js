@@ -29,13 +29,19 @@ __decorate([
 ], SKUDetails.prototype, "subCategory", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
+], SKUDetails.prototype, "sapCode", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKUDetails.prototype, "hsn", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKUDetails.prototype, "modelNumber", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
-], SKUDetails.prototype, "MRP", void 0);
+], SKUDetails.prototype, "mrp", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.FLOAT })
+], SKUDetails.prototype, "gst", void 0);
 __decorate([
     (0, sequelize_typescript_1.Default)(false),
     (0, sequelize_typescript_1.Column)({
