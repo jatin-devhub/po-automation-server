@@ -1,4 +1,5 @@
-import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, HasMany, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
+import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, HasMany, HasOne, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
+import VendorProfile from "./VendorProfile";
 // import SKU from "../SKU";
 // import BuyingOrder from "../BuyingOrder";
 
@@ -39,6 +40,9 @@ export default class Vendor extends Model {
 
     // @HasMany(() => BuyingOrder)
     // buyingOrders!: BuyingOrder[]
+
+    @HasOne(() => VendorProfile)
+    profile!: VendorProfile;
 
     @CreatedAt
     createdAt?: Date;

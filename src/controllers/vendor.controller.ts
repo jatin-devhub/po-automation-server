@@ -8,7 +8,7 @@ import VendorBank from "../models/vendor/VendorBank";
 import VendorOther from "../models/vendor/VendorOther";
 import ContactPerson from "../models/vendor/ContactPerson";
 import VendorAddress from "../models/vendor/VendorAddress";
-import SKU from "../models/SKU";
+import SKU from "../models/sku/SKU";
 import BuyingOrder from "../models/PurchaseOrder";
 import { sendMailSetup } from "../utils/mail.service";
 import Comment from "../models/Comment";
@@ -60,13 +60,13 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             createdBy,
         }, { transaction: t });
 
-        const vendorAttachments =  await VendorAttachments.create({
+        const vendorAttachments = await VendorAttachments.create({
             vendorProfileId: vendorProfile.id,
             gstId,
             coiId,
             msmeId,
             tradeMarkId
-        })
+        }, { transaction: t });
 
         await ContactPerson.create({
             name: contactPersonName,
@@ -611,11 +611,11 @@ export const getAllVendors: RequestHandler = async (req, res) => {
         const vendors = await Vendor.findAll({
             attributes: ['vendorCode', 'companyName', 'productCategory'],
             include: [{
-              model: VendorProfile,
-              where: { isVerified: true },
-              attributes: []
+                model: VendorProfile,
+                where: { isVerified: true },
+                attributes: []
             }]
-          });
+        });
 
         return res.status(201).json({
             success: true,

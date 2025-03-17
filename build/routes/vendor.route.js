@@ -6,7 +6,7 @@ const vendor_controller_1 = require("../controllers/vendor.controller");
 const router = (0, express_1.Router)();
 // router.post('/new', validateNew, vendorRegistration);
 router.post('/new-start', vendor_validators_1.validateNewStart, vendor_controller_1.vendorRegistrationStart);
-router.post('/new-complete', vendor_validators_1.validateNewComplete);
+router.post('/new-complete', vendor_validators_1.validateNewComplete, vendor_controller_1.vendorRegistrationComplete);
 // router.put('/update-details/:vendorCode', validateUpdatedVendorDetails, updateVendorDetails);
 // router.put('/update/:vendorCode', validateUpdate, updateVendor)
 // router.post('/validate', validateValidation, setValidation)
