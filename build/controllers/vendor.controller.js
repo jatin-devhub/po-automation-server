@@ -276,7 +276,7 @@ const getAllVendors = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.getAllVendors = getAllVendors;
 const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     try {
         const { vendorCode } = req.params;
         const vendor = yield Vendor_1.default.findOne({
@@ -386,7 +386,7 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                             attachment: (_a = other === null || other === void 0 ? void 0 : other.otherAttachment) === null || _a === void 0 ? void 0 : _a.attachment
                         });
                     }),
-                    comment: vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.comment.comment
+                    comment: (_g = vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.comment) === null || _g === void 0 ? void 0 : _g.comment
                 },
             },
         });

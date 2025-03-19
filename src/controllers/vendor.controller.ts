@@ -457,7 +457,7 @@ export const getVendor: RequestHandler = async (req, res) => {
                         value: other.otherValue,
                         attachment: other?.otherAttachment?.attachment
                     })),
-                    comment: vendorProfile?.comment.comment
+                    comment: vendorProfile?.comment?.comment
                 },
             },
         });
