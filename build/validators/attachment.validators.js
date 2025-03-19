@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateGetFile = exports.validateUploadChunk = exports.validateAttachmentInit = void 0;
+exports.validateGetFile = exports.validateGetChunk = exports.validateUploadChunk = exports.validateAttachmentInit = void 0;
 const joi_1 = __importDefault(require("joi"));
+const Attachment_1 = __importDefault(require("../models/attachment/Attachment"));
 const validateAttachmentInit = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -75,6 +76,44 @@ const validateUploadChunk = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.validateUploadChunk = validateUploadChunk;
+const validateGetChunk = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const getChunkSchema = joi_1.default.object({
+            attachmentId: joi_1.default.number().required(),
+            chunkIndex: joi_1.default.number().required()
+        });
+        const { error, value } = getChunkSchema.validate(req.params);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message,
+                data: [],
+            });
+        }
+        const attachment = yield Attachment_1.default.findOne({ where: { id: value.attachmentId } });
+        if (!attachment)
+            return res.status(400).json({
+                success: false,
+                message: "Attachment not found",
+                data: [],
+            });
+        if (attachment.totalChunks <= value.chunkIndex)
+            return res.status(400).json({
+                success: false,
+                message: "Chunk not found",
+                data: [],
+            });
+        next();
+    }
+    catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+});
+exports.validateGetChunk = validateGetChunk;
 const validateGetFile = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const validateVendorCode = joi_1.default.object({
@@ -96,8 +135,8 @@ exports.validateGetFile = validateGetFile;
 // export const validateUpdateFile: RequestHandler = async (req, res, next) => {
 //     try {
 //         const updateFileBody = Joi.object({
-//             attachment: Joi.any().required(), 
-//             idName: Joi.string().required(), 
+//             attachment: Joi.any().required(),
+//             idName: Joi.string().required(),
 //             idValue: Joi.number().required()
 //         })
 //         const files = req.files as Express.Multer.File[];
@@ -117,7 +156,7 @@ exports.validateGetFile = validateGetFile;
 // export const validateNewFile: RequestHandler = async (req, res, next) => {
 //     try {
 //         const newFileBody = Joi.object({
-//             attachmentChunk: Joi.any().required(), 
+//             attachmentChunk: Joi.any().required(),
 //             chunkIndex: Joi.number().required(),
 //             totalChunks: Joi.number().required(),
 //             fileName: Joi.string().required()

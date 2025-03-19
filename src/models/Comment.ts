@@ -1,7 +1,5 @@
-import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasMany, AllowNull, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
-import BuyingOrder from './BuyingOrder';
-import SKU from './SKU';
-import Vendor from './Vendor';
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo, AllowNull, AutoIncrement, PrimaryKey } from 'sequelize-typescript';
+import VendorProfile from './vendor/VendorProfile';
 
 @Table({
   tableName: 'comments',
@@ -21,43 +19,13 @@ export default class Comment extends Model {
   })
   comment!: string;
 
-  @ForeignKey(() => Comment)
+  @ForeignKey(() => VendorProfile)
   @Column({
     type: DataType.INTEGER
   })
-  commentId!: number
+  vendorProfileId!: number
 
-  @ForeignKey(() => BuyingOrder)
-  @Column({
-    type: DataType.INTEGER
-  })
-  buyingOrderId!: number
-
-  @ForeignKey(() => SKU)
-  @Column({
-    type: DataType.INTEGER
-  })
-  skuId!: number
-
-  @ForeignKey(() => Vendor)
-  @Column({
-    type: DataType.INTEGER
-  })
-  vendorId!: number
-
-  @HasMany(() => Comment)
-  comments!: Comment[]
-
-  @BelongsTo(() => Comment)
-  parentComment!: Comment;
-
-  @BelongsTo(() => BuyingOrder)
-  buyingOrder!: BuyingOrder;
-
-  @BelongsTo(() => SKU)
-  sku!: SKU;
-
-  @BelongsTo(() => Vendor)
-  vendor!: Vendor;
+  @BelongsTo(() => VendorProfile)
+  vendorProfile!: VendorProfile;
   
 }

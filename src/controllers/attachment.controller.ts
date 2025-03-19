@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import File from "../models/File";
 import AttachmentChunk from "../models/attachment/AttachmentChunk";
 import Attachment from "../models/attachment/Attachment";
 import AttachmentMapping from "../models/attachment/AttachmentMapping";
@@ -8,6 +7,31 @@ import AttachmentMapping from "../models/attachment/AttachmentMapping";
 export const uploadAttachmentsInit: RequestHandler = async (req, res) => {
     try {
         const { name, mimeType, totalSizeInBytes, totalChunks, attachmentType, entityName, entityId } = req.body;
+        const attachmentExists = await AttachmentMapping.findOne({
+            where: {
+                attachmentType,
+                entityName,
+                entityId
+            }
+        })
+
+        if (attachmentExists) {
+            Attachment.destroy({
+                where: {
+                    id: attachmentExists.attachmentId
+                }
+            })
+            AttachmentChunk.destroy({
+                where: {
+                    attachmentId: attachmentExists.attachmentId
+                }
+            })
+            AttachmentMapping.destroy({
+                where: {
+                    id: attachmentExists.id
+                }
+            })
+        }
         const attachment = await Attachment.create({
             name,
             mimeType,
@@ -24,7 +48,7 @@ export const uploadAttachmentsInit: RequestHandler = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: "Vendor Attachment creation started. Please upload the chunks.",
+            message: "Attachment creation started. Please upload the chunks.",
             data: {
                 attachmentId: attachment.id,
             },
@@ -62,6 +86,39 @@ export const uploadChunk: RequestHandler = async (req, res) => {
             message: error.message,
             data: {
                 "source": "file.controller.js -> uploadChunk"
+            },
+        });
+    }
+}
+
+export const getChunk: RequestHandler = async (req, res) => {
+    try {
+        const { attachmentId, chunkIndex } = req.params;
+
+        const chunk = await AttachmentChunk.findOne({
+            where: {
+                attachmentId,
+                chunkIndex
+            }
+        })
+
+        return res.status(201).json({
+            success: true,
+            message: `Chunk fetched successfully`,
+            data: {
+                chunk: {
+                    chunkData: chunk?.chunkData.toString('base64')
+                }
+            },
+        });
+
+    }
+    catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "file.controller.js -> getChunk"
             },
         });
     }

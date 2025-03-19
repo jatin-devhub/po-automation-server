@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
+import Attachment from "../models/attachment/Attachment";
 
 export const validateAttachmentInit: RequestHandler = async (req, res, next) => {
     try {
@@ -12,7 +13,7 @@ export const validateAttachmentInit: RequestHandler = async (req, res, next) => 
             entityName: Joi.string().required(),
             entityId: Joi.number().required()
         });
-        if(!req.body)
+        if (!req.body)
             return res.status(400).json({
                 success: false,
                 message: "No body found",
@@ -43,7 +44,7 @@ export const validateUploadChunk: RequestHandler = async (req, res, next) => {
                 data: {},
             });
 
-        if(!req.body)
+        if (!req.body)
             return res.status(400).json({
                 success: false,
                 message: "No body found",
@@ -52,6 +53,44 @@ export const validateUploadChunk: RequestHandler = async (req, res, next) => {
         chunkUploadSchema.validate(req.body);
         next();
 
+    } catch (error: any) {
+        return res.status(400).json({
+            success: false,
+            message: error.message,
+            data: [],
+        });
+    }
+}
+
+export const validateGetChunk: RequestHandler = async (req, res, next) => {
+    try {
+        const getChunkSchema = Joi.object({
+            attachmentId: Joi.number().required(),
+            chunkIndex: Joi.number().required()
+        })
+
+        const { error, value } = getChunkSchema.validate(req.params);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message,
+                data: [],
+            });
+        }
+        const attachment = await Attachment.findOne({ where: { id: value.attachmentId } });
+        if (!attachment)
+            return res.status(400).json({
+                success: false,
+                message: "Attachment not found",
+                data: [],
+            });
+        if (attachment.totalChunks <= value.chunkIndex)
+            return res.status(400).json({
+                success: false,
+                message: "Chunk not found",
+                data: [],
+            });
+        next();
     } catch (error: any) {
         return res.status(400).json({
             success: false,
@@ -83,8 +122,8 @@ export const validateGetFile: RequestHandler = async (req, res, next) => {
 // export const validateUpdateFile: RequestHandler = async (req, res, next) => {
 //     try {
 //         const updateFileBody = Joi.object({
-//             attachment: Joi.any().required(), 
-//             idName: Joi.string().required(), 
+//             attachment: Joi.any().required(),
+//             idName: Joi.string().required(),
 //             idValue: Joi.number().required()
 //         })
 //         const files = req.files as Express.Multer.File[];
@@ -105,7 +144,7 @@ export const validateGetFile: RequestHandler = async (req, res, next) => {
 // export const validateNewFile: RequestHandler = async (req, res, next) => {
 //     try {
 //         const newFileBody = Joi.object({
-//             attachmentChunk: Joi.any().required(), 
+//             attachmentChunk: Joi.any().required(),
 //             chunkIndex: Joi.number().required(),
 //             totalChunks: Joi.number().required(),
 //             fileName: Joi.string().required()

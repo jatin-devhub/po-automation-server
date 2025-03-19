@@ -5,7 +5,8 @@ import VendorAddress from "./VendorAddress";
 import VendorBank from "./VendorBank";
 import VendorOther from "./VendorOther";
 // import Comment from "../Comment";
-import VendorDocuments from "./VendorAttachments";
+import VendorAttachments from "./VendorAttachments";
+import Comment from "../Comment";
 
 @Table({
     tableName: 'vendor_profile'
@@ -33,8 +34,8 @@ export default class VendorProfile extends Model {
     })
     createdBy!: string
 
-    @HasOne(() => VendorDocuments)
-    documents!: VendorDocuments;
+    @HasOne(() => VendorAttachments)
+    attachments!: VendorAttachments;
 
     @HasOne(() => ContactPerson)
     contactPerson!: ContactPerson;
@@ -48,8 +49,8 @@ export default class VendorProfile extends Model {
     @HasMany(() => VendorOther)
     otherFields!: VendorOther[];
 
-    // @HasMany(() => Comment)
-    // comments!: Comment[]
+    @HasOne(() => Comment)
+    comment!: Comment
 
     @BelongsTo(() => Vendor)
     vendor?: Vendor;

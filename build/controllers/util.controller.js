@@ -34,18 +34,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCities = exports.getStates = exports.getCountries = void 0;
 const fs = __importStar(require("fs"));
-const countriesUrl = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/refs/heads/master/json/countries.json';
-const statesUrl = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/refs/heads/master/json/states.json';
-const citiesUrl = 'https://github.com/dr5hn/countries-states-cities-database/raw/refs/heads/master/json/cities.json';
-const localCountriesUrl = './data/countries.json';
-const localStatesUrl = './data/states.json';
-const localCitiesUrl = './data/cities.json';
+const util_values_1 = require("../utils/util-values");
 const getCountries = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let response = yield fetch(countriesUrl);
+        let response = yield fetch(util_values_1.countriesUrl);
         if (!response.ok) {
             console.log('Failed to fetch from remote source');
-            fs.readFile(localCountriesUrl, 'utf-8', (err, data) => {
+            fs.readFile(util_values_1.localCountriesUrl, 'utf-8', (err, data) => {
                 if (err) {
                     res.status(500).json({ error: 'Failed to fetch data from both sources' });
                     return;
@@ -77,10 +72,10 @@ exports.getCountries = getCountries;
 const getStates = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const countryCode = req.query.country_code;
     try {
-        const response = yield fetch(statesUrl);
+        const response = yield fetch(util_values_1.statesUrl);
         if (!response.ok) {
             console.log('Failed to fetch from remote source');
-            fs.readFile(localStatesUrl, 'utf-8', (err, data) => {
+            fs.readFile(util_values_1.localStatesUrl, 'utf-8', (err, data) => {
                 if (err) {
                     res.status(500).json({ error: 'Failed to fetch data from both sources' });
                     return;
@@ -125,10 +120,10 @@ exports.getStates = getStates;
 const getCities = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const stateCode = req.query.state_code;
     try {
-        const response = yield fetch(citiesUrl);
+        const response = yield fetch(util_values_1.citiesUrl);
         if (!response.ok) {
             console.log('Failed to fetch from remote source');
-            fs.readFile(localCitiesUrl, 'utf-8', (err, data) => {
+            fs.readFile(util_values_1.localCitiesUrl, 'utf-8', (err, data) => {
                 if (err) {
                     res.status(500).json({ error: 'Failed to fetch data from both sources' });
                     return;

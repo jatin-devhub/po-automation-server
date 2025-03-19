@@ -4,12 +4,10 @@ const express_1 = require("express");
 const vendor_validators_1 = require("../validators/vendor.validators");
 const vendor_controller_1 = require("../controllers/vendor.controller");
 const router = (0, express_1.Router)();
-// router.post('/new', validateNew, vendorRegistration);
 router.post('/new-start', vendor_validators_1.validateNewStart, vendor_controller_1.vendorRegistrationStart);
 router.post('/new-complete', vendor_validators_1.validateNewComplete, vendor_controller_1.vendorRegistrationComplete);
-// router.put('/update-details/:vendorCode', validateUpdatedVendorDetails, updateVendorDetails);
-// router.put('/update/:vendorCode', validateUpdate, updateVendor)
-// router.post('/validate', validateValidation, setValidation)
+router.put('/update/:vendorCode', vendor_validators_1.validateVendorCode, vendor_validators_1.validateUpdate, vendor_controller_1.updateVendor);
+router.post('/validate/:vendorCode', vendor_validators_1.validateVendorCode, vendor_validators_1.validateValidation, vendor_controller_1.setValidation);
 router.get('/all', vendor_controller_1.getAllVendors);
-// router.get('/:vendorCode', validateVendorCode, getVendor)
+router.get('/:vendorCode', vendor_validators_1.validateVendorCode, vendor_controller_1.getVendor);
 exports.default = router;

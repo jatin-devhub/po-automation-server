@@ -9,11 +9,12 @@ import VendorBank from "../models/vendor/VendorBank";
 import VendorOther from "../models/vendor/VendorOther";
 import VendorDocuments from "../models/vendor/VendorAttachments";
 import VendorProfile from "../models/vendor/VendorProfile";
-
-import * as mysql from "mysql2";
 import SKU from "../models/sku/SKU";
 import SKUDetails from "../models/sku/SKUDetails";
 import SKUDimensions from "../models/sku/SKUDimensions";
+import Comment from "../models/Comment";
+
+import * as mysql from "mysql2";
 
 const connection = new Sequelize({
   dialect: "mysql",
@@ -24,7 +25,7 @@ const connection = new Sequelize({
   database: process.env.DB_NAME,
   // database: 'brand_analytics',
   port: 3306,
-  models: [Attachment, AttachmentChunk, AttachmentMapping, Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, VendorDocuments, VendorProfile, SKU, SKUDetails, SKUDimensions]
+  models: [Attachment, AttachmentChunk, AttachmentMapping, Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, VendorDocuments, VendorProfile, SKU, SKUDetails, SKUDimensions, Comment]
 });
  
 // connection.sync({ alter: true }); 

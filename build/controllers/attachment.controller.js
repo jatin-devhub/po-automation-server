@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadChunk = exports.uploadAttachmentsInit = void 0;
+exports.getChunk = exports.uploadChunk = exports.uploadAttachmentsInit = void 0;
 const AttachmentChunk_1 = __importDefault(require("../models/attachment/AttachmentChunk"));
 const Attachment_1 = __importDefault(require("../models/attachment/Attachment"));
 const AttachmentMapping_1 = __importDefault(require("../models/attachment/AttachmentMapping"));
@@ -20,6 +20,30 @@ const AttachmentMapping_1 = __importDefault(require("../models/attachment/Attach
 const uploadAttachmentsInit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, mimeType, totalSizeInBytes, totalChunks, attachmentType, entityName, entityId } = req.body;
+        const attachmentExists = yield AttachmentMapping_1.default.findOne({
+            where: {
+                attachmentType,
+                entityName,
+                entityId
+            }
+        });
+        if (attachmentExists) {
+            Attachment_1.default.destroy({
+                where: {
+                    id: attachmentExists.attachmentId
+                }
+            });
+            AttachmentChunk_1.default.destroy({
+                where: {
+                    attachmentId: attachmentExists.attachmentId
+                }
+            });
+            AttachmentMapping_1.default.destroy({
+                where: {
+                    id: attachmentExists.id
+                }
+            });
+        }
         const attachment = yield Attachment_1.default.create({
             name,
             mimeType,
@@ -34,7 +58,7 @@ const uploadAttachmentsInit = (req, res) => __awaiter(void 0, void 0, void 0, fu
         });
         return res.status(201).json({
             success: true,
-            message: "Vendor Attachment creation started. Please upload the chunks.",
+            message: "Attachment creation started. Please upload the chunks.",
             data: {
                 attachmentId: attachment.id,
             },
@@ -77,6 +101,36 @@ const uploadChunk = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.uploadChunk = uploadChunk;
+const getChunk = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { attachmentId, chunkIndex } = req.params;
+        const chunk = yield AttachmentChunk_1.default.findOne({
+            where: {
+                attachmentId,
+                chunkIndex
+            }
+        });
+        return res.status(201).json({
+            success: true,
+            message: `Chunk fetched successfully`,
+            data: {
+                chunk: {
+                    chunkData: chunk === null || chunk === void 0 ? void 0 : chunk.chunkData.toString('base64')
+                }
+            },
+        });
+    }
+    catch (error) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "file.controller.js -> getChunk"
+            },
+        });
+    }
+});
+exports.getChunk = getChunk;
 // export const getFile: RequestHandler = async (req, res) => {
 //     try {
 //         const { idType, id } = req.params;

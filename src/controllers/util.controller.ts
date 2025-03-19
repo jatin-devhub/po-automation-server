@@ -1,13 +1,6 @@
 import { RequestHandler } from "express";
 import * as fs from 'fs';
-
-const countriesUrl = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/refs/heads/master/json/countries.json';
-const statesUrl = 'https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/refs/heads/master/json/states.json';
-const citiesUrl = 'https://github.com/dr5hn/countries-states-cities-database/raw/refs/heads/master/json/cities.json';
-
-const localCountriesUrl = './data/countries.json';
-const localStatesUrl = './data/states.json';
-const localCitiesUrl = './data/cities.json';
+import { citiesUrl, countriesUrl, localCitiesUrl, localCountriesUrl, localStatesUrl, statesUrl } from "../utils/util-values";
 
 interface Country {
   id: number;

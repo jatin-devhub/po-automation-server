@@ -28,19 +28,31 @@ export default class VendorAddress extends Model {
     @Column({
         type: DataType.STRING
     })
-    country!: string;
+    countryName!: string;
 
     @AllowNull(false)
     @Column({
         type: DataType.STRING
     })
-    state!: string;
+    countryCode!: string;
 
     @AllowNull(false)
     @Column({
         type: DataType.STRING
     })
-    city!: string;
+    stateName!: string;
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
+    stateCode!: string;
+
+    @AllowNull(false)
+    @Column({
+        type: DataType.STRING
+    })
+    cityName!: string;
 
     @AllowNull(false)
     @Column({

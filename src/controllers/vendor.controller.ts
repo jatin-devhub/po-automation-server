@@ -8,14 +8,12 @@ import VendorBank from "../models/vendor/VendorBank";
 import VendorOther from "../models/vendor/VendorOther";
 import ContactPerson from "../models/vendor/ContactPerson";
 import VendorAddress from "../models/vendor/VendorAddress";
-import SKU from "../models/sku/SKU";
-import BuyingOrder from "../models/PurchaseOrder";
 import { sendMailSetup } from "../utils/mail.service";
-import Comment from "../models/Comment";
 import VendorProfile from "../models/vendor/VendorProfile";
-import Attachment from "../models/attachment/Attachment";
-import AttachmentMapping from "../models/attachment/AttachmentMapping";
 import VendorAttachments from "../models/vendor/VendorAttachments";
+import AttachmentMapping from "../models/attachment/AttachmentMapping";
+import Attachment from "../models/attachment/Attachment";
+import Comment from "../models/Comment";
 
 export const vendorRegistrationStart: RequestHandler = async (req, res) => {
     const t = await connection.transaction();
@@ -26,9 +24,11 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             productCategory,
             addressLine1,
             addressLine2,
-            country,
-            state,
-            city,
+            countryName,
+            countryCode,
+            stateName,
+            stateCode,
+            cityName,
             postalCode,
             gstId,
             coiId,
@@ -47,7 +47,7 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
         } = req.body;
         let otherFieldsIds: { key: string, id: number }[] = []
 
-        const vendorCode = await getNewVendorCode(country);
+        const vendorCode = await getNewVendorCode(countryName);
 
         const vendor = await Vendor.create({
             vendorCode,
@@ -78,9 +78,11 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
         await VendorAddress.create({
             addressLine1,
             addressLine2,
-            country,
-            state,
-            city,
+            countryName,
+            countryCode,
+            stateName,
+            stateCode,
+            cityName,
             postalCode,
             vendorProfileId: vendorProfile.id,
         }, { transaction: t });
@@ -94,19 +96,18 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             vendorProfileId: vendorProfile.id,
         }, { transaction: t });
 
-        if (otherFields) {
-            if (otherFields?.length > 0) {
-                for (let i = 0; i < otherFields.length; i++) {
-                    let field = otherFields[i];
+        let otherFieldsJSON = JSON.parse(otherFields);
+        if (otherFieldsJSON?.length > 0) {
+            for (let i = 0; i < otherFieldsJSON.length; i++) {
+                let field = otherFieldsJSON[i];
 
-                    const vendorOther = await VendorOther.create({
-                        otherKey: field.key,
-                        otherValue: field.value,
-                        vendorProfileId: vendorProfile.id,
-                    }, { transaction: t });
+                const vendorOther = await VendorOther.create({
+                    otherKey: field.key,
+                    otherValue: field.value,
+                    vendorProfileId: vendorProfile.id,
+                }, { transaction: t });
 
-                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
-                }
+                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
             }
         }
 
@@ -178,240 +179,87 @@ export const vendorRegistrationComplete: RequestHandler = async (req, res) => {
     }
 };
 
-
-export const vendorRegistration: RequestHandler = async (req, res) => {
+export const updateVendor: RequestHandler = async (req, res) => {
+    const t = await connection.transaction();
     try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
-
-        const vendorCode = await getNewVendorCode(country);
-
-        const vendor = await Vendor.create({
-            vendorCode,
-            productCategory,
+        const {
             companyName,
-            gst,
-            coi,
-            msme,
-            tradeMark,
-            createdBy
-        })
-        if (!vendor)
-            return res.status(404).json({
-                success: false,
-                message: `Some error occured while creating vendor. Please contact our team for it.`
-            })
-
-        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
-        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        if (coiAttachment) {
-            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
-            await File.create({
-                fileName: coiAttachment.originalname,
-                fileContent: decodedCoiFile,
-                fileType: 'coi',
-                coiAttVendorId: vendor.id
-            })
-        }
-        if (msmeAttachment) {
-            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
-            await File.create({
-                fileName: msmeAttachment.originalname,
-                fileContent: decodedMsmeFile,
-                fileType: 'msme',
-                msmeAttVendorId: vendor.id
-            })
-        }
-        if (tradeAttachment) {
-            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
-            await File.create({
-                fileName: tradeAttachment.originalname,
-                fileContent: decodedTradeFile,
-                fileType: 'trade',
-                tradeMarkAttVendorId: vendor.id
-            })
-        }
-
-        const gstFile = await File.create({
-            fileName: gstAttachment.originalname,
-            fileContent: decodedGstFile,
-            fileType: 'gst',
-            gstAttVendorId: vendor.id
-        })
-        if (!gstFile)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create bank details`
-            })
-
-        const agreementFile = await File.create({
-            fileName: agreementAttachment.originalname,
-            fileContent: decodedAgreementFile,
-            fileType: 'agreement',
-            agreementAttVendorId: vendor.id
-        })
-        if (!agreementFile)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create bank details`
-            })
-
-        const newContactPerson = new ContactPerson({
-            name: contactPersonName,
-            email: contactPersonEmail,
-            phoneNumber: contactPersonPhone,
-            vendorId: vendor.id
-        })
-        const contactPerson = await newContactPerson.save();
-        if (!contactPerson)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create contact person details`
-            })
-
-        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
-
-        const newAdress = new VendorAddress({
+            productCategory,
             addressLine1,
             addressLine2,
-            country,
-            state,
-            city,
+            countryName,
+            countryCode,
+            stateName,
+            stateCode,
+            cityName,
             postalCode,
-            vendorId: vendor.id
-        })
-        const address = await newAdress.save();
-        if (!address)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create address details`
-            })
-
-        const newVendorBank = new VendorBank({
-            beneficiaryName: beneficiary,
+            gstId,
+            coiId,
+            msmeId,
+            tradeMarkId,
+            contactPersonName,
+            contactPersonEmail,
+            contactPersonPhone,
+            beneficiary,
             accountNumber,
             ifsc,
             bankName,
             branch,
-            vendorId: vendor.id
-        })
-        const vendorBank = await newVendorBank.save();
-        if (!vendorBank)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create bank details`
-            })
-
-        const bankProofFile = await File.create({
-            fileName: bankAttachment.originalname,
-            fileContent: decodedbankFile,
-            fileType: 'bankProof',
-            vendorBankId: vendorBank.id
-        })
-        if (!bankProofFile)
-            return res.status(404).json({
-                success: false,
-                message: `Unable to create bank proof attachments`
-            })
-
-        if (otherFields) {
-            let otherFieldsObject = JSON.parse(otherFields)
-            if (otherFieldsObject?.length > 0) {
-                for (let i = 0; i < otherFieldsObject.length; i++) {
-                    let field = otherFieldsObject[i], otherFile;
-
-                    const newOtherField = new VendorOther({
-                        otherKey: field.key,
-                        otherValue: field.value,
-                        vendorId: vendor.id
-                    })
-                    const otherField = await newOtherField.save();
-                    if (!otherField)
-                        return res.status(404).json({
-                            success: false,
-                            message: `Unable to create other fields`
-                        })
-                    if (req.body[`otherFieldsAttachments-${field.key}`]) {
-                        const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
-
-                        otherFile = await File.create({
-                            fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
-                            fileContent: decodedOtherFile,
-                            fileType: 'other',
-                            vendorOtherId: otherField.id
-                        })
-                    }
-
-                }
-            }
-        }
-
-        const mailSent = await sendMailSetup(vendor.vendorCode, 'new-vendor', undefined, undefined);
-
-        if (mailSent)
-            return res.status(201).json({
-                success: true,
-                message: `Your Vendor has been successfully added`,
-                data: [],
-            });
-
-        return res.status(404).json({
-            success: false,
-            message: `Unable to send email.`,
-            data: {
-                mailSent
-            }
-        })
-
-    } catch (error: any) {
-        return res.status(504).json({
-            success: false,
-            message: error.message,
-            data: {
-                "source": "vendor.controller.js -> vendorRegistration"
-            },
-        });
-    }
-};
-
-export const updateVendorDetails: RequestHandler = async (req, res) => {
-    const t = await connection.transaction();
-
-    try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, coi, msme, tradeMark, beneficiary, accountNumber, ifsc, bankName, branch, createdBy } = req.body;
+            otherFields
+        } = req.body;
         const { vendorCode } = req.params;
+        let otherFieldsIds: { key: string, id: number }[] = []
 
-        const vendor = await Vendor.findOne({ where: { vendorCode } });
+        await Vendor.update({
+            productCategory,
+            companyName
+        }, {
+            where: { vendorCode },
+            transaction: t
+        });
 
-        if (!vendor) {
-            return res.status(404).json({
-                success: false,
-                message: "Vendor not found.",
-            });
-        }
+        const vendor = await Vendor.findOne({
+            where: { vendorCode }
+        });
 
-        await Vendor.update(
-            { productCategory, companyName, gst, coi, msme, tradeMark, createdBy },
-            { where: { vendorCode }, transaction: t }
-        );
+        const vendorProfile = await VendorProfile.findOne({
+            where: { vendorId: vendor?.id }
+        });
+
+        await VendorAttachments.update({
+            gstId,
+            coiId,
+            msmeId,
+            tradeMarkId
+        }, {
+            where: { vendorProfileId: vendorProfile?.id },
+            transaction: t
+        });
+
+        const vendorAttachments = await VendorAttachments.findOne({
+            where: { vendorProfileId: vendorProfile?.id }
+        });
 
         await ContactPerson.update({
             name: contactPersonName,
             email: contactPersonEmail,
             phoneNumber: contactPersonPhone
         }, {
-            where: { vendorId: vendor.id },
+            where: { vendorProfileId: vendorProfile?.id },
             transaction: t
         });
 
         await VendorAddress.update({
             addressLine1,
             addressLine2,
-            country,
-            state,
-            city,
+            countryName,
+            countryCode,
+            stateName,
+            stateCode,
+            cityName,
             postalCode
         }, {
-            where: { vendorId: vendor.id },
+            where: { vendorProfileId: vendorProfile?.id },
             transaction: t
         });
 
@@ -422,178 +270,43 @@ export const updateVendorDetails: RequestHandler = async (req, res) => {
             bankName,
             branch
         }, {
-            where: { vendorId: vendor.id },
-            transaction: t
+            where: { vendorProfileId: vendorProfile?.id }
         });
+
+        const vendorBank = await VendorBank.findOne({
+            where: { vendorProfileId: vendorProfile?.id }
+        });
+
+        await VendorOther.destroy({ where: { vendorProfileId: vendorProfile?.id } })
+        let otherFieldsJSON = JSON.parse(otherFields);
+        if (otherFieldsJSON?.length > 0) {
+            for (let i = 0; i < otherFieldsJSON.length; i++) {
+                let field = otherFieldsJSON[i];
+
+                const vendorOther = await VendorOther.create({
+                    otherKey: field.key,
+                    otherValue: field.value,
+                    vendorProfileId: vendorProfile?.id,
+                }, { transaction: t });
+
+                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+            }
+        }
 
         await t.commit();
 
-        return res.status(200).json({
+        return res.status(201).json({
             success: true,
-            message: "Vendor details have been successfully updated.",
+            message: "Vendor updated successfully. Proceed to upload attachments",
             data: {
-                vendorId: vendor.id,
+                vendorId: vendor?.id,
+                vendorProfileId: vendorProfile?.id,
                 vendorCode,
+                vendorAttachmentsId: vendorAttachments?.id,
+                vendorBankId: vendorBank?.id,
+                otherFields: otherFieldsIds
             },
         });
-
-    } catch (error: any) {
-        await t.rollback();
-
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-            data: {
-                source: "vendor.controller.js -> updateVendorDetails",
-            },
-        });
-    }
-};
-
-export const updateVendor: RequestHandler = async (req, res) => {
-    try {
-        const { companyName, productCategory, contactPersonName, contactPersonEmail, contactPersonPhone, addressLine1, addressLine2, country, state, city, postalCode, gst, gstAttachment, coi, coiAttachment, msme, msmeAttachment, tradeMark, tradeAttachment, agreementAttachment, beneficiary, accountNumber, ifsc, bankName, branch, bankAttachment, otherFields, createdBy } = req.body;
-        const { vendorCode } = req.params;
-
-        const vendor = await Vendor.findOne({ where: { vendorCode } })
-
-        await Vendor.update(
-            { productCategory, companyName, gst, coi, msme, tradeMark, createdBy },
-            { where: { vendorCode } }
-        );
-
-        const decodedGstFile = Buffer.from(gstAttachment.buffer, 'base64');
-        const decodedAgreementFile = Buffer.from(agreementAttachment.buffer, 'base64');
-        if (coiAttachment) {
-            const decodedCoiFile = Buffer.from(coiAttachment.buffer, 'base64');
-            await File.update({
-                fileName: coiAttachment.originalname,
-                fileContent: decodedCoiFile
-            },
-                {
-                    where: { fileType: 'coi', coiAttVendorId: vendor?.id }
-                })
-        }
-        if (msmeAttachment) {
-            const decodedMsmeFile = Buffer.from(msmeAttachment.buffer, 'base64');
-            await File.update({
-                fileName: msmeAttachment.originalname,
-                fileContent: decodedMsmeFile
-            },
-                {
-                    where: { fileType: 'msme', msmeAttVendorId: vendor?.id }
-                })
-        }
-        if (tradeAttachment) {
-            const decodedTradeFile = Buffer.from(tradeAttachment.buffer, 'base64');
-            await File.update({
-                fileName: tradeAttachment.originalname,
-                fileContent: decodedTradeFile
-            },
-                {
-                    where: { fileType: 'trade', tradeMarkAttVendorId: vendor?.id }
-                })
-        }
-
-        await File.update({
-            fileName: gstAttachment.originalname,
-            fileContent: decodedGstFile
-        },
-            {
-                where: { fileType: 'gst', gstAttVendorId: vendor?.id }
-            })
-
-        await File.update({
-            fileName: agreementAttachment.originalname,
-            fileContent: decodedAgreementFile
-        },
-            {
-                where: { fileType: 'agreement', agreementAttVendorId: vendor?.id }
-            })
-
-        await ContactPerson.update({
-            name: contactPersonName,
-            email: contactPersonEmail,
-            phoneNumber: contactPersonPhone
-        }, {
-            where: { vendorId: vendor?.id }
-        })
-
-        const decodedbankFile = Buffer.from(bankAttachment.buffer, 'base64');
-
-        await VendorAddress.update({
-            addressLine1,
-            addressLine2,
-            country,
-            state,
-            city,
-            postalCode
-        }, {
-            where: { vendorId: vendor?.id }
-        })
-
-        await VendorBank.update({
-            beneficiaryName: beneficiary,
-            accountNumber,
-            ifsc,
-            bankName,
-            branch
-        }, {
-            where: { vendorId: vendor?.id }
-        })
-
-        const vendorBank = await VendorBank.findOne({ where: { vendorId: vendor?.id } })
-
-
-        await File.update({
-            fileName: bankAttachment.originalname,
-            fileContent: decodedbankFile
-        },
-            {
-                where: { fileType: 'bankProof', vendorBankId: vendorBank?.id }
-            })
-
-        if (otherFields) {
-            await VendorOther.destroy({ where: { vendorId: vendor?.id } })
-            let otherFieldsObject = JSON.parse(otherFields)
-            if (otherFieldsObject?.length > 0) {
-                for (let i = 0; i < otherFieldsObject.length; i++) {
-                    let field = otherFieldsObject[i], otherFile;
-
-                    const newOtherField = new VendorOther({
-                        otherKey: field.key,
-                        otherValue: field.value,
-                        vendorId: vendor?.id
-                    })
-                    const otherField = await newOtherField.save();
-                    if (req.body[`otherFieldsAttachments-${field.key}`]) {
-                        const decodedOtherFile = Buffer.from(req.body[`otherFieldsAttachments-${field.key}`].buffer, 'base64');
-
-                        otherFile = await File.create({
-                            fileName: req.body[`otherFieldsAttachments-${field.key}`].originalname,
-                            fileContent: decodedOtherFile,
-                            fileType: 'other',
-                            vendorOtherId: otherField.id
-                        })
-                    }
-
-                }
-            }
-        }
-
-        const mailSent = await sendMailSetup(vendorCode, 'update-vendor', undefined, undefined);
-
-        if (mailSent)
-            return res.status(201).json({
-                success: true,
-                message: `Your Vendor has been successfully updated`,
-                data: [],
-            });
-
-        return res.status(404).json({
-            success: false,
-            message: `Some error occured`
-        })
 
     } catch (error: any) {
         return res.status(504).json({
@@ -642,33 +355,172 @@ export const getVendor: RequestHandler = async (req, res) => {
             where: { vendorCode },
             include: [
                 {
-                    model: ContactPerson
-                },
-                {
-                    model: VendorAddress
-                },
-                {
-                    model: VendorBank
-                },
-                {
-                    model: VendorOther
-                },
-                {
-                    model: SKU,
-                },
-                {
-                    model: BuyingOrder
-                },
-                {
-                    model: Comment
+                    model: VendorProfile,
+                    include: [
+                        { model: ContactPerson },
+                        {
+                            model: VendorAttachments,
+                            include: [
+                                {
+                                    model: AttachmentMapping,
+                                    as: 'gstAttachment',
+                                    include: [{ model: Attachment }]
+                                },
+                                {
+                                    model: AttachmentMapping,
+                                    as: 'coiAttachment',
+                                    include: [{ model: Attachment }]
+                                },
+                                {
+                                    model: AttachmentMapping,
+                                    as: 'msmeAttachment',
+                                    include: [{ model: Attachment }]
+                                },
+                                {
+                                    model: AttachmentMapping,
+                                    as: 'tradeMarkAttachment',
+                                    include: [{ model: Attachment }]
+                                },
+                                {
+                                    model: AttachmentMapping,
+                                    as: 'agreementAttachment',
+                                    include: [{ model: Attachment }]
+                                }
+                            ]
+                        },
+                        { model: VendorAddress },
+                        {
+                            model: VendorBank,
+                            include: [{ model: AttachmentMapping, include: [{ model: Attachment }] }]
+                        },
+                        {
+                            model: VendorOther,
+                            include: [{ model: AttachmentMapping, include: [{ model: Attachment }] }]
+                        },
+                        { model: Comment }
+                    ]
                 }
             ]
         });
 
-        return res.status(201).json({
+        const vendorProfile = vendor?.profile;
+        const contactPerson = vendorProfile?.contactPerson;
+        const vendorAttachments = vendorProfile?.attachments;
+        const vendorAddress = vendorProfile?.address;
+        const vendorBank = vendorProfile?.vendorBank;
+        const vendorOthers = vendorProfile?.otherFields || [];
+
+        return res.status(200).json({
             success: true,
             message: `Vendor data successfully fetched`,
-            data: { vendor },
+            data: {
+                vendor: {
+                    companyName: vendor?.companyName,
+                    productCategory: vendor?.productCategory,
+                    contactPersonName: contactPerson?.name,
+                    contactPersonEmail: contactPerson?.email,
+                    contactPersonPhone: contactPerson?.phoneNumber,
+                    gstId: vendorAttachments?.gstId,
+                    "gst-attachment": vendorAttachments?.gstAttachment?.attachment,
+                    address: {
+                        addressLine1: vendorAddress?.addressLine1,
+                        addressLine2: vendorAddress?.addressLine2,
+                        country: {
+                            name: vendorAddress?.countryName,
+                            iso2: vendorAddress?.countryCode
+                        },
+                        state: {
+                            name: vendorAddress?.stateName,
+                            state_code: vendorAddress?.stateCode
+                        },
+                        city: {
+                            name: vendorAddress?.cityName
+                        },
+                        postalCode: vendorAddress?.postalCode,
+                    },
+                    beneficiary: vendorBank?.beneficiaryName,
+                    accountNumber: vendorBank?.accountNumber,
+                    ifsc: vendorBank?.ifsc,
+                    bankName: vendorBank?.bankName,
+                    branch: vendorBank?.branch,
+                    "bank-proof": vendorBank?.bankProof?.attachment,
+                    coiId: vendorAttachments?.coiId,
+                    "coi-attachment": vendorAttachments?.coiAttachment?.attachment,
+                    msmeId: vendorAttachments?.msmeId,
+                    "msme-attachment": vendorAttachments?.msmeAttachment?.attachment,
+                    tradeMarkId: vendorAttachments?.tradeMarkId,
+                    "trade-mark-attachment": vendorAttachments?.tradeMarkAttachment?.attachment,
+                    "agreement-attachment": vendorAttachments?.agreementAttachment?.attachment,
+                    createdBy: vendorProfile?.createdBy,
+                    otherFields: vendorOthers.map((other: VendorOther) => ({
+                        key: other.otherKey,
+                        value: other.otherValue,
+                        attachment: other?.otherAttachment?.attachment
+                    })),
+                    comment: vendorProfile?.comment.comment
+                },
+            },
+        });
+
+    } catch (error: any) {
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "vendor.controller.js -> getVendor"
+            },
+        });
+    }
+};
+
+export const setValidation: RequestHandler = async (req, res) => {
+    try {
+        const { isValid, reason } = req.body;
+        const vendorCode = req.params.vendorCode;
+
+        const vendor = await Vendor.findOne({
+            where: { vendorCode }
+        });
+
+        const vendorProfile = await VendorProfile.findOne({
+            where: { vendorId: vendor?.id },
+            include: [{
+                model: ContactPerson
+            }]
+        });
+        if (isValid == "true") {
+            // const variables = {
+            //     company: vendor?.companyName,
+            //     vendorCode
+            // }
+            // await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
+            await VendorProfile.update(
+                { isVerified: true },
+                { where: { vendorId: vendor?.id } }
+            );
+        } else {
+            const variables = {
+                denyReason: reason
+            }
+            const existingComment = await Comment.findOne({
+                where: { vendorProfileId: vendorProfile?.id }
+            });
+
+            if (existingComment) {
+                await existingComment.update({ comment: reason });
+            } else {
+                await Comment.create({
+                    comment: reason,
+                    vendorProfileId: vendorProfile?.id,
+                });
+            }
+            await sendMailSetup(vendorCode, 'vendor-fail', variables, vendorProfile?.createdBy ? vendorProfile.createdBy : vendorProfile?.contactPerson.email)
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: `Vendor Review Done Successfully`,
+            data: {},
         });
 
     } catch (error: any) {
@@ -681,56 +533,6 @@ export const getVendor: RequestHandler = async (req, res) => {
         });
     }
 };
-
-// export const setValidation: RequestHandler = async (req, res) => {
-//     try {
-//         const { vendorCode, isValid, reason } = req.body;
-//         console.log(vendorCode, isValid, reason)
-//         const vendor = await Vendor.findOne({
-//             where: { vendorCode },
-//             include: [
-//                 {
-//                     model: ContactPerson
-//                 }
-//             ]
-//         });
-//         if (isValid == "true") {
-//             const variables = {
-//                 company: vendor?.companyName,
-//                 vendorCode
-//             }
-//             await sendMailSetup(null, 'vendor-success', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
-//             await Vendor.update(
-//                 { isVerified: true },
-//                 { where: { vendorCode } }
-//             );
-//         } else {
-//             const variables = {
-//                 denyReason: reason
-//             }
-//             const comment = await Comment.create({
-//                 comment: reason,
-//                 vendorId: vendor?.id,
-//             })
-//             await sendMailSetup(vendorCode, 'vendor-fail', variables, vendor?.createdBy ? vendor.createdBy : vendor?.contactPerson.email)
-//         }
-
-//         return res.status(201).json({
-//             success: true,
-//             message: `Vendor Review Done Successfully`,
-//             data: {},
-//         });
-
-//     } catch (error: any) {
-//         return res.status(504).json({
-//             success: false,
-//             message: error.message,
-//             data: {
-//                 "source": "vendor.controller.js -> getAllVendors"
-//             },
-//         });
-//     }
-// };
 
 const getNewVendorCode = async (country: string) => {
     let prefix;

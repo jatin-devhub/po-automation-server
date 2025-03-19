@@ -17,6 +17,7 @@ const VendorBank_1 = __importDefault(require("./VendorBank"));
 const VendorOther_1 = __importDefault(require("./VendorOther"));
 // import Comment from "../Comment";
 const VendorAttachments_1 = __importDefault(require("./VendorAttachments"));
+const Comment_1 = __importDefault(require("../Comment"));
 let VendorProfile = class VendorProfile extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -43,7 +44,7 @@ __decorate([
 ], VendorProfile.prototype, "createdBy", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => VendorAttachments_1.default)
-], VendorProfile.prototype, "documents", void 0);
+], VendorProfile.prototype, "attachments", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => ContactPerson_1.default)
 ], VendorProfile.prototype, "contactPerson", void 0);
@@ -56,6 +57,9 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => VendorOther_1.default)
 ], VendorProfile.prototype, "otherFields", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Comment_1.default)
+], VendorProfile.prototype, "comment", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
 ], VendorProfile.prototype, "vendor", void 0);
