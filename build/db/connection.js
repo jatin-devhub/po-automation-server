@@ -42,6 +42,7 @@ const SKUDetails_1 = __importDefault(require("../models/sku/SKUDetails"));
 const SKUDimensions_1 = __importDefault(require("../models/sku/SKUDimensions"));
 const Comment_1 = __importDefault(require("../models/Comment"));
 const mysql = __importStar(require("mysql2"));
+const Inventory_1 = __importDefault(require("../models/sku/Inventory"));
 const connection = new sequelize_typescript_1.Sequelize({
     dialect: "mysql",
     dialectModule: mysql,
@@ -51,7 +52,7 @@ const connection = new sequelize_typescript_1.Sequelize({
     database: process.env.DB_NAME,
     // database: 'brand_analytics',
     port: 3306,
-    models: [Attachment_1.default, AttachmentChunk_1.default, AttachmentMapping_1.default, Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, VendorAttachments_1.default, VendorProfile_1.default, SKU_1.default, SKUDetails_1.default, SKUDimensions_1.default, Comment_1.default]
+    models: [Attachment_1.default, AttachmentChunk_1.default, AttachmentMapping_1.default, Vendor_1.default, ContactPerson_1.default, VendorAddress_1.default, VendorBank_1.default, VendorOther_1.default, VendorAttachments_1.default, VendorProfile_1.default, SKU_1.default, SKUDetails_1.default, SKUDimensions_1.default, Comment_1.default, Inventory_1.default]
 });
 // connection.sync({ alter: true }); 
 exports.default = connection;

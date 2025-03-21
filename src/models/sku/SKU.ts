@@ -4,6 +4,7 @@ import {
 } from 'sequelize-typescript';
 import Vendor from '../vendor/Vendor';
 import SKUDetails from './SKUDetails';
+import Inventory from './Inventory';
 
 @Table({
     tableName: 'sku'
@@ -31,6 +32,9 @@ export default class SKU extends Model {
 
     @HasOne(() => SKUDetails)
     details!: SKUDetails;
+
+    @HasMany(() => Inventory)
+    inventory!: Inventory[];
 
     @ForeignKey(() => Vendor)
     @Column({ type: DataType.INTEGER })
