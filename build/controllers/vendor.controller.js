@@ -72,16 +72,18 @@ const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, 
             branch,
             vendorProfileId: vendorProfile.id,
         }, { transaction: t });
-        let otherFieldsJSON = JSON.parse(otherFields);
-        if ((otherFieldsJSON === null || otherFieldsJSON === void 0 ? void 0 : otherFieldsJSON.length) > 0) {
-            for (let i = 0; i < otherFieldsJSON.length; i++) {
-                let field = otherFieldsJSON[i];
-                const vendorOther = yield VendorOther_1.default.create({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    vendorProfileId: vendorProfile.id,
-                }, { transaction: t });
-                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+        if (otherFields) {
+            let otherFieldsJSON = JSON.parse(otherFields);
+            if ((otherFieldsJSON === null || otherFieldsJSON === void 0 ? void 0 : otherFieldsJSON.length) > 0) {
+                for (let i = 0; i < otherFieldsJSON.length; i++) {
+                    let field = otherFieldsJSON[i];
+                    const vendorOther = yield VendorOther_1.default.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile.id,
+                    }, { transaction: t });
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
             }
         }
         yield t.commit();
@@ -211,16 +213,18 @@ const updateVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             where: { vendorProfileId: vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.id }
         });
         yield VendorOther_1.default.destroy({ where: { vendorProfileId: vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.id } });
-        let otherFieldsJSON = JSON.parse(otherFields);
-        if ((otherFieldsJSON === null || otherFieldsJSON === void 0 ? void 0 : otherFieldsJSON.length) > 0) {
-            for (let i = 0; i < otherFieldsJSON.length; i++) {
-                let field = otherFieldsJSON[i];
-                const vendorOther = yield VendorOther_1.default.create({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    vendorProfileId: vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.id,
-                }, { transaction: t });
-                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+        if (otherFields) {
+            let otherFieldsJSON = JSON.parse(otherFields);
+            if ((otherFieldsJSON === null || otherFieldsJSON === void 0 ? void 0 : otherFieldsJSON.length) > 0) {
+                for (let i = 0; i < otherFieldsJSON.length; i++) {
+                    let field = otherFieldsJSON[i];
+                    const vendorOther = yield VendorOther_1.default.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.id,
+                    }, { transaction: t });
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
             }
         }
         yield t.commit();

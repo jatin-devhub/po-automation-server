@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const Vendor_1 = __importDefault(require("../vendor/Vendor"));
 const SKUDetails_1 = __importDefault(require("./SKUDetails"));
+const Inventory_1 = __importDefault(require("./Inventory"));
 let SKU = class SKU extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -37,6 +38,9 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => SKUDetails_1.default)
 ], SKU.prototype, "details", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Inventory_1.default)
+], SKU.prototype, "inventory", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })

@@ -96,18 +96,20 @@ export const vendorRegistrationStart: RequestHandler = async (req, res) => {
             vendorProfileId: vendorProfile.id,
         }, { transaction: t });
 
-        let otherFieldsJSON = JSON.parse(otherFields);
-        if (otherFieldsJSON?.length > 0) {
-            for (let i = 0; i < otherFieldsJSON.length; i++) {
-                let field = otherFieldsJSON[i];
+        if (otherFields) {
+            let otherFieldsJSON = JSON.parse(otherFields);
+            if (otherFieldsJSON?.length > 0) {
+                for (let i = 0; i < otherFieldsJSON.length; i++) {
+                    let field = otherFieldsJSON[i];
 
-                const vendorOther = await VendorOther.create({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    vendorProfileId: vendorProfile.id,
-                }, { transaction: t });
+                    const vendorOther = await VendorOther.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile.id,
+                    }, { transaction: t });
 
-                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
             }
         }
 
@@ -278,18 +280,20 @@ export const updateVendor: RequestHandler = async (req, res) => {
         });
 
         await VendorOther.destroy({ where: { vendorProfileId: vendorProfile?.id } })
-        let otherFieldsJSON = JSON.parse(otherFields);
-        if (otherFieldsJSON?.length > 0) {
-            for (let i = 0; i < otherFieldsJSON.length; i++) {
-                let field = otherFieldsJSON[i];
+        if (otherFields) {
+            let otherFieldsJSON = JSON.parse(otherFields);
+            if (otherFieldsJSON?.length > 0) {
+                for (let i = 0; i < otherFieldsJSON.length; i++) {
+                    let field = otherFieldsJSON[i];
 
-                const vendorOther = await VendorOther.create({
-                    otherKey: field.key,
-                    otherValue: field.value,
-                    vendorProfileId: vendorProfile?.id,
-                }, { transaction: t });
+                    const vendorOther = await VendorOther.create({
+                        otherKey: field.key,
+                        otherValue: field.value,
+                        vendorProfileId: vendorProfile?.id,
+                    }, { transaction: t });
 
-                otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                    otherFieldsIds.push({ key: field.key, id: vendorOther.id });
+                }
             }
         }
 
