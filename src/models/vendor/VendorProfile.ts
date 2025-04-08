@@ -7,6 +7,7 @@ import VendorOther from "./VendorOther";
 // import Comment from "../Comment";
 import VendorAttachments from "./VendorAttachments";
 import Comment from "../Comment";
+import PurchaseOrder from "../PurchaseOrder";
 
 @Table({
     tableName: 'vendor_profile'
@@ -48,6 +49,9 @@ export default class VendorProfile extends Model {
 
     @HasMany(() => VendorOther)
     otherFields!: VendorOther[];
+
+    @HasMany(() => PurchaseOrder)
+    purchaseOrders!: PurchaseOrder[]
 
     @HasOne(() => Comment)
     comment!: Comment

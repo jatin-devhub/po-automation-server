@@ -33,6 +33,10 @@ __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "name", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.BOOLEAN })
+], SKU.prototype, "isCombo", void 0);
+__decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING })
 ], SKU.prototype, "ean", void 0);
 __decorate([
@@ -50,7 +54,8 @@ __decorate([
 ], SKU.prototype, "vendor", void 0);
 SKU = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: 'sku'
+        tableName: 'sku',
+        timestamps: false
     })
 ], SKU);
 exports.default = SKU;

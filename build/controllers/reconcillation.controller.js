@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteInvoice = exports.updateInvoice = exports.newInvoice = exports.updateGRNData = exports.getPODetailsForReconcillation = exports.getAllPOs = exports.getApprovedPOs = void 0;
 const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
-const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
+const PurchaseOrderRecord_1 = __importDefault(require("../models/PurchaseOrderRecord"));
 const sequelize_1 = require("sequelize");
 const SKU_1 = __importDefault(require("../models/sku/SKU"));
 const BuyingOrderOther_1 = __importDefault(require("../models/BuyingOrderOther"));
@@ -31,7 +31,7 @@ const getApprovedPOs = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     model: Vendor_1.default,
                 },
                 {
-                    model: BuyingOrderRecord_1.default
+                    model: PurchaseOrderRecord_1.default
                 }
             ]
         });
@@ -80,7 +80,7 @@ const getAllPOs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     model: Vendor_1.default,
                 },
                 {
-                    model: BuyingOrderRecord_1.default
+                    model: PurchaseOrderRecord_1.default
                 }
             ]
         });
@@ -136,7 +136,7 @@ const getPODetailsForReconcillation = (req, res) => __awaiter(void 0, void 0, vo
                 }
             ]
         });
-        const poRecords = yield BuyingOrderRecord_1.default.findAll({
+        const poRecords = yield PurchaseOrderRecord_1.default.findAll({
             where: { buyingOrderId: buyingOrder === null || buyingOrder === void 0 ? void 0 : buyingOrder.id },
             attributes: [[sequelize_1.Sequelize.col('sku.skuCode'), 'skuCode'], [sequelize_1.Sequelize.col('sku.productTitle'), 'productTitle'], [sequelize_1.Sequelize.col('sku.category'), 'category'], [sequelize_1.Sequelize.col('sku.brand'), 'brand'], [sequelize_1.Sequelize.col('sku.colorFamilyColor'), 'colorFamilyColor'], [sequelize_1.Sequelize.col('expectedQty'), 'eQty'], 'unitCost', [sequelize_1.Sequelize.literal('ROUND((`unitCost` * `gst`) / 100, 2)'), 'totalGST'], 'gst'],
             include: [

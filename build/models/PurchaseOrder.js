@@ -10,10 +10,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const BuyingOrderRecord_1 = __importDefault(require("./BuyingOrderRecord"));
-const Vendor_1 = __importDefault(require("./vendor/Vendor"));
 const AttachmentMapping_1 = __importDefault(require("./attachment/AttachmentMapping"));
-const Invoice_1 = __importDefault(require("./Invoice"));
+const PurchaseOrderRecord_1 = __importDefault(require("./PurchaseOrderRecord"));
+const VendorProfile_1 = __importDefault(require("./vendor/VendorProfile"));
 let PurchaseOrder = class PurchaseOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -67,21 +66,21 @@ __decorate([
     })
 ], PurchaseOrder.prototype, "closed", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasMany)(() => Invoice_1.default)
-], PurchaseOrder.prototype, "invoices", void 0);
-__decorate([
-    (0, sequelize_typescript_1.HasMany)(() => BuyingOrderRecord_1.default)
+    (0, sequelize_typescript_1.HasMany)(() => PurchaseOrderRecord_1.default)
 ], PurchaseOrder.prototype, "records", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Vendor_1.default),
+    (0, sequelize_typescript_1.ForeignKey)(() => VendorProfile_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], PurchaseOrder.prototype, "vendorId", void 0);
+], PurchaseOrder.prototype, "vendorProfileId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => Vendor_1.default)
-], PurchaseOrder.prototype, "vendor", void 0);
+    (0, sequelize_typescript_1.BelongsTo)(() => VendorProfile_1.default)
+], PurchaseOrder.prototype, "vendorProfile", void 0);
 PurchaseOrder = __decorate([
-    sequelize_typescript_1.Table
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'purchase_order',
+        timestamps: true,
+    })
 ], PurchaseOrder);
 exports.default = PurchaseOrder;

@@ -12,77 +12,101 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = exports.newBuyingOrder = void 0;
+exports.getPODetails = exports.applyReview = exports.getUniquePOCodeRoute = exports.newPurchaseOrder = void 0;
 const Vendor_1 = __importDefault(require("../models/vendor/Vendor"));
 const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
-const BuyingOrderRecord_1 = __importDefault(require("../models/BuyingOrderRecord"));
 const SKU_1 = __importDefault(require("../models/sku/SKU"));
 const File_1 = __importDefault(require("../models/File"));
 const mail_service_1 = require("../utils/mail.service");
-const VendorAddress_1 = __importDefault(require("../models/vendor/VendorAddress"));
-const newBuyingOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const PurchaseOrder_2 = __importDefault(require("../models/PurchaseOrder"));
+const PurchaseOrderRecord_1 = __importDefault(require("../models/PurchaseOrderRecord"));
+const VendorProfile_1 = __importDefault(require("../models/vendor/VendorProfile"));
+const connection_1 = __importDefault(require("../db/connection"));
+const SKUDetails_1 = __importDefault(require("../models/sku/SKUDetails"));
+const newPurchaseOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const transaction = yield connection_1.default.transaction();
     try {
-        const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy, poAttachment } = req.body;
-        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode } });
-        const decodedPOFile = Buffer.from(poAttachment.buffer, 'base64');
-        const newBuyingOrder = new PurchaseOrder_1.default({
+        const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy } = req.body;
+        // Retrieve the vendor and its corresponding profile (1:1 mapping)
+        const vendor = yield Vendor_1.default.findOne({ where: { vendorCode }, transaction });
+        if (!vendor) {
+            yield transaction.rollback();
+            return res.status(404).json({ error: 'Vendor not found' });
+        }
+        const vendorProfile = yield VendorProfile_1.default.findOne({ where: { vendorId: vendor.id }, transaction });
+        if (!vendorProfile) {
+            yield transaction.rollback();
+            return res.status(404).json({ error: 'Vendor Profile not found' });
+        }
+        // Create the Purchase Order with the vendor profile ID
+        const purchaseOrder = yield PurchaseOrder_2.default.create({
             poCode,
             currency,
             paymentTerms,
             estimatedDeliveryDate,
             createdBy,
             verificationLevel: 'Buyer',
-            vendorId: vendor === null || vendor === void 0 ? void 0 : vendor.id
-        });
-        const buyingOrder = yield newBuyingOrder.save();
-        if (buyingOrder) {
-            const recordsObject = JSON.parse(records);
-            for (let i = 0; i < recordsObject.length; i++) {
-                const { skuCode, expectedQty, unitCost, gst } = recordsObject[i];
-                const sku = yield SKU_1.default.findOne({ where: { skuCode } });
-                const newBuyingOrderRecord = new BuyingOrderRecord_1.default({
-                    expectedQty,
-                    unitCost,
-                    gst,
-                    buyingOrderId: buyingOrder.id,
-                    skuId: sku === null || sku === void 0 ? void 0 : sku.id
-                });
-                const buyingOrderRecord = yield newBuyingOrderRecord.save();
+            vendorProfileId: vendorProfile.id
+        }, { transaction });
+        // Parse the JSON records
+        const orderRecords = JSON.parse(records);
+        // For efficiency, extract all skuCodes from records
+        const skuCodes = orderRecords.map((r) => r.skuCode);
+        // Retrieve all matching SKUs in one query
+        const skus = yield SKU_1.default.findAll({ where: { skuCode: skuCodes }, transaction });
+        const skuMap = new Map(skus.map(sku => [sku.skuCode, sku]));
+        // Prepare data for bulk creation of purchase order records
+        const purchaseRecordsData = [];
+        // Process each record: validate SKU, update SKUDetail, and collect record data
+        for (const record of orderRecords) {
+            const sku = skuMap.get(record.skuCode);
+            if (!sku) {
+                yield transaction.rollback();
+                return res.status(404).json({ error: `SKU not found for skuCode: ${record.skuCode}` });
             }
+            // Update the one-to-one SKUDetail record with gst and mrp values
+            yield SKUDetails_1.default.update({ gst: record.gst, mrp: record.mrp }, { where: { skuId: sku.id }, transaction });
+            // Prepare the purchase order record (adjust field names as necessary)
+            purchaseRecordsData.push({
+                expectedQty: record.expectedQty,
+                unitCost: record.unitCost,
+                gst: record.gst,
+                purchaseOrderId: purchaseOrder.id,
+                skuId: sku.id
+            });
         }
-        const poFile = yield File_1.default.create({
-            fileName: poAttachment.originalname,
-            fileContent: decodedPOFile,
-            filetype: 'PO',
-            buyingOrderId: buyingOrder.id
+        // Bulk create purchase order records
+        yield PurchaseOrderRecord_1.default.bulkCreate(purchaseRecordsData, { transaction });
+        // Commit the transaction if everything passes
+        yield transaction.commit();
+        // const mailSent = await sendMailSetup(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
+        // if (mailSent)
+        return res.status(201).json({
+            success: true,
+            message: `Your Purchase Order has been successfully added`,
+            data: { purchaseOrder },
         });
-        const mailSent = yield (0, mail_service_1.sendMailSetup)(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
-        if (mailSent)
-            return res.status(201).json({
-                success: true,
-                message: `Your BuyingOrder request has been successfully added`,
-                data: { buyingOrder },
-            });
-        else
-            return res.status(404).json({
-                success: false,
-                message: `Unable to send email.`,
-                data: {
-                    mailSent
-                }
-            });
+        // else
+        //     return res.status(404).json({
+        //         success: false,
+        //         message: `Unable to send email.`,
+        //         data: {
+        //             mailSent
+        //         }
+        //     })
     }
     catch (error) {
+        yield transaction.rollback();
         return res.status(504).json({
             success: false,
             message: error.message,
             data: {
-                "source": "buying-order.controller.js -> newBuyingOrder"
+                "source": "purchase-order.controller.js -> newPurchaseOrder"
             },
         });
     }
 });
-exports.newBuyingOrder = newBuyingOrder;
+exports.newPurchaseOrder = newPurchaseOrder;
 const getUniquePOCodeRoute = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const poCode = yield getUniquePOCode();
@@ -149,15 +173,13 @@ exports.applyReview = applyReview;
 const getPODetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { poCode } = req.params;
-        const buyingOrder = yield PurchaseOrder_1.default.findOne({
+        const buyingOrder = yield PurchaseOrder_2.default.findOne({
             where: { poCode }, include: [
                 {
                     model: Vendor_1.default,
-                    include: [
-                        {
-                            model: VendorAddress_1.default
-                        }
-                    ]
+                    include: []
+                }, {
+                    model: PurchaseOrderRecord_1.default
                 }
             ]
         });

@@ -1,9 +1,11 @@
 import { Model, Table, Column, DataType, ForeignKey, AllowNull, AutoIncrement, PrimaryKey, BelongsTo } from 'sequelize-typescript';
-import BuyingOrder from './BuyingOrder'; // Assuming you have a BuyingOrder model
-import SKU from './SKU';
+import SKU from './sku/SKU';
+import PurchaseOrder from './PurchaseOrder';
 
-@Table
-export default class BuyingOrderRecord extends Model {
+@Table({
+    tableName: 'purchase_order_record'
+})
+export default class PurchaseOrderRecord extends Model {
     @AutoIncrement
     @PrimaryKey
     @Column({
@@ -38,15 +40,15 @@ export default class BuyingOrderRecord extends Model {
     })
     skuId!: number;
 
-    @ForeignKey(() => BuyingOrder)
+    @ForeignKey(() => PurchaseOrder)
     @Column({
         type: DataType.INTEGER
     })
-    buyingOrderId!: number;
+    purchaseOrderId!: number;
 
     @BelongsTo(() => SKU)
     sku!: SKU
 
-    @BelongsTo(() => BuyingOrder)
-    buyingOrder!: BuyingOrder
+    @BelongsTo(() => PurchaseOrder)
+    purchaseOrder!: PurchaseOrder
 }

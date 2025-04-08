@@ -2,7 +2,8 @@ import { Router } from "express";
 
 import vendorRouter from "./vendor.route"
 import skuRouter from "./sku.route"
-// import buyingOrderRouter from "./buying-order.route"
+import inventoryRouter from "./inventory.route"
+import purchaseOrderRouter from "./purchase-order.route"
 import attachmentRoute from "./attachment.route"
 import authRouter from "./auth.route"
 // import reconcillationRouter from "./reconcillation.route"
@@ -17,7 +18,8 @@ router.get("/", (req, res) => {
 
 router.use("/vendor", vendorRouter)
 router.use("/sku", skuRouter)
-// router.use("/buying-order", buyingOrderRouter)
+router.use("/inventory", inventoryRouter);
+router.use("/purchase-order", purchaseOrderRouter)
 router.use("/attachment", attachmentRoute)
 router.use("/auth", authRouter)
 // router.use("/reconcillation", reconcillationRouter)

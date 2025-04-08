@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const purchase_order_validators_1 = require("../validators/purchase-order.validators");
+const purchase_order_controller_1 = require("../controllers/purchase-order.controller");
+const router = (0, express_1.Router)();
+router.post('/new', purchase_order_validators_1.validateNew, purchase_order_controller_1.newPurchaseOrder);
+router.get('/', purchase_order_controller_1.getUniquePOCodeRoute);
+router.post('/review', purchase_order_validators_1.validateReview, purchase_order_controller_1.applyReview);
+router.get('/:poCode', purchase_order_validators_1.validatePOCode, purchase_order_controller_1.getPODetails);
+exports.default = router;

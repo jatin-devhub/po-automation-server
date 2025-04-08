@@ -17,21 +17,16 @@ const joi_1 = __importDefault(require("joi"));
 const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const validateNew = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newBuyingOrderSchema = joi_1.default.object({
+        const newPurchaseOrderSchema = joi_1.default.object({
             poCode: joi_1.default.string().required(),
             currency: joi_1.default.string().required(),
             paymentTerms: joi_1.default.string(),
             estimatedDeliveryDate: joi_1.default.string(),
             records: joi_1.default.any().required(),
             vendorCode: joi_1.default.string(),
-            createdBy: joi_1.default.string().email().required(),
-            poAttachment: joi_1.default.any().required()
+            createdBy: joi_1.default.string().email().required()
         });
-        const files = req.files;
-        for (const file of files) {
-            req.body[file.fieldname] = file;
-        }
-        const value = yield newBuyingOrderSchema.validateAsync(req.body);
+        yield newPurchaseOrderSchema.validateAsync(req.body);
         next();
     }
     catch (error) {
@@ -79,13 +74,13 @@ const validatePOCode = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         });
         const value = yield validatePOCode.validateAsync(req.params);
         const poCode = value.poCode;
-        const buyingOrder = yield PurchaseOrder_1.default.findOne({ where: { poCode } });
-        if (buyingOrder)
+        const purchaseOrder = yield PurchaseOrder_1.default.findOne({ where: { poCode } });
+        if (purchaseOrder)
             next();
         else {
             return res.status(404).json({
                 success: false,
-                message: "Buying Order with this po code doesn't exists",
+                message: "Purchase Order with this po code doesn't exists",
                 data: {}
             });
         }

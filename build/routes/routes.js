@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const vendor_route_1 = __importDefault(require("./vendor.route"));
 const sku_route_1 = __importDefault(require("./sku.route"));
-// import buyingOrderRouter from "./buying-order.route"
+const inventory_route_1 = __importDefault(require("./inventory.route"));
+const purchase_order_route_1 = __importDefault(require("./purchase-order.route"));
 const attachment_route_1 = __importDefault(require("./attachment.route"));
 const auth_route_1 = __importDefault(require("./auth.route"));
 // import reconcillationRouter from "./reconcillation.route"
@@ -18,7 +19,8 @@ router.get("/", (req, res) => {
 });
 router.use("/vendor", vendor_route_1.default);
 router.use("/sku", sku_route_1.default);
-// router.use("/buying-order", buyingOrderRouter)
+router.use("/inventory", inventory_route_1.default);
+router.use("/purchase-order", purchase_order_route_1.default);
 router.use("/attachment", attachment_route_1.default);
 router.use("/auth", auth_route_1.default);
 // router.use("/reconcillation", reconcillationRouter)

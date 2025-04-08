@@ -10,9 +10,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder")); // Assuming you have a BuyingOrder model
 const SKU_1 = __importDefault(require("./sku/SKU"));
-let BuyingOrderRecord = class BuyingOrderRecord extends sequelize_typescript_1.Model {
+const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder"));
+let PurchaseOrderRecord = class PurchaseOrderRecord extends sequelize_typescript_1.Model {
 };
 __decorate([
     sequelize_typescript_1.AutoIncrement,
@@ -20,47 +20,49 @@ __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], BuyingOrderRecord.prototype, "id", void 0);
+], PurchaseOrderRecord.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], BuyingOrderRecord.prototype, "expectedQty", void 0);
+], PurchaseOrderRecord.prototype, "expectedQty", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.DECIMAL(10, 2) })
-], BuyingOrderRecord.prototype, "unitCost", void 0);
+], PurchaseOrderRecord.prototype, "unitCost", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.DECIMAL(5, 2) })
-], BuyingOrderRecord.prototype, "gst", void 0);
+], PurchaseOrderRecord.prototype, "gst", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], BuyingOrderRecord.prototype, "short", void 0);
+], PurchaseOrderRecord.prototype, "short", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], BuyingOrderRecord.prototype, "damaged", void 0);
+], PurchaseOrderRecord.prototype, "damaged", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], BuyingOrderRecord.prototype, "excess", void 0);
+], PurchaseOrderRecord.prototype, "excess", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => SKU_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], BuyingOrderRecord.prototype, "skuId", void 0);
+], PurchaseOrderRecord.prototype, "skuId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => PurchaseOrder_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.INTEGER
     })
-], BuyingOrderRecord.prototype, "buyingOrderId", void 0);
+], PurchaseOrderRecord.prototype, "purchaseOrderId", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
-], BuyingOrderRecord.prototype, "sku", void 0);
+], PurchaseOrderRecord.prototype, "sku", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => PurchaseOrder_1.default)
-], BuyingOrderRecord.prototype, "buyingOrder", void 0);
-BuyingOrderRecord = __decorate([
-    sequelize_typescript_1.Table
-], BuyingOrderRecord);
-exports.default = BuyingOrderRecord;
+], PurchaseOrderRecord.prototype, "purchaseOrder", void 0);
+PurchaseOrderRecord = __decorate([
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'purchase_order_record'
+    })
+], PurchaseOrderRecord);
+exports.default = PurchaseOrderRecord;

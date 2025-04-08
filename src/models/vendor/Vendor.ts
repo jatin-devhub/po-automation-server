@@ -1,5 +1,6 @@
 import { AllowNull, AutoIncrement, Column, CreatedAt, DataType, HasMany, HasOne, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
 import VendorProfile from "./VendorProfile";
+import SKU from "../sku/SKU";
 // import SKU from "../SKU";
 // import BuyingOrder from "../BuyingOrder";
 
@@ -35,11 +36,13 @@ export default class Vendor extends Model {
     })
     companyName!: string;
 
-    // @HasMany(() => SKU)
-    // skus!: SKU[];
+    @Column({
+        type: DataType.STRING
+    })
+    brandName!: string;
 
-    // @HasMany(() => BuyingOrder)
-    // buyingOrders!: BuyingOrder[]
+    @HasMany(() => SKU)
+    skus!: SKU[];
 
     @HasOne(() => VendorProfile)
     profile!: VendorProfile;

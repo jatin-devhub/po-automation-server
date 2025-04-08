@@ -7,7 +7,8 @@ import SKUDetails from './SKUDetails';
 import Inventory from './Inventory';
 
 @Table({
-    tableName: 'sku'
+    tableName: 'sku',
+    timestamps: false
 })
 export default class SKU extends Model {
     @AutoIncrement
@@ -26,6 +27,10 @@ export default class SKU extends Model {
 
     @Column({ type: DataType.STRING })
     name!: string;
+
+    @Default(false)
+    @Column({ type: DataType.BOOLEAN })
+    isCombo!: boolean;
 
     @Column({ type: DataType.STRING })
     ean!: string;

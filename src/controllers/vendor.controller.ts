@@ -14,6 +14,9 @@ import VendorAttachments from "../models/vendor/VendorAttachments";
 import AttachmentMapping from "../models/attachment/AttachmentMapping";
 import Attachment from "../models/attachment/Attachment";
 import Comment from "../models/Comment";
+import SKU from "../models/sku/SKU";
+import SKUDetails from "../models/sku/SKUDetails";
+import SKUDimensions from "../models/sku/SKUDimensions";
 
 export const vendorRegistrationStart: RequestHandler = async (req, res) => {
     const t = await connection.transaction();
@@ -403,6 +406,13 @@ export const getVendor: RequestHandler = async (req, res) => {
                         },
                         { model: Comment }
                     ]
+                },
+                {
+                    model: SKU,
+                    include: [{ 
+                        model: SKUDetails,
+                        include: [{ model: SKUDimensions }]
+                    }]
                 }
             ]
         });
@@ -420,7 +430,9 @@ export const getVendor: RequestHandler = async (req, res) => {
             data: {
                 vendor: {
                     companyName: vendor?.companyName,
+                    brandName: vendor?.brandName,
                     productCategory: vendor?.productCategory,
+                    vendorCode: vendor?.vendorCode,
                     contactPersonName: contactPerson?.name,
                     contactPersonEmail: contactPerson?.email,
                     contactPersonPhone: contactPerson?.phoneNumber,
@@ -461,7 +473,8 @@ export const getVendor: RequestHandler = async (req, res) => {
                         value: other.otherValue,
                         attachment: other?.otherAttachment?.attachment
                     })),
-                    comment: vendorProfile?.comment?.comment
+                    comment: vendorProfile?.comment?.comment,
+                    skus: vendor?.skus
                 },
             },
         });

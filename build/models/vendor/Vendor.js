@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const VendorProfile_1 = __importDefault(require("./VendorProfile"));
+const SKU_1 = __importDefault(require("../sku/SKU"));
 // import SKU from "../SKU";
 // import BuyingOrder from "../BuyingOrder";
 let Vendor = class Vendor extends sequelize_typescript_1.Model {
@@ -42,6 +43,14 @@ __decorate([
         type: sequelize_typescript_1.DataType.STRING
     })
 ], Vendor.prototype, "companyName", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING
+    })
+], Vendor.prototype, "brandName", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => SKU_1.default)
+], Vendor.prototype, "skus", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasOne)(() => VendorProfile_1.default)
 ], Vendor.prototype, "profile", void 0);

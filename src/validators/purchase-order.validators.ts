@@ -1,24 +1,19 @@
 import { RequestHandler } from "express";
 import Joi from "joi";
-import BuyingOrder from "../models/BuyingOrder";
+import PurchaseOrder from "../models/PurchaseOrder";
 
 export const validateNew: RequestHandler = async (req, res, next) => {
     try {
-        const newBuyingOrderSchema = Joi.object({
+        const newPurchaseOrderSchema = Joi.object({
             poCode: Joi.string().required(),
             currency: Joi.string().required(),
             paymentTerms: Joi.string(),
             estimatedDeliveryDate: Joi.string(),
             records: Joi.any().required(),
             vendorCode: Joi.string(),
-            createdBy: Joi.string().email().required(),
-            poAttachment: Joi.any().required()
+            createdBy: Joi.string().email().required()
         });
-        const files = req.files as Express.Multer.File[];
-        for (const file of files) {
-            req.body[file.fieldname] = file
-        }
-        const value = await newBuyingOrderSchema.validateAsync(req.body);
+        await newPurchaseOrderSchema.validateAsync(req.body);
         next();
 
     } catch (error: any) {
@@ -40,7 +35,7 @@ export const validateReview: RequestHandler = async (req, res, next) => {
 
         const value = await validateVendorCode.validateAsync(req.body);
         const poCode = value.poCode;
-        const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
+        const buyingOrder = await PurchaseOrder.findOne({ where: { poCode } })
         if (buyingOrder)
             next();
         else {
@@ -68,13 +63,13 @@ export const validatePOCode: RequestHandler = async (req, res, next) => {
 
         const value = await validatePOCode.validateAsync(req.params);
         const poCode = value.poCode;
-        const buyingOrder = await BuyingOrder.findOne({ where: { poCode } })
-        if (buyingOrder)
+        const purchaseOrder = await PurchaseOrder.findOne({ where: { poCode } })
+        if (purchaseOrder)
             next();
         else {
             return res.status(404).json({
                 success: false,
-                message: "Buying Order with this po code doesn't exists",
+                message: "Purchase Order with this po code doesn't exists",
                 data: {}
             })
         }
@@ -95,7 +90,7 @@ export const validatePOId: RequestHandler = async (req, res, next) => {
         });
 
         const { poId } = await validatePOCode.validateAsync(req.params);
-        const buyingOrder = await BuyingOrder.findOne({ where: { id: poId } })
+        const buyingOrder = await PurchaseOrder.findOne({ where: { id: poId } })
         if (buyingOrder)
             next();
         else {

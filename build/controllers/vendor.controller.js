@@ -25,6 +25,9 @@ const VendorAttachments_1 = __importDefault(require("../models/vendor/VendorAtta
 const AttachmentMapping_1 = __importDefault(require("../models/attachment/AttachmentMapping"));
 const Attachment_1 = __importDefault(require("../models/attachment/Attachment"));
 const Comment_1 = __importDefault(require("../models/Comment"));
+const SKU_1 = __importDefault(require("../models/sku/SKU"));
+const SKUDetails_1 = __importDefault(require("../models/sku/SKUDetails"));
+const SKUDimensions_1 = __importDefault(require("../models/sku/SKUDimensions"));
 const vendorRegistrationStart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const t = yield connection_1.default.transaction();
     try {
@@ -331,6 +334,13 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                         },
                         { model: Comment_1.default }
                     ]
+                },
+                {
+                    model: SKU_1.default,
+                    include: [{
+                            model: SKUDetails_1.default,
+                            include: [{ model: SKUDimensions_1.default }]
+                        }]
                 }
             ]
         });
@@ -346,7 +356,9 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             data: {
                 vendor: {
                     companyName: vendor === null || vendor === void 0 ? void 0 : vendor.companyName,
+                    brandName: vendor === null || vendor === void 0 ? void 0 : vendor.brandName,
                     productCategory: vendor === null || vendor === void 0 ? void 0 : vendor.productCategory,
+                    vendorCode: vendor === null || vendor === void 0 ? void 0 : vendor.vendorCode,
                     contactPersonName: contactPerson === null || contactPerson === void 0 ? void 0 : contactPerson.name,
                     contactPersonEmail: contactPerson === null || contactPerson === void 0 ? void 0 : contactPerson.email,
                     contactPersonPhone: contactPerson === null || contactPerson === void 0 ? void 0 : contactPerson.phoneNumber,
@@ -390,7 +402,8 @@ const getVendor = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                             attachment: (_a = other === null || other === void 0 ? void 0 : other.otherAttachment) === null || _a === void 0 ? void 0 : _a.attachment
                         });
                     }),
-                    comment: (_g = vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.comment) === null || _g === void 0 ? void 0 : _g.comment
+                    comment: (_g = vendorProfile === null || vendorProfile === void 0 ? void 0 : vendorProfile.comment) === null || _g === void 0 ? void 0 : _g.comment,
+                    skus: vendor === null || vendor === void 0 ? void 0 : vendor.skus
                 },
             },
         });
