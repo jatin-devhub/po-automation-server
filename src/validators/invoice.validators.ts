@@ -16,7 +16,7 @@ export const validateNewInvoice: RequestHandler = async (req, res, next) => {
             invoiceDate: Joi.date().required(),
             grnRecords: Joi.array().items(
                 Joi.object({
-                    skuCode: Joi.number().required()
+                    skuCode: Joi.string().required()
                         .external(async (value) => {
                             const tempSKU = await SKU.findOne({ where: { skuCode: value } });
                             if (!tempSKU) {

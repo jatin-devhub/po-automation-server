@@ -28,7 +28,7 @@ const validateNewInvoice = (req, res, next) => __awaiter(void 0, void 0, void 0,
             })),
             invoiceDate: joi_1.default.date().required(),
             grnRecords: joi_1.default.array().items(joi_1.default.object({
-                skuCode: joi_1.default.number().required()
+                skuCode: joi_1.default.string().required()
                     .external((value) => __awaiter(void 0, void 0, void 0, function* () {
                     const tempSKU = yield SKU_1.default.findOne({ where: { skuCode: value } });
                     if (!tempSKU) {
