@@ -26,13 +26,10 @@ export default class PurchaseOrderRecord extends Model {
     gst!: number;
 
     @Column({ type: DataType.INTEGER })
-    short!: number;
+    receivedQty!: number;
 
     @Column({ type: DataType.INTEGER })
     damaged!: number;
-
-    @Column({ type: DataType.INTEGER })
-    excess!: number;
 
     @ForeignKey(() => SKU)
     @Column({

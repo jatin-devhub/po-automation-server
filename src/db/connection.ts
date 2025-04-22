@@ -18,6 +18,7 @@ import * as mysql from "mysql2";
 import Inventory from "../models/sku/Inventory";
 import PurchaseOrder from "../models/PurchaseOrder";
 import PurchaseOrderRecord from "../models/PurchaseOrderRecord";
+import Invoice from "../models/Invoice";
 
 const connection = new Sequelize({
   dialect: "mysql",
@@ -28,7 +29,7 @@ const connection = new Sequelize({
   database: process.env.DB_NAME,
   // database: 'brand_analytics',
   port: 3306,
-  models: [Attachment, AttachmentChunk, AttachmentMapping, Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, VendorDocuments, VendorProfile, SKU, SKUDetails, SKUDimensions, Comment, Inventory, PurchaseOrder, PurchaseOrderRecord]
+  models: [Attachment, AttachmentChunk, AttachmentMapping, Vendor, ContactPerson, VendorAddress, VendorBank, VendorOther, VendorDocuments, VendorProfile, SKU, SKUDetails, SKUDimensions, Comment, Inventory, PurchaseOrder, PurchaseOrderRecord, Invoice]
 });
  
 // connection.sync({ alter: true }); 

@@ -37,7 +37,7 @@ const validateNewInvoice = (req, res, next) => __awaiter(void 0, void 0, void 0,
                 })),
                 receivedQty: joi_1.default.number().required(),
                 damaged: joi_1.default.number().required(),
-                expiryDate: joi_1.default.string().required()
+                expiryDate: joi_1.default.string()
             }))
         });
         // const files = req.files as Express.Multer.File[];

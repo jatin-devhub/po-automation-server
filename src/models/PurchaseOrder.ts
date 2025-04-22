@@ -2,6 +2,7 @@ import { Model, Table, HasMany, AllowNull, AutoIncrement, PrimaryKey, Column, Da
 import AttachmentMapping from './attachment/AttachmentMapping';
 import PurchaseOrderRecord from './PurchaseOrderRecord';
 import VendorProfile from './vendor/VendorProfile';
+import Invoice from './Invoice';
 
 @Table({
     tableName: 'purchase_order',
@@ -58,8 +59,8 @@ export default class PurchaseOrder extends Model {
     })
     closed!: boolean
 
-    // @HasMany(() => Invoice)
-    // invoices!: Invoice[];
+    @HasMany(() => Invoice)
+    invoices!: Invoice[];
 
     @HasMany(() => PurchaseOrderRecord)
     records?: PurchaseOrderRecord[];
