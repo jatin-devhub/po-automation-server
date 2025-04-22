@@ -42,7 +42,7 @@ const getInventory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 "Model Number": details ? details.modelNumber : null,
                 "Current Inventory": sku.inventory ? sku.inventory.map(inv => ({
                     count: inv.quantity,
-                    expiry: inv.expiry,
+                    expiry: inv.expiryDate,
                 })) : []
             };
         });

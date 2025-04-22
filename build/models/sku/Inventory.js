@@ -34,15 +34,15 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.DATE,
-        allowNull: false,
     })
-], Inventory.prototype, "expiry", void 0);
+], Inventory.prototype, "expiryDate", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => SKU_1.default)
 ], Inventory.prototype, "sku", void 0);
 Inventory = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: 'inventory'
+        tableName: 'inventory',
+        timestamps: false
     })
 ], Inventory);
 exports.default = Inventory;

@@ -13,6 +13,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const AttachmentMapping_1 = __importDefault(require("./attachment/AttachmentMapping"));
 const PurchaseOrderRecord_1 = __importDefault(require("./PurchaseOrderRecord"));
 const VendorProfile_1 = __importDefault(require("./vendor/VendorProfile"));
+const Invoice_1 = __importDefault(require("./Invoice"));
 let PurchaseOrder = class PurchaseOrder extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -65,6 +66,9 @@ __decorate([
         type: sequelize_typescript_1.DataType.BOOLEAN
     })
 ], PurchaseOrder.prototype, "closed", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Invoice_1.default)
+], PurchaseOrder.prototype, "invoices", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => PurchaseOrderRecord_1.default)
 ], PurchaseOrder.prototype, "records", void 0);

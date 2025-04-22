@@ -35,13 +35,10 @@ __decorate([
 ], PurchaseOrderRecord.prototype, "gst", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], PurchaseOrderRecord.prototype, "short", void 0);
+], PurchaseOrderRecord.prototype, "receivedQty", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
 ], PurchaseOrderRecord.prototype, "damaged", void 0);
-__decorate([
-    (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.INTEGER })
-], PurchaseOrderRecord.prototype, "excess", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => SKU_1.default),
     (0, sequelize_typescript_1.Column)({

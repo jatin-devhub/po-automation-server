@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const PurchaseOrder_1 = __importDefault(require("./PurchaseOrder"));
+const AttachmentMapping_1 = __importDefault(require("./attachment/AttachmentMapping"));
 let Invoice = class Invoice extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -20,6 +21,17 @@ __decorate([
         type: sequelize_typescript_1.DataType.INTEGER
     })
 ], Invoice.prototype, "id", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+    })
+], Invoice.prototype, "invoiceDate", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => AttachmentMapping_1.default, {
+        foreignKey: 'entityId',
+        scope: { attachmentType: 'invoiceAttachment' }
+    })
+], Invoice.prototype, "invoiceAttachment", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => PurchaseOrder_1.default),
     (0, sequelize_typescript_1.Column)({

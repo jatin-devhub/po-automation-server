@@ -59,7 +59,7 @@ const newPurchaseOrder = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const purchaseRecordsData = [];
         // Process each record: validate SKU, update SKUDetail, and collect record data
         for (const record of orderRecords) {
-            const sku = skuMap.get(record.skuCode);
+            const sku = skuMap.get(record.skuCode + '');
             if (!sku) {
                 yield transaction.rollback();
                 return res.status(404).json({ error: `SKU not found for skuCode: ${record.skuCode}` });
@@ -171,24 +171,34 @@ const applyReview = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.applyReview = applyReview;
 const getPODetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const { poCode } = req.params;
-        const buyingOrder = yield PurchaseOrder_2.default.findOne({
+        const purchaseOrder = yield PurchaseOrder_2.default.findOne({
             where: { poCode }, include: [
                 {
-                    model: Vendor_1.default,
-                    include: []
-                }, {
-                    model: PurchaseOrderRecord_1.default
+                    model: PurchaseOrderRecord_1.default,
+                    include: [
+                        {
+                            model: SKU_1.default
+                        }
+                    ]
                 }
             ]
         });
-        // const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
-        // const vendor = await Vendor.findOne({where: {}})
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
             message: `Your details have been fetched`,
-            data: { buyingOrder },
+            data: {
+                records: (_a = purchaseOrder === null || purchaseOrder === void 0 ? void 0 : purchaseOrder.records) === null || _a === void 0 ? void 0 : _a.map((record) => {
+                    var _a, _b;
+                    return {
+                        expectedQty: record.expectedQty,
+                        skuCode: (_a = record.sku) === null || _a === void 0 ? void 0 : _a.skuCode,
+                        name: (_b = record.sku) === null || _b === void 0 ? void 0 : _b.name
+                    };
+                })
+            },
         });
     }
     catch (error) {
@@ -196,7 +206,7 @@ const getPODetails = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             success: false,
             message: error.message,
             data: {
-                "source": "sku.controller.js -> applyReview"
+                "source": "purchase-order.controller.js -> getPODetails"
             },
         });
     }

@@ -14,17 +14,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateNewInvoice = void 0;
 const joi_1 = __importDefault(require("joi"));
+const SKU_1 = __importDefault(require("../models/sku/SKU"));
+const PurchaseOrder_1 = __importDefault(require("../models/PurchaseOrder"));
 const validateNewInvoice = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newInvoiceSchema = joi_1.default.object({
-            poCode: joi_1.default.string().required(),
-            invoiceDate: joi_1.default.date().required()
+            poCode: joi_1.default.string().required()
+                .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                const tempPO = yield PurchaseOrder_1.default.findOne({ where: { poCode: value } });
+                if (!tempPO) {
+                    throw new Error("PO Code is not valid.");
+                }
+            })),
+            invoiceDate: joi_1.default.date().required(),
+            grnRecords: joi_1.default.array().items(joi_1.default.object({
+                skuCode: joi_1.default.number().required()
+                    .external((value) => __awaiter(void 0, void 0, void 0, function* () {
+                    const tempSKU = yield SKU_1.default.findOne({ where: { skuCode: value } });
+                    if (!tempSKU) {
+                        throw new Error("SKU Code is not valid.");
+                    }
+                })),
+                receivedQty: joi_1.default.number().required(),
+                damaged: joi_1.default.number().required(),
+                expiryDate: joi_1.default.string().required()
+            }))
         });
-        const files = req.files;
-        for (const file of files) {
-            req.body[file.fieldname] = file;
-        }
-        const value = yield newInvoiceSchema.validateAsync(req.body);
+        // const files = req.files as Express.Multer.File[];
+        // for (const file of files) {
+        //     req.body[file.fieldname] = file
+        // }
+        req.body.grnRecords = JSON.parse(req.body.grnRecords);
+        yield newInvoiceSchema.validateAsync(req.body);
         next();
     }
     catch (error) {

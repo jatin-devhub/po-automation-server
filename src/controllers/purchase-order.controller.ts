@@ -11,84 +11,84 @@ import connection from "../db/connection";
 import SKUDetails from "../models/sku/SKUDetails";
 
 export const newPurchaseOrder: RequestHandler = async (req, res) => {
-  const transaction = await connection.transaction();
-  try {
-    const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy } = req.body;
+    const transaction = await connection.transaction();
+    try {
+        const { poCode, currency, paymentTerms, estimatedDeliveryDate, records, vendorCode, createdBy } = req.body;
 
-    // Retrieve the vendor and its corresponding profile (1:1 mapping)
-    const vendor = await Vendor.findOne({ where: { vendorCode }, transaction });
-    if (!vendor) {
-      await transaction.rollback();
-      return res.status(404).json({ error: 'Vendor not found' });
-    }
+        // Retrieve the vendor and its corresponding profile (1:1 mapping)
+        const vendor = await Vendor.findOne({ where: { vendorCode }, transaction });
+        if (!vendor) {
+            await transaction.rollback();
+            return res.status(404).json({ error: 'Vendor not found' });
+        }
 
-    const vendorProfile = await VendorProfile.findOne({ where: { vendorId: vendor.id }, transaction });
-    if (!vendorProfile) {
-      await transaction.rollback();
-      return res.status(404).json({ error: 'Vendor Profile not found' });
-    }
+        const vendorProfile = await VendorProfile.findOne({ where: { vendorId: vendor.id }, transaction });
+        if (!vendorProfile) {
+            await transaction.rollback();
+            return res.status(404).json({ error: 'Vendor Profile not found' });
+        }
 
-    // Create the Purchase Order with the vendor profile ID
-    const purchaseOrder = await PurchaseOrder.create({
-      poCode,
-      currency,
-      paymentTerms,
-      estimatedDeliveryDate,
-      createdBy,
-      verificationLevel: 'Buyer',
-      vendorProfileId: vendorProfile.id
-    }, { transaction });
+        // Create the Purchase Order with the vendor profile ID
+        const purchaseOrder = await PurchaseOrder.create({
+            poCode,
+            currency,
+            paymentTerms,
+            estimatedDeliveryDate,
+            createdBy,
+            verificationLevel: 'Buyer',
+            vendorProfileId: vendorProfile.id
+        }, { transaction });
 
-    // Parse the JSON records
-    const orderRecords = JSON.parse(records);
+        // Parse the JSON records
+        const orderRecords = JSON.parse(records);
 
-    // For efficiency, extract all skuCodes from records
-    const skuCodes = orderRecords.map((r: any) => r.skuCode);
+        // For efficiency, extract all skuCodes from records
+        const skuCodes = orderRecords.map((r: any) => r.skuCode);
 
-    // Retrieve all matching SKUs in one query
-    const skus = await SKU.findAll({ where: { skuCode: skuCodes }, transaction });
-    const skuMap = new Map(skus.map(sku => [sku.skuCode, sku]));
+        // Retrieve all matching SKUs in one query
+        const skus = await SKU.findAll({ where: { skuCode: skuCodes }, transaction });
+        const skuMap = new Map(skus.map(sku => [sku.skuCode, sku]));
 
-    // Prepare data for bulk creation of purchase order records
-    const purchaseRecordsData: Array<{
-      expectedQty: number;
-      unitCost: number;
-      gst: number;
-      purchaseOrderId: number;
-      skuId: number;
-    }> = [];
+        // Prepare data for bulk creation of purchase order records
+        const purchaseRecordsData: Array<{
+            expectedQty: number;
+            unitCost: number;
+            gst: number;
+            purchaseOrderId: number;
+            skuId: number;
+        }> = [];
 
-    // Process each record: validate SKU, update SKUDetail, and collect record data
-    for (const record of orderRecords) {
-      const sku = skuMap.get(record.skuCode);
-      if (!sku) {
-        await transaction.rollback();
-        return res.status(404).json({ error: `SKU not found for skuCode: ${record.skuCode}` });
-      }
+        // Process each record: validate SKU, update SKUDetail, and collect record data
+        for (const record of orderRecords) {
+            const sku = skuMap.get(record.skuCode+'');
+            if (!sku) {
+                await transaction.rollback();
+                return res.status(404).json({ error: `SKU not found for skuCode: ${record.skuCode}` });
+            }
 
-      // Update the one-to-one SKUDetail record with gst and mrp values
-      await SKUDetails.update(
-        { gst: record.gst, mrp: record.mrp },
-        { where: { skuId: sku.id }, transaction }
-      );
+            // Update the one-to-one SKUDetail record with gst and mrp values
+            await SKUDetails.update(
+                { gst: record.gst, mrp: record.mrp },
+                { where: { skuId: sku.id }, transaction }
+            );
 
-      // Prepare the purchase order record (adjust field names as necessary)
-      purchaseRecordsData.push({
-        expectedQty: record.expectedQty,
-        unitCost: record.unitCost,
-        gst: record.gst,
-        purchaseOrderId: purchaseOrder.id,
-        skuId: sku.id
-      });
-    }
+            // Prepare the purchase order record (adjust field names as necessary)
+            purchaseRecordsData.push({
+                expectedQty: record.expectedQty,
+                unitCost: record.unitCost,
+                gst: record.gst,
+                purchaseOrderId: purchaseOrder.id,
+                skuId: sku.id
+            });
+        }
 
-    // Bulk create purchase order records
-    await PurchaseOrderRecord.bulkCreate(purchaseRecordsData, { transaction });
+        // Bulk create purchase order records
+        await PurchaseOrderRecord.bulkCreate(purchaseRecordsData, { transaction });
 
-    // Commit the transaction if everything passes
-    await transaction.commit();
-    
-    // const mailSent = await sendMailSetup(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
+        // Commit the transaction if everything passes
+        await transaction.commit();
+
+        // const mailSent = await sendMailSetup(buyingOrder.poCode, 'buyer-approval', undefined, undefined, poFile);
 
         // if (mailSent)
         return res.status(201).json({
@@ -96,24 +96,24 @@ export const newPurchaseOrder: RequestHandler = async (req, res) => {
             message: `Your Purchase Order has been successfully added`,
             data: { purchaseOrder },
         });
-    // else
-    //     return res.status(404).json({
-    //         success: false,
-    //         message: `Unable to send email.`,
-    //         data: {
-    //             mailSent
-    //         }
-    //     })
-  } catch (error: any) {
-    await transaction.rollback();
-    return res.status(504).json({
-        success: false,
-        message: error.message,
-        data: {
-            "source": "purchase-order.controller.js -> newPurchaseOrder"
-        },
-    });
-  }
+        // else
+        //     return res.status(404).json({
+        //         success: false,
+        //         message: `Unable to send email.`,
+        //         data: {
+        //             mailSent
+        //         }
+        //     })
+    } catch (error: any) {
+        await transaction.rollback();
+        return res.status(504).json({
+            success: false,
+            message: error.message,
+            data: {
+                "source": "purchase-order.controller.js -> newPurchaseOrder"
+            },
+        });
+    }
 };
 
 
@@ -201,26 +201,31 @@ export const getPODetails: RequestHandler = async (req, res) => {
     try {
         const { poCode } = req.params;
 
-        const buyingOrder = await PurchaseOrder.findOne({
+        const purchaseOrder = await PurchaseOrder.findOne({
             where: { poCode }, include: [
                 {
-                    model: Vendor,
-                    include: []
-                }, {
-                    model: PurchaseOrderRecord
+                    model: PurchaseOrderRecord,
+                    include: [
+                        {
+                            model: SKU
+                        }
+                    ]
                 }
             ]
         })
 
-        // const poFile = await File.findOne({ where: { buyingOrderId: buyingOrder?.id } }) || undefined
-
-        // const vendor = await Vendor.findOne({where: {}})
-
-
-        return res.status(201).json({
+        return res.status(200).json({
             success: true,
             message: `Your details have been fetched`,
-            data: { buyingOrder },
+            data: {
+                records: purchaseOrder?.records?.map((record) => {
+                    return {
+                        expectedQty: record.expectedQty,
+                        skuCode: record.sku?.skuCode,
+                        name: record.sku?.name
+                    }
+                })
+            },
         });
 
     } catch (error: any) {
@@ -228,11 +233,10 @@ export const getPODetails: RequestHandler = async (req, res) => {
             success: false,
             message: error.message,
             data: {
-                "source": "sku.controller.js -> applyReview"
+                "source": "purchase-order.controller.js -> getPODetails"
             },
         });
     }
-
 }
 
 const getUniquePOCode = async () => {
